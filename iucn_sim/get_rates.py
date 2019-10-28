@@ -13,25 +13,30 @@ import pandas as pd
 np.random.seed(1234)
 import argparse
 
-p = argparse.ArgumentParser()
-p.add_argument('-input_data', help='Path to generation length (GL) data: first column taxon list, followed by n columns of GL values', default=None, required=True)
-args = p.parse_args()
+def add_arguments(parser):
+    parser.add_argument(
+        '--input_data',
+        required=True,
+        help="Path to generation length (GL) data: first column taxon list, followed by n columns of GL values."
+    )
 
 
-args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_all_mammals.txt'
 
-# get user input
-input_data = args.input_data
-taxon_reference_group = 'Mammalia'
-n_years = 81
-n_rep = 0
+def main(args):
+	#args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_all_mammals.txt'
 
-data = pd.read_csv(input_data,sep='\t')
-species_list = data.iloc[:,0].values
-gl_matrix = data.iloc[:,1:].values
-if n_rep:
-    sim_reps = n_rep
-else:
-    sim_reps = gl_matrix.shape[1]
-    
-print('Preparing data for %i simulation replicates'%sim_reps)
+	# get user input
+	input_data = args.input_data
+	taxon_reference_group = 'Mammalia'
+	n_years = 81
+	n_rep = 0
+
+	data = pd.read_csv(input_data,sep='\t')
+	species_list = data.iloc[:,0].values
+	gl_matrix = data.iloc[:,1:].values
+	if n_rep:
+		sim_reps = n_rep
+	else:
+		sim_reps = gl_matrix.shape[1]
+		
+	print('Preparing data for %i simulation replicates'%sim_reps)
