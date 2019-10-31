@@ -15,8 +15,6 @@ import subprocess
 import os, glob
 import datetime
 import sys
-sys.path.append('/Users/tobias/GitHub/iucn_predictions/src/')
-import functions as cust_func
 
 
 # get extinction probs_________________________________________________________
@@ -57,11 +55,6 @@ def add_arguments(parser):
         help="Provide the taxonomic rank of the provided reference group(s). E.g. in case of 'Mammalia', provide 'class' for this flag, in case of 'Rodentia,Chiroptera' provide 'order,order'. Has to be at least 'Family' or above. This flag is not needed if species list is provided as reference_group or if reference group is already pre-compiled."
     )
     parser.add_argument(
-        '--n_years',
-        default=100,
-        help="How many years to simulate into the future."
-    )
-    parser.add_argument(
         '--n_rep',
         default=0,
         help="How many independent simulation replicates to run (default == number of provided GL value columns per species under 'input_data' flag)."
@@ -77,11 +70,6 @@ def add_arguments(parser):
         help="Provide path to outdir where results will be saved."
     )
     parser.add_argument(
-        '--outdir',
-        required=True,
-        help="Provide path to outdir where results will be saved."
-    )
-    parser.add_argument(
         '--github_repo',
         required=True,
         help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files and updated functions. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
@@ -89,13 +77,20 @@ def add_arguments(parser):
     parser.add_argument(
         '--allow_precompiled_iucn_data',
         default=1,
-        help="Set this flag to 0 if you want to avoid using precompiled IUCN history data. By default this data is used if available for your specified reference organism group."
+        help="Set this flag to 0 if you want to avoid using precompiled IUCN history data. By default (1) this data is used if available for your specified reference organism group."
     )
     parser.add_argument(
         '--rate_sampling_range',
         default=100,
         help="Set the range of status change rate sampling. Default = 100 will sample from a uniform distribution centered at the Maximum Likelihood Estimate (MLE) with a range of MLE/100 and MLE*100."
     )
+    parser.add_argument(
+        '--rate_bins',
+        default=10000,
+        help="Set number of bins from which to sample the status transition rates (default=10000)."
+    )
+    
+    
 def main(args):
 
 #    import argparse
@@ -112,26 +107,29 @@ def main(args):
 #    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator'
 #    args.allow_precompiled_iucn_data = 1
 #    args.rate_sampling_range = 100
+#    args.rate_bins = 10000
     
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
     reference_rank = args.reference_rank
-    n_years = args.n_years
     n_rep = args.n_rep
     iucn_key = args.iucn_key
     outdir = args.outdir
     github_repo = args.github_repo
     allow_precompiled_iucn_data = args.allow_precompiled_iucn_data
     rate_sampling_range = args.rate_sampling_range
-    
+    rate_bins = args.rate_bins
+
+    sys.path.append('%s/src/'%github_repo)
+    import functions as cust_func
+ 
 #    taxon_reference_group = 'Equidae,Elephantidae'
 #    reference_rank = 'family,family'
-    taxon_reference_group = 'Mammalia'
-    reference_rank = 'class'
+#    taxon_reference_group = 'Mammalia'
+#    reference_rank = 'class'
 #    taxon_reference_group = 'Rodentia'
 #    reference_rank = 'order'
-
     
     taxon_reference_groups = taxon_reference_group.split(',')
     reference_ranks = reference_rank.split(',')
@@ -144,7 +142,7 @@ def main(args):
     species_list = gl_data.iloc[:,0].values
     gl_matrix = gl_data.iloc[:,1:].values
     
-    # get IUCN history
+    # get IUCN history_________________________________________________________
     iucn_outdir = os.path.join(outdir,'iucn_data')    
     if not os.path.exists(iucn_outdir):
         os.makedirs(iucn_outdir)
@@ -167,7 +165,7 @@ def main(args):
             iucn_history_files.append(os.path.join(iucn_outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
 
     
-    # process the IUCN history data
+    # process the IUCN history data____________________________________________
     iucn_start_year = 2000
     current_year = datetime.datetime.now().year  
     master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
@@ -189,7 +187,7 @@ def main(args):
     # replace EX with NaN
     master_stat_time_df.replace('EX', np.nan,inplace=True)
     # write IUCN history df to file
-    master_stat_time_df.to_csv(os.path.join(outdir,'iucn_history_reference_taxa.txt'),sep='\t')
+    master_stat_time_df.to_csv(os.path.join(iucn_outdir,'iucn_history_reference_taxa.txt'),sep='\t')
     # extract most recent valid status for each taxon
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
     # count current status distribution
@@ -203,22 +201,18 @@ def main(args):
     df_for_year_count = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict,iucn_start_year,current_year)
     # count years spent in each category for all species
     years_in_each_category = cust_func.get_years_spent_in_each_category(df_for_year_count)
-
-
-    # prepare data for simulations
-    if n_rep:
-        sim_reps = n_rep
-    else:
-        sim_reps = gl_matrix.shape[1]
-    print('Preparing data for %i simulation replicates'%sim_reps)
-
     # write the status change data to file
     final_years_count_array = np.array([list(years_in_each_category.keys()),list(years_in_each_category.values())]).T
     np.savetxt(os.path.join(outdir,'years_spent_in_each_category.txt'),final_years_count_array,fmt='%s\t%s')
     change_type_dict_array = np.array([list(change_type_dict.keys()),list(change_type_dict.values())]).T
     np.savetxt(os.path.join(outdir,'change_type_dict.txt'),change_type_dict_array,fmt='%s\t%s')   
 
-    # sample rates for all types of changes
+    # sample transition rates for all types of changes_________________________
+    if n_rep:
+        sim_reps = n_rep
+    else:
+        sim_reps = gl_matrix.shape[1]
+    print('Preparing data for %i simulation replicates'%sim_reps)
     status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
     for status_change in change_type_dict.keys():
         states = status_change.split('->')
@@ -226,7 +220,6 @@ def main(args):
         new_state = states[1]
         count = change_type_dict[status_change]
         status_change_coutn_df.loc[original_state,new_state] = count
-
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)])
     for status_a in status_change_coutn_df.columns:
         column = status_change_coutn_df[status_a]
@@ -234,19 +227,17 @@ def main(args):
             if not status_a == status_b:
                 count = column[status_b]
                 total_time = years_in_each_category[status_a]
-                rates = sample_rate(count, total_time, n_samples = 100, range_factor = 100, n_bins = 10000)
+                rates = sample_rate(count, total_time, n_samples = sim_reps, range_factor = rate_sampling_range, n_bins = rate_bins)
                 sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)]),ignore_index=True)
-    sampled_rates_df.iloc[:,1:] = sampled_rates_df.iloc[:,1:].apply(pd.to_numeric)
+    sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]].apply(pd.to_numeric)
     sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')
 
-
-
-
-    # get current status for all species we want to simulate
+    # get current status for all species we want to simulate___________________
     # get list of all species that we don't have IUCN data for already
     missing_species = np.array([species for species in species_list if not species in most_recent_status_dict.keys()])
     missing_species_file = os.path.join(outdir,'missing_species_list.txt')
     np.savetxt(missing_species_file,missing_species,fmt='%s')
+    # extract the current status for those missing species
     print('Extracting current status for missing species...')
     iucn_cmd = ['/usr/local/bin/Rscript','%s/src/r_scripts/get_current_iucn_status_missing_species.r'%github_repo, missing_species_file, iucn_key, iucn_outdir]
     iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
@@ -274,9 +265,7 @@ def main(args):
     if os.path.exists(missing_species_file):
         os.remove(missing_species_file)
 
-
-
-    # calculate EN and CR extinction risk for all species, using GL information
+    # calculate EN and CR extinction risk using GL information_________________
     # calculate yearly extinction risks for categories EN and CR
     en_risks = np.array([p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2) for gl_array in gl_matrix])
     if en_risks.shape[1] == 1:
@@ -286,7 +275,6 @@ def main(args):
     en_risks_df.species = species_list
     en_risks_df.iloc[:,1:] = en_risks
     en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
-    
     cr_risks = np.array([p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5) for gl_array in gl_matrix])
     if cr_risks.shape[1] == 1:
         cr_risks = np.array([cr_risks for i in range(sim_reps)])[:,:,0].T
