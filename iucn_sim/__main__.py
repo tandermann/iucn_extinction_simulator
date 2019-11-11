@@ -17,18 +17,19 @@ __author__ = "Tobias Andermann"
 # add_arguments() and main() functions.
 
 COMMANDS = [
-		'get_rates'
+		'get_rates',
+		'run_sim'
 ]
 
 
 def main(arguments=None):
 	logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-	parser = ArgumentParser(description=__doc__, prog='secapr')
+	parser = ArgumentParser(description=__doc__, prog='iucn_sim')
 	parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
 
 	subparsers = parser.add_subparsers()
 	for command_name in COMMANDS:
-		module = importlib.import_module('.' + command_name, 'secapr')
+		module = importlib.import_module('.' + command_name, 'iucn_sim')
 		subparser = subparsers.add_parser(command_name,
 			help=module.__doc__.split('\n')[1], description=module.__doc__)
 		subparser.set_defaults(func=module.main)

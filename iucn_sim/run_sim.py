@@ -162,7 +162,7 @@ def main(args):
     # plot histograms of extinction times
     with PdfPages(os.path.join(outdir,'extinction_time_histograms.pdf')) as pdf:
         for i,species in enumerate(te_array[:,0]):
-            print(species)
+            print('Plotting extinction histogram for',species)
             plt.figure()
             species_te_array = te_array[:,1:][i]
             not_na_values = species_te_array[~np.isnan(list(species_te_array))]

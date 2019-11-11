@@ -36,6 +36,8 @@ def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 100
     lik = get_loglik(count,tot_time,rates)
     lik = lik - np.max(lik)
     sample_rates = np.random.choice(rates,size=n_samples,p=np.exp(lik)/np.sum(np.exp(lik)),replace=1)
+    #plt.plot(np.log(rates),lik)
+    #np.log(mle)
     return sample_rates
 
 def add_arguments(parser):
