@@ -1,5 +1,5 @@
 {% set name = "iucn_sim" %}
-{% set version = "1.1" %}
+{% set version = "1.2" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,13 +7,14 @@ package:
 
 source:
   url: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/v{{ version }}.tar.gz
-  sha256: 09d44dc64f632376f9cb1af2e40cee0d381b7d53d83fe1fdacfa949bb7a535da
+  sha256: 747d87ffbc8c65c370085bcf6c4ea97839fd1009082eee0ace1ee5e8cbcd4092
 
 build:
+  noarch: python
   number: 0
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
   entry_points:
-    - secapr = secapr.__main__:main
+    - iucn_sim = iucn_sim.__main__:main
 
 requirements:
   host:
