@@ -159,7 +159,7 @@ def main(args):
         else:
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
-            iucn_cmd = ['/usr/local/bin/Rscript','%s/src/r_scripts/get_iucn_status_data_and_species_list.r'%github_repo, str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
+            iucn_cmd = ['Rscript','./r_scripts/get_iucn_status_data_and_species_list.r'%github_repo, str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
             iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
             with open(iucn_error_file, 'w') as err:
                 seqtk = subprocess.Popen(iucn_cmd, stderr = err)
@@ -241,7 +241,7 @@ def main(args):
     np.savetxt(missing_species_file,missing_species,fmt='%s')
     # extract the current status for those missing species
     print('Extracting current status for missing species...')
-    iucn_cmd = ['/usr/local/bin/Rscript','%s/src/r_scripts/get_current_iucn_status_missing_species.r'%github_repo, missing_species_file, iucn_key, iucn_outdir]
+    iucn_cmd = ['Rscript','./r_scripts/get_current_iucn_status_missing_species.r'%github_repo, missing_species_file, iucn_key, iucn_outdir]
     iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
     with open(iucn_error_file, 'w') as err:
         seqtk = subprocess.Popen(iucn_cmd, stderr = err)

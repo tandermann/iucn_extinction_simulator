@@ -20,12 +20,14 @@ requirements:
   host:
     - pip
     - python >=3.6
+    - r-base
   run:
     - python >=3.6
     - pandas
     - numpy
     - scipy
     - matplotlib
+    - r-base
     - r-rredlist
 
 test:

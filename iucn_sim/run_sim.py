@@ -15,6 +15,7 @@ np.random.seed(1234)
 import os, glob
 import datetime
 import sys
+import .functions as cust_func
 
 def add_arguments(parser):
     parser.add_argument(
@@ -69,10 +70,7 @@ def main(args):
     
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-
-    # add the custom functions to path
-    sys.path.append('%s/src/'%github_repo)
-    import functions as cust_func
+    
     
     species_list_status_file = os.path.join(indir,'iucn_data/current_status_all_species.txt')
     transition_rates_file = os.path.join(indir,'sampled_status_change_rates.txt')
