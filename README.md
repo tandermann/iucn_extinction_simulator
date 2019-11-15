@@ -12,11 +12,16 @@ The conda package manager creates an extremely light-weight virtual environment 
 
 2. Once miniconda is installed, open a command line terminal. Windows users will need to open the freshly installed **Anaconda Powershell Prompt** instead of the regular Command Prompt for this purpose.
 
-3. Install `iucn_sim` and all it's dependencies by typing `conda install iucn_sim` into the command line.
+3. Add the conda-forge and bioconda channels to conda, where some of the needed packages are hosted:
+	- `conda config --add channels conda-forge`
+	- `conda config --add channels bioconda`
 
-4. Test if installation worked by typing `iucn_sim -h`. This should show an overview of the available arguments of `iucn_sim`.
+4. Install `iucn_sim` and all it's dependencies by typing the following into the command line:
+	- `conda install iucn_sim`
 
-5. If step 4 caused an error something went wrong along the way. If you are a Linux or Mac user, you can instead install `iucn_sim` by [downloading this GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip) and building the software by typing `python setup.py install`. You will need to make sure yourself that Python3 and R are installed, including the R package `rredlist`.
+5. Test if installation worked by typing `iucn_sim -h`. This should show an overview of the available arguments of `iucn_sim`.
+
+6. If step 4 caused an error something went wrong along the way. If you are a Linux or Mac user, you can instead install `iucn_sim` by [downloading this GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip) and building the software by typing `python setup.py install`. You will need to make sure yourself that Python3 and R are installed, including the R package `rredlist`.
 
 ## Required input data:
 
