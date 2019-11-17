@@ -6,12 +6,6 @@ group_rank = args[2]
 iucn_key = args[3]
 outdir = args[4]
 
-
-#taxon_group = 'MAMMALIA'
-#group_rank = 'class'
-#iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
-#outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output/iucn_data/'
-
 # load all IUCN data
 data = c()
 for (i in seq(0, 10, 1)){

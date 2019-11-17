@@ -15,6 +15,7 @@ import subprocess
 import os, glob
 import datetime
 import sys
+import iucn_sim.functions as cust_func
 
 
 # get extinction probs_________________________________________________________
@@ -73,7 +74,7 @@ def add_arguments(parser):
     )
     parser.add_argument(
         '--github_repo',
-        required=True,
+        default=0,
         help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files and updated functions. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
     )
     parser.add_argument(
@@ -99,13 +100,13 @@ def main(args):
 #    p = argparse.ArgumentParser()
 #    args = p.parse_args()    
 #
-#    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_all_mammals.txt'
+#    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_carnivora_no_gl.txt'
 #    args.reference_group = 'mammalia'
 #    args.reference_rank = 'class'
 #    args.n_years = '81'
 #    args.n_rep = 0
 #    args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
-#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output'
+#    args.outdir = '/Users/tobias/Desktop/test_iucn_sim2'
 #    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator'
 #    args.allow_precompiled_iucn_data = 1
 #    args.rate_sampling_range = 100
@@ -115,16 +116,13 @@ def main(args):
     input_data = args.input_data
     taxon_reference_group = args.reference_group
     reference_rank = args.reference_rank
-    n_rep = args.n_rep
+    n_rep = int(args.n_rep)
     iucn_key = args.iucn_key
     outdir = args.outdir
     github_repo = args.github_repo
     allow_precompiled_iucn_data = args.allow_precompiled_iucn_data
     rate_sampling_range = args.rate_sampling_range
     rate_bins = args.rate_bins
-
-    sys.path.append('%s/src/'%github_repo)
-    import functions as cust_func
  
 #    taxon_reference_group = 'Equidae,Elephantidae'
 #    reference_rank = 'family,family'
@@ -140,30 +138,34 @@ def main(args):
         os.makedirs(outdir)
 
     # get gl data to calculate en and cr extinction risk for all species
-    gl_data = pd.read_csv(input_data,sep='\t')
+    gl_data = pd.read_csv(input_data,sep='\t',header=None)
     species_list = gl_data.iloc[:,0].values
-    gl_matrix = gl_data.iloc[:,1:].values
+    gl_data_available = False
+    if gl_data.shape[1] > 1:
+        gl_matrix = gl_data.iloc[:,1:].values
+        gl_data_available = True
     
     # get IUCN history_________________________________________________________
     iucn_outdir = os.path.join(outdir,'iucn_data')    
     if not os.path.exists(iucn_outdir):
         os.makedirs(iucn_outdir)
-    precompiled_taxon_group_files = glob.glob('%s/data/precompiled/iucn_history/*_iucn_history.txt'%github_repo)
-    precompiled_taxon_groups = [str.lower(os.path.basename(filename).replace('_iucn_history.txt','')) for filename in precompiled_taxon_group_files]
+    precompiled_taxon_groups=[]
+    if github_repo:
+        precompiled_taxon_group_files = glob.glob('%s/data/precompiled/iucn_history/*_iucn_history.txt'%github_repo)
+        precompiled_taxon_groups = [str.lower(os.path.basename(filename).replace('_iucn_history.txt','')) for filename in precompiled_taxon_group_files]
     iucn_history_files = []
     for i,taxon_group in enumerate(taxon_reference_groups):
-        print(taxon_group)
         if str.lower(taxon_group) in precompiled_taxon_groups and allow_precompiled_iucn_data:
             print('Loading precompiled IUCN history data from %s/data/precompiled/iucn_history/'%github_repo)
             iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).startswith(str.upper(taxon_group))][0])
         else:
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
-            iucn_cmd = ['Rscript','./r_scripts/get_iucn_status_data_and_species_list.r'%github_repo, str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
-            iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
-            with open(iucn_error_file, 'w') as err:
-                seqtk = subprocess.Popen(iucn_cmd, stderr = err)
-                seqtk.wait()
+            iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_iucn_status_data_and_species_list.r', str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
+            #iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
+            #with open(iucn_error_file, 'w') as err:
+            seqtk = subprocess.Popen(iucn_cmd)
+            seqtk.wait()
             iucn_history_files.append(os.path.join(iucn_outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
 
     
@@ -210,10 +212,14 @@ def main(args):
     np.savetxt(os.path.join(outdir,'change_type_dict.txt'),change_type_dict_array,fmt='%s\t%s')   
 
     # sample transition rates for all types of changes_________________________
-    if n_rep:
+    if n_rep > 0:
         sim_reps = n_rep
     else:
-        sim_reps = gl_matrix.shape[1]
+        if gl_data_available:
+            sim_reps = gl_matrix.shape[1]
+        else:
+            print('ERROR: Use --n_rep flag to set the number of simulation replicates.')
+            quit()
     print('Preparing data for %i simulation replicates'%sim_reps)
     status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
     for status_change in change_type_dict.keys():
@@ -237,18 +243,24 @@ def main(args):
     # get current status for all species we want to simulate___________________
     # get list of all species that we don't have IUCN data for already
     missing_species = np.array([species for species in species_list if not species in most_recent_status_dict.keys()])
-    missing_species_file = os.path.join(outdir,'missing_species_list.txt')
-    np.savetxt(missing_species_file,missing_species,fmt='%s')
-    # extract the current status for those missing species
-    print('Extracting current status for missing species...')
-    iucn_cmd = ['Rscript','./r_scripts/get_current_iucn_status_missing_species.r'%github_repo, missing_species_file, iucn_key, iucn_outdir]
-    iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-    with open(iucn_error_file, 'w') as err:
-        seqtk = subprocess.Popen(iucn_cmd, stderr = err)
+    if len(missing_species) > 0:
+        missing_species_file = os.path.join(outdir,'missing_species_list.txt')
+        np.savetxt(missing_species_file,missing_species,fmt='%s')
+        # extract the current status for those missing species
+        print('Extracting current status for missing species...')
+        iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_current_iucn_status_missing_species.r', missing_species_file, iucn_key, iucn_outdir]
+        #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
+        #with open(iucn_error_file, 'w') as err:
+        seqtk = subprocess.Popen(iucn_cmd)
         seqtk.wait()
-    missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
-    if os.path.exists(missing_species_status_file):
-        missing_species_status_data = pd.read_csv(missing_species_status_file,sep='\t',header=None)
+        missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
+        if os.path.exists(missing_species_status_file):
+            missing_species_status_data = pd.read_csv(missing_species_status_file,sep='\t',header=None)
+        # clean up temporary files
+        if os.path.exists(missing_species_status_file):
+            os.remove(missing_species_status_file)
+        if os.path.exists(missing_species_file):
+            os.remove(missing_species_file)
     current_status_list = []
     for species in species_list:
         if species in most_recent_status_dict.keys():
@@ -261,15 +273,15 @@ def main(args):
         current_status_list.append(current_status)
     final_df_current_status = pd.DataFrame(np.array([species_list,current_status_list]).T,columns=['species','current_status'])
     final_df_current_status.to_csv(os.path.join(iucn_outdir,'current_status_all_species.txt'),sep='\t',index=False)
-    # clean up temporary files
-    if os.path.exists(missing_species_status_file):
-        os.remove(missing_species_status_file)
-    if os.path.exists(missing_species_file):
-        os.remove(missing_species_file)
+
 
     # calculate EN and CR extinction risk using GL information_________________
     # calculate yearly extinction risks for categories EN and CR
-    en_risks = np.array([p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2) for gl_array in gl_matrix])
+    if gl_data_available:
+        en_risks = np.array([p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2) for gl_array in gl_matrix])
+    else:
+        print('Warning: No generation length (GL) data found. Extinction risks for status EN and CR are calculated without using GL data.')
+        en_risks = np.array([[p_e_year(20,0.2)]*sim_reps]*len(species_list))
     if en_risks.shape[1] == 1:
         en_risks = np.array([en_risks for i in range(sim_reps)])[:,:,0].T        
     en_risks_df = pd.DataFrame(np.zeros((len(species_list),sim_reps+1)))
@@ -277,7 +289,11 @@ def main(args):
     en_risks_df.species = species_list
     en_risks_df.iloc[:,1:] = en_risks
     en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
-    cr_risks = np.array([p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5) for gl_array in gl_matrix])
+
+    if gl_data_available:
+        cr_risks = np.array([p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5) for gl_array in gl_matrix])
+    else:
+        cr_risks = np.array([[p_e_year(10,0.5)]*sim_reps]*len(species_list))
     if cr_risks.shape[1] == 1:
         cr_risks = np.array([cr_risks for i in range(sim_reps)])[:,:,0].T
     cr_risks_df = pd.DataFrame(np.zeros((len(species_list),sim_reps+1)))

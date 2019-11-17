@@ -29,11 +29,6 @@ def add_arguments(parser):
         help="Provide path to outdir where results will be saved."
     )
     parser.add_argument(
-        '--github_repo',
-        required=True,
-        help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files and updated functions. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
-    )
-    parser.add_argument(
         '--n_years',
         default=100,
         help="How many years to simulate into the future."
@@ -63,7 +58,6 @@ def main(args):
 
     indir = args.indir
     outdir = args.outdir
-    github_repo = args.github_repo
     n_years = args.n_years
     plot_diversity_trajectory = args.plot_diversity_trajectory
     plot_histograms = args.plot_histograms
@@ -89,7 +83,7 @@ def main(args):
     qmatrix_dict_list = []
     for i in np.arange(n_sim):
         rates = transition_rates.iloc[:,i]
-        print(i)
+        print('Calculating q-matrices for rep',i)
         en_risks_rep = en_ext_data.T[i]
         cr_risks_rep = cr_ext_data.T[i]
         q_matrix_dict = {}
@@ -117,7 +111,7 @@ def main(args):
     # simulations______________________________________________________________
     n_rep = n_sim
     current_year = datetime.datetime.now().year 
-    final_year = current_year+n_years
+    final_year = current_year+int(n_years)
     all_lc=False
     status_change=True
     dynamic_qmatrix=True
@@ -133,57 +127,58 @@ def main(args):
     extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=['species','p_extinct_by_%iAD'%final_year])
     extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False)
     
-    
-    # plot diversity trajectory of species list________________________________
-    #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
-    colors = ["#b80033","#bf7400","#008349"]
-    # define time axis
-    time_axis = np.array(range(len(diversity_through_time[0])))+current_year
-    fig = plt.figure()
-    plt.plot(time_axis,np.mean(diversity_through_time, axis =0),color=colors[0], label='accounting for GL')
-    for rep in diversity_through_time:
-        plt.plot(time_axis,rep,color=colors[0],alpha=.08)  
-    #plt.legend()
-    plt.ylabel('Total diversity')
-    plt.xlabel('Years AD')
-    ax = plt.gca()
-    ax1 = ax.twinx()
-    # Set the limits of the new axis from the original axis limits
-    ax1.set_ylim(ax.get_ylim())
-    current_diversity = diversity_through_time[0,0]
-    plt.yticks([np.mean(diversity_through_time[:,-1])],[int(current_diversity-np.mean(diversity_through_time[:,-1]))])
-    #plt.xticks(modified_q_matrix.year[::10],modified_q_matrix.year[::10])
-    plt.ylabel('Lost species')
-    plt.tight_layout()
-    fig.savefig(os.path.join(outdir,'future_diversity_trajectory.pdf'),bbox_inches='tight', dpi = 500)
+    if plot_diversity_trajectory:
+        # plot diversity trajectory of species list________________________________
+        #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
+        colors = ["#b80033","#bf7400","#008349"]
+        # define time axis
+        time_axis = np.array(range(len(diversity_through_time[0])))+current_year
+        fig = plt.figure()
+        plt.plot(time_axis,np.mean(diversity_through_time, axis =0),color=colors[0], label='accounting for GL')
+        for rep in diversity_through_time:
+            plt.plot(time_axis,rep,color=colors[0],alpha=.08)  
+        #plt.legend()
+        plt.ylabel('Total diversity')
+        plt.xlabel('Years AD')
+        ax = plt.gca()
+        ax1 = ax.twinx()
+        # Set the limits of the new axis from the original axis limits
+        ax1.set_ylim(ax.get_ylim())
+        current_diversity = diversity_through_time[0,0]
+        plt.yticks([np.mean(diversity_through_time[:,-1])],[int(current_diversity-np.mean(diversity_through_time[:,-1]))])
+        #plt.xticks(modified_q_matrix.year[::10],modified_q_matrix.year[::10])
+        plt.ylabel('Lost species')
+        plt.tight_layout()
+        fig.savefig(os.path.join(outdir,'future_diversity_trajectory.pdf'),bbox_inches='tight', dpi = 500)
 
-    # plot histograms of extinction times
-    with PdfPages(os.path.join(outdir,'extinction_time_histograms.pdf')) as pdf:
-        for i,species in enumerate(te_array[:,0]):
-            print('Plotting extinction histogram for',species)
-            plt.figure()
-            species_te_array = te_array[:,1:][i]
-            not_na_values = species_te_array[~np.isnan(list(species_te_array))]
-            heights, bins = np.histogram(not_na_values,np.arange(0,(final_year-current_year)+10,10))
-            percent = heights/n_rep
-            plt.bar(bins[:-1],percent,width=10, align="edge")
-            plt.ylim(0,0.5)
-            survival_prob = 1-sum(percent)
-            if survival_prob >= 0.5:
-                text_color = 'green'
-            else:
-                text_color = 'red'
-            ax = plt.gca()
-            plt.text(0.05, 0.7, 'survival probability: %.2f'%survival_prob,color=text_color, horizontalalignment='left',verticalalignment='baseline', transform=ax.transAxes)
-            # annotate last bar            
-            if ax.patches[-1].get_height() > 0:
-                ax.text(ax.patches[-1].get_x()+3, np.round(ax.patches[-1].get_height()+0.001,4), '**', fontsize=12, color='black')
-            plt.title('Simulated extinction dates - %s'%species)
-            plt.xlabel('Years from present')
-            plt.ylabel('Fraction of simulations')
-            plt.tight_layout()
-            pdf.savefig()  # saves the current figure into a pdf page
-            plt.close()
+    if plot_histograms:
+        # plot histograms of extinction times
+        with PdfPages(os.path.join(outdir,'extinction_time_histograms.pdf')) as pdf:
+            for i,species in enumerate(te_array[:,0]):
+                print('Plotting extinction histogram for',species)
+                plt.figure()
+                species_te_array = te_array[:,1:][i]
+                not_na_values = species_te_array[~np.isnan(list(species_te_array))]
+                heights, bins = np.histogram(not_na_values,np.arange(0,(final_year-current_year)+10,10))
+                percent = heights/n_rep
+                plt.bar(bins[:-1],percent,width=10, align="edge")
+                plt.ylim(0,0.5)
+                survival_prob = 1-sum(percent)
+                if survival_prob >= 0.5:
+                    text_color = 'green'
+                else:
+                    text_color = 'red'
+                ax = plt.gca()
+                plt.text(0.05, 0.7, 'survival probability: %.2f'%survival_prob,color=text_color, horizontalalignment='left',verticalalignment='baseline', transform=ax.transAxes)
+                # annotate last bar            
+                if ax.patches[-1].get_height() > 0:
+                    ax.text(ax.patches[-1].get_x()+3, np.round(ax.patches[-1].get_height()+0.001,4), '**', fontsize=12, color='black')
+                plt.title('Simulated extinction dates - %s'%species)
+                plt.xlabel('Years from present')
+                plt.ylabel('Fraction of simulations')
+                plt.tight_layout()
+                pdf.savefig()  # saves the current figure into a pdf page
+                plt.close()
 
 
         
