@@ -15,7 +15,7 @@ np.random.seed(1234)
 import os, glob
 import datetime
 import sys
-import .functions as cust_func
+import iucn_sim.functions as cust_func
 
 def add_arguments(parser):
     parser.add_argument(
