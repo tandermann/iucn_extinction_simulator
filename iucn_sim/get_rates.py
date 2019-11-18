@@ -100,24 +100,7 @@ def add_arguments(parser):
     
     
 def main(args):
-
-#    import argparse
-#    p = argparse.ArgumentParser()
-#    args = p.parse_args()    
-#
-#    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_carnivora_no_gl.txt'
-#    args.reference_group = 'mammalia'
-#    args.reference_rank = 'class'
-#    args.n_years = '81'
-#    args.n_rep = 0
-#    args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
-#    args.outdir = '/Users/tobias/Desktop/test_iucn_sim2'
-#    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator'
-#    args.allow_precompiled_iucn_data = 1
-#    args.rate_sampling_range = 100
-#    args.rate_bins = 10000
-    
-    
+        
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -130,16 +113,7 @@ def main(args):
     rate_sampling_range = args.rate_sampling_range
     rate_bins = args.rate_bins
     status_list = args.status_list
-    
-    
-
-#    taxon_reference_group = 'Equidae,Elephantidae'
-#    reference_rank = 'family,family'
-#    taxon_reference_group = 'Mammalia'
-#    reference_rank = 'class'
-#    taxon_reference_group = 'Rodentia'
-#    reference_rank = 'order'
-    
+        
     taxon_reference_groups = taxon_reference_group.split(',')
     reference_ranks = reference_rank.split(',')
     

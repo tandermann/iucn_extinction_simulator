@@ -17,6 +17,10 @@ import datetime
 import sys
 import iucn_sim.functions as cust_func
 
+def p_e_year(years,p_e):
+    pe_year = 1-(1-p_e)**(1/years)
+    return pe_year
+
 def add_arguments(parser):
     parser.add_argument(
         '--indir',
@@ -43,28 +47,17 @@ def add_arguments(parser):
         default=0,
         help="0=off, 1=on (default=0)."
     )
+
     
 def main(args):
-#    import argparse
-#    p = argparse.ArgumentParser()
-#    args = p.parse_args()    
-#
-#    args.indir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output'
-#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output/simulation_results'
-#    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator/'
-#    args.n_years = 81
-#    args.plot_diversity_trajectory = 1
-#    args.plot_histograms = 1
-
     indir = args.indir
     outdir = args.outdir
     n_years = args.n_years
     plot_diversity_trajectory = args.plot_diversity_trajectory
     plot_histograms = args.plot_histograms
-    
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    
     
     species_list_status_file = os.path.join(indir,'iucn_data/current_status_all_species.txt')
     transition_rates_file = os.path.join(indir,'sampled_status_change_rates.txt')
@@ -119,13 +112,39 @@ def main(args):
     diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,final_year,current_year,species_list_status,dd_probs,qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
     
     
-    # export list with extinction probability by year x________________________
+    # calculate some extinction stats__________________________________________
     sim_species_list = te_array[:,0]
     ext_date_data = te_array[:,1:]
     extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
     extinction_prob = extinction_occs/ext_date_data.shape[1]
-    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=['species','p_extinct_by_%iAD'%final_year])
-    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False)
+    # sample rates
+    sampled_extinction_rates = []
+    for i in extinction_prob:
+        sampled_rates = []
+        for j in np.arange(100):
+            rate = np.random.normal(i,0.01)
+            while rate < 0:
+                rate = np.random.normal(i,0.01)
+            sampled_rates.append(rate)
+        sampled_extinction_rates.append(sampled_rates)
+    sampled_extinction_rates = np.array(sampled_extinction_rates)
+    # get mean and upper and lower boundary
+    sampled_extinction_rates_mean = np.mean(sampled_extinction_rates,axis=1)
+    upper_lower_boundaries = np.array([np.array(cust_func.calcHPD(i,0.95)) for i in sampled_extinction_rates])
+    lower_boundaries = upper_lower_boundaries[:,0]
+    upper_boundaries = upper_lower_boundaries[:,1]    
+    # get yearly extinction probabilities
+    yearly_extinction_prob = np.array([p_e_year(n_years,species_rates) for species_rates in sampled_extinction_rates])
+    yearly_extinction_prob_mean = np.mean(yearly_extinction_prob,axis=1)
+    upper_lower_boundaries_yearly = np.array([np.array(cust_func.calcHPD(i,0.95)) for i in yearly_extinction_prob])
+    lower_boundaries_yearly = upper_lower_boundaries_yearly[:,0]
+    upper_boundaries_yearly = upper_lower_boundaries_yearly[:,1]
+    # export extinction stats to file
+    column_names = ['species','yearly_extinction_rate_mean','yearly_extinction_rate_lower','yearly_extinction_rate_upper','extinct_by_%iAD_mean'%final_year,'extinct_by_%iAD_lower'%final_year,'extinct_by_%iAD_upper'%final_year,'extinct_by_%iAD_sim_frequency'%final_year]
+    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,yearly_extinction_prob_mean,lower_boundaries_yearly,upper_boundaries_yearly,sampled_extinction_rates_mean,lower_boundaries,upper_boundaries,extinction_prob]).T,columns=column_names)
+#    extinction_prob_df.iloc[:,1:] = extinction_prob_df.iloc[:,1:].astype(float).round(decimals=6)
+    extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
+    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.9f')
     
     if plot_diversity_trajectory:
         # plot diversity trajectory of species list________________________________
@@ -163,17 +182,17 @@ def main(args):
                 percent = heights/n_rep
                 plt.bar(bins[:-1],percent,width=10, align="edge")
                 plt.ylim(0,0.5)
-                survival_prob = 1-sum(percent)
-                if survival_prob >= 0.5:
-                    text_color = 'green'
-                else:
-                    text_color = 'red'
+                #survival_prob = 1-sum(percent)
+                #if survival_prob >= 0.5:
+                #    text_color = 'green'
+                #else:
+                #    text_color = 'red'
                 ax = plt.gca()
-                plt.text(0.05, 0.7, 'survival probability: %.2f'%survival_prob,color=text_color, horizontalalignment='left',verticalalignment='baseline', transform=ax.transAxes)
+                #plt.text(0.05, 0.7, 'survival probability: %.2f'%survival_prob,color=text_color, horizontalalignment='left',verticalalignment='baseline', transform=ax.transAxes)
                 # annotate last bar            
                 if ax.patches[-1].get_height() > 0:
                     ax.text(ax.patches[-1].get_x()+3, np.round(ax.patches[-1].get_height()+0.001,4), '**', fontsize=12, color='black')
-                plt.title('Simulated extinction dates - %s'%species)
+                plt.title('%s - Extinct by year %i: %i/%i'%(species,final_year,sum(heights),n_rep))
                 plt.xlabel('Years from present')
                 plt.ylabel('Fraction of simulations')
                 plt.tight_layout()
