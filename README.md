@@ -16,8 +16,11 @@ The conda package manager creates an extremely light-weight virtual environment 
 	- `conda config --add channels conda-forge`
 	- `conda config --add channels bioconda`
 
-4. Install `iucn_sim` and all it's dependencies by typing the following into the command line:
+4. Install `iucn_sim` and all it's dependencies by typing the following into the command line, but see the tip below before you do so!
 	- `conda install iucn_sim`
+
+	> **_Tip::_**It is recommendable to create your own environment for `iucn_sim`. This will ensure that downloading the required R or Python version for `iucn_sim` will not affect any existing setup on your computer. In order to install `iucn_sim` into a new environment, simply type `conda create -n iucn_sim_env iucn_sim`.
+	Now everytime you want to use the software you first need to connect to the environment you created by typing `source activate iucn_sim_env`. Now you can use `iucn_sim`, while connected to your specially created environment. Disconnect from the environment by typing `source deactivate` while connected.
 
 5. Test if installation worked by typing `iucn_sim -h`. This should show an overview of the available arguments of `iucn_sim`.
 
