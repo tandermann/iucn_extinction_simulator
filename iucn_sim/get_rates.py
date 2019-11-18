@@ -75,7 +75,12 @@ def add_arguments(parser):
     parser.add_argument(
         '--github_repo',
         default=0,
-        help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files and updated functions. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
+        help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files that significantly shorten the computation time. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
+    )
+    parser.add_argument(
+        '--status_list',
+        default=0,
+        help="Provide a text file containing a valid IUCN status (LC,NT,VU,EN,CR,DD) for each species, separated by newline (same order as species names provided under --input_data)."
     )
     parser.add_argument(
         '--allow_precompiled_iucn_data',
@@ -112,6 +117,7 @@ def main(args):
 #    args.rate_sampling_range = 100
 #    args.rate_bins = 10000
     
+    
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -123,7 +129,10 @@ def main(args):
     allow_precompiled_iucn_data = args.allow_precompiled_iucn_data
     rate_sampling_range = args.rate_sampling_range
     rate_bins = args.rate_bins
- 
+    status_list = args.status_list
+    
+    
+
 #    taxon_reference_group = 'Equidae,Elephantidae'
 #    reference_rank = 'family,family'
 #    taxon_reference_group = 'Mammalia'
@@ -145,6 +154,12 @@ def main(args):
         gl_matrix = gl_data.iloc[:,1:].values
         gl_data_available = True
     
+    status_list_data = list(pd.read_csv(status_list,sep='\t',header=None).iloc[:,0].values)
+
+    if len(species_list) != len(status_list_data):
+        print('Error: Length of provided status list does not match length of species list provided as --input_data!')
+        quit()
+
     # get IUCN history_________________________________________________________
     iucn_outdir = os.path.join(outdir,'iucn_data')    
     if not os.path.exists(iucn_outdir):
@@ -242,35 +257,38 @@ def main(args):
 
     # get current status for all species we want to simulate___________________
     # get list of all species that we don't have IUCN data for already
-    missing_species = np.array([species for species in species_list if not species in most_recent_status_dict.keys()])
-    if len(missing_species) > 0:
-        missing_species_file = os.path.join(outdir,'missing_species_list.txt')
-        np.savetxt(missing_species_file,missing_species,fmt='%s')
-        # extract the current status for those missing species
-        print('Extracting current status for missing species...')
-        iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_current_iucn_status_missing_species.r', missing_species_file, iucn_key, iucn_outdir]
-        #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-        #with open(iucn_error_file, 'w') as err:
-        seqtk = subprocess.Popen(iucn_cmd)
-        seqtk.wait()
-        missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
-        if os.path.exists(missing_species_status_file):
-            missing_species_status_data = pd.read_csv(missing_species_status_file,sep='\t',header=None)
-        # clean up temporary files
-        if os.path.exists(missing_species_status_file):
-            os.remove(missing_species_status_file)
-        if os.path.exists(missing_species_file):
-            os.remove(missing_species_file)
-    current_status_list = []
-    for species in species_list:
-        if species in most_recent_status_dict.keys():
-            current_status = most_recent_status_dict[species]
-        else:
-            current_status = missing_species_status_data[missing_species_status_data[0]==species][1].values[0]
-            if current_status not in ['LC','NT','VU','EN','CR','DD']:
-                print('Species %s was not found in IUCN database. Current status is therefore set to DD (data deficient).'%species)
-                current_status = 'DD'
-        current_status_list.append(current_status)
+    if status_list:
+        current_status_list = status_list_data
+    else:
+        missing_species = np.array([species for species in species_list if not species in most_recent_status_dict.keys()])
+        if len(missing_species) > 0:
+            missing_species_file = os.path.join(outdir,'missing_species_list.txt')
+            np.savetxt(missing_species_file,missing_species,fmt='%s')
+            # extract the current status for those missing species
+            print('Extracting current status for missing species...')
+            iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_current_iucn_status_missing_species.r', missing_species_file, iucn_key, iucn_outdir]
+            #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
+            #with open(iucn_error_file, 'w') as err:
+            seqtk = subprocess.Popen(iucn_cmd)
+            seqtk.wait()
+            missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
+            if os.path.exists(missing_species_status_file):
+                missing_species_status_data = pd.read_csv(missing_species_status_file,sep='\t',header=None)
+            # clean up temporary files
+            if os.path.exists(missing_species_status_file):
+                os.remove(missing_species_status_file)
+            if os.path.exists(missing_species_file):
+                os.remove(missing_species_file)
+        current_status_list = []
+        for species in species_list:
+            if species in most_recent_status_dict.keys():
+                current_status = most_recent_status_dict[species]
+            else:
+                current_status = missing_species_status_data[missing_species_status_data[0]==species][1].values[0]
+                if current_status not in ['LC','NT','VU','EN','CR','DD']:
+                    print('Species %s was not found in IUCN database. Current status is therefore set to DD (data deficient).'%species)
+                    current_status = 'DD'
+            current_status_list.append(current_status)
     final_df_current_status = pd.DataFrame(np.array([species_list,current_status_list]).T,columns=['species','current_status'])
     final_df_current_status.to_csv(os.path.join(iucn_outdir,'current_status_all_species.txt'),sep='\t',index=False)
 
