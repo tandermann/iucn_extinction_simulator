@@ -128,11 +128,12 @@ def main(args):
         gl_matrix = gl_data.iloc[:,1:].values
         gl_data_available = True
     
-    status_list_data = list(pd.read_csv(status_list,sep='\t',header=None).iloc[:,0].values)
+    if status_list:
+        status_list_data = list(pd.read_csv(status_list,sep='\t',header=None).iloc[:,0].values)
 
-    if len(species_list) != len(status_list_data):
-        print('Error: Length of provided status list does not match length of species list provided as --input_data!')
-        quit()
+        if len(species_list) != len(status_list_data):
+            print('Error: Length of provided status list does not match length of species list provided as --input_data!')
+            quit()
 
     # get IUCN history_________________________________________________________
     iucn_outdir = os.path.join(outdir,'iucn_data')    

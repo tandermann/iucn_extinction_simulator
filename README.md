@@ -36,7 +36,14 @@ Once installed, `iucn_sim` will be installed in your standard path, so you can s
 
 The -h command will show and explain all available flags for each specific `iucn_sim` function. An example command could look like this:
 
+
+#### Estimate status transition rates and extinction probabilities for all taxa:
+
 `iucn_sim get_rates --input_data data/example_data/gl_data_carnivora.txt --reference_group Mammalia --reference_rank class --iucn_key PASTE_YOUR_IUCN_KEY_HERE --outdir data/example_data/output --github_repo ~/GitHub/iucn_extinction_simulator`
+
+#### Run simulations for future
+
+`iucn_sim run_sim --indir data/example_data/output/ --outdir data/example_data/output/simulations --n_years 81`
 
 See below for further explanation of the required input.
 
@@ -52,8 +59,9 @@ For running `iucn_sim` you will need to provide the following input:
 
 To use the full functionality of `iucn_sim` you will have to apply for an [IUCN API token](https://apiv3.iucnredlist.org/api/v3/token). This key is necessary to download data from IUCN, which is done internally in `iucn_sim`. It is easy o apply for an API key, just [follow this link](https://apiv3.iucnredlist.org/api/v3/token), it will then take a couple of days before you receive your API key. Once you have received your IUCN token, provide it when using the `get_rates` function with the `--iucn_key` flag.
 
-However, if for some reason you have problems obtaining an IUCN token or don't want to wait until receiving it, you can run the `get_rates` without using the IUCN functions. In that case you will need to provide an extra file containing the current IUCN status of all your input species (`--status_list`) and you will further need to choose a reference group (`--reference_group`) for which the IUCN history is already pre-compiled ([see available precompiled groups here](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history)). In order to use precompiled data you simply [download this GitHub repository](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip), unzip the folder, and provide it to the `get_rates` function using the `--github_repo` flag. 
+However, if for some reason you have problems obtaining an IUCN token or don't want to wait until receiving it, you can run the `get_rates` function without donwloading data from IUCN. In that case you will need to provide an extra file containing the current IUCN status of all your input species (`--status_list`, but see **Note** below) and you will further need to choose a reference group (`--reference_group`) for which the IUCN history is already pre-compiled ([see available precompiled groups here](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history)). In order to use precompiled data you simply [download this GitHub repository](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip), unzip the folder, and provide it to the `get_rates` function using the `--github_repo` flag.
 
+**Note:** If all species from the `--input_data` file are present in one of the pre-compiled IUCN history files in the [GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history), it is **not necessary** to provide an additional file containing the current IUCN status of all input species (`--status_list`). E.g. in the code example above for running the `get_rates` function, it is technically not necessary to provide an IUCN key, since all species in the input Carnivora file are present in the precompiled IUCN history file for Mammalia. However, due to the ever-changing taxonomy it is not a given that all your species are contained in the precompiled file, even if you have a list of mammal names and use the precompiled Mammalia reference group. Long story short: Make your life easier and [apply for an IUCN token](https://apiv3.iucnredlist.org/api/v3/token)!
 
 ## Other user settings:
 

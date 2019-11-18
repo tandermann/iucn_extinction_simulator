@@ -134,7 +134,7 @@ def main(args):
     lower_boundaries = upper_lower_boundaries[:,0]
     upper_boundaries = upper_lower_boundaries[:,1]    
     # get yearly extinction probabilities
-    yearly_extinction_prob = np.array([p_e_year(n_years,species_rates) for species_rates in sampled_extinction_rates])
+    yearly_extinction_prob = np.array([p_e_year(int(n_years),species_rates) for species_rates in sampled_extinction_rates])
     yearly_extinction_prob_mean = np.mean(yearly_extinction_prob,axis=1)
     upper_lower_boundaries_yearly = np.array([np.array(cust_func.calcHPD(i,0.95)) for i in yearly_extinction_prob])
     lower_boundaries_yearly = upper_lower_boundaries_yearly[:,0]

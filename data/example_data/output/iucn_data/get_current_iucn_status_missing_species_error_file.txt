@@ -1,6 +1,0 @@
-Warning message:
-package ‘rredlist’ was built under R version 3.4.4 
-Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
-  no lines available in input
-Calls: read.csv -> read.table
-Execution halted
