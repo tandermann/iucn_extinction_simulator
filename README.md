@@ -2,6 +2,11 @@
 
 A program for estimating extinction probabilities and dates for a given set of species, based on IUCN threat assessments.
 
+[![downloads](https://anaconda.org/bioconda/iucn_sim/badges/downloads.svg)](http://bioconda.github.io/recipes/iucn_sim/README.html)
+[![updated](https://anaconda.org/bioconda/iucn_sim/badges/latest_release_date.svg)](http://bioconda.github.io/recipes/iucn_sim/README.html)
+[![conda](https://anaconda.org/bioconda/iucn_sim/badges/installer/conda.svg)](http://bioconda.github.io/recipes/iucn_sim/README.html)
+[![conda](https://anaconda.org/bioconda/iucn_sim/badges/license.svg)](http://bioconda.github.io/recipes/iucn_sim/README.html) 
+
 
 ## Installation
 
