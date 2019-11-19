@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 28 14:43:44 2019
+Download IUCN data and estimate status transition rates
 
+Created on Mon Oct 28 14:43:44 2019
 @author: Tobias Andermann (tobias.andermann@bioenv.gu.se)
 """
 

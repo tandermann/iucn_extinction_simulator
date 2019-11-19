@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 30 20:59:28 2019
+Calculate q-matrices and run simulations
 
+Created on Wed Oct 30 20:59:28 2019
 @author: Tobias Andermann (tobias.andermann@bioenv.gu.se)
 """
 
