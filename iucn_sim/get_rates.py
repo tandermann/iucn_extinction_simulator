@@ -41,6 +41,7 @@ def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 100
     #plt.plot(np.log(rates),lik)
     #np.log(mle)
     return sample_rates
+                
 
 def add_arguments(parser):
     parser.add_argument(
@@ -101,7 +102,6 @@ def add_arguments(parser):
     
     
 def main(args):
-        
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -114,7 +114,10 @@ def main(args):
     rate_sampling_range = args.rate_sampling_range
     rate_bins = args.rate_bins
     status_list = args.status_list
-        
+    
+    # create the r-scripts to be used later on:
+    cust_func.write_r_scripts(outdir)
+    
     taxon_reference_groups = taxon_reference_group.split(',')
     reference_ranks = reference_rank.split(',')
     
@@ -152,7 +155,7 @@ def main(args):
         else:
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
-            iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_iucn_status_data_and_species_list.r', str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
+            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
             #iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
             seqtk = subprocess.Popen(iucn_cmd)
@@ -242,7 +245,7 @@ def main(args):
             np.savetxt(missing_species_file,missing_species,fmt='%s')
             # extract the current status for those missing species
             print('Extracting current status for missing species...')
-            iucn_cmd = ['Rscript','./iucn_sim/r_scripts/get_current_iucn_status_missing_species.r', missing_species_file, iucn_key, iucn_outdir]
+            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), missing_species_file, iucn_key, iucn_outdir]
             #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
             seqtk = subprocess.Popen(iucn_cmd)
