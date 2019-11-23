@@ -62,7 +62,7 @@ def add_arguments(parser):
     parser.add_argument(
         '--n_rep',
         default=0,
-        help="How many independent simulation replicates to run (default == number of provided GL value columns per species under 'input_data' flag)."
+        help="How many different transition-rate and extinction risk estimates to produce for simulations (default == number of provided GL value columns per species under 'input_data' flag)."
     )
     parser.add_argument(
         '--iucn_key',

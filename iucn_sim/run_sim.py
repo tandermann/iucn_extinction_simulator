@@ -39,6 +39,11 @@ def add_arguments(parser):
         help="How many years to simulate into the future."
     )
     parser.add_argument(
+        '--n_sim',
+        default=0,
+        help="How many simulation replicates to run. By default (value 0) as many simulation replicates are being produced as there are available rate estimates, resulting from the get_rates function (set by --n_rep flag in get_rates). If the number of simulation replicates exceeds the number of available transition rate estimates, these rates will be randomely resampled for the remaining simulations."
+    )
+    parser.add_argument(
         '--plot_diversity_trajectory',
         default=1,
         help="0=off, 1=on (default=1)."
@@ -49,13 +54,50 @@ def add_arguments(parser):
         help="0=off, 1=on (default=0)."
     )
 
-    
+
+def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
+    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
+    ext_time_array_new = ext_time_array.copy()
+    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
+    ext_time_array_new = ext_time_array_new.astype(float)
+    q_samples = np.random.random(n_bins)
+    # extinction occurrences
+    n_extinct = len(ext_time_array_new[ext_time_array_new< float(max_t)])
+    n_alive = len(ext_time_array_new[ext_time_array_new== float(max_t)])
+    p = np.zeros([ext_time_array_new.shape[0],n_bins])
+    if n_extinct>0:
+        p[ext_time_array_new< float(max_t),:] = q_samples*np.exp(-np.array([q_samples for i in np.arange(n_extinct)]).T*ext_time_array_new[ext_time_array_new< float(max_t)]).T
+    # non extinct occurrences
+    p[ext_time_array_new==float(max_t),:] = np.exp(-np.array([q_samples for i in np.arange(n_alive)]).T*ext_time_array_new[ext_time_array_new==float(max_t)]).T
+    #p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
+    p = (p.T/np.sum(p,axis=1))
+    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
+    all_rates = [item for sublist in all_sampled_rates for item in sublist]
+    mean_value = np.mean(all_rates)
+    lower,upper = cust_func.calcHPD(all_rates,0.95)
+    return [mean_value,lower,upper]
+
+#def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
+#    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
+#    ext_time_array_new = ext_time_array.copy()
+#    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
+#    ext_time_array_new = ext_time_array_new.astype(float)
+#    q_samples = np.random.random(n_bins)
+#    p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
+#    p = (p.T/np.sum(p,axis=1))
+#    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
+#    all_rates = [item for sublist in all_sampled_rates for item in sublist]
+#    mean_value = np.mean(all_rates)
+#    lower,upper = cust_func.calcHPD(all_rates,0.95)
+#    return [mean_value,lower,upper]
+
 def main(args):
     indir = args.indir
     outdir = args.outdir
     n_years = args.n_years
     plot_diversity_trajectory = args.plot_diversity_trajectory
     plot_histograms = args.plot_histograms
+    n_sim = int(args.n_sim)
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -72,12 +114,12 @@ def main(args):
     
     
     # calculate all q-matrices (all species and sim replicates)________________
-    n_sim = transition_rates.shape[1]
-    print("Calculating species-specific q-matrices for all %i simulation replicates ..."%n_sim)
+    n_rates = transition_rates.shape[1]
+    print("\nCalculating species-specific q-matrices for all %i simulation replicates ..."%n_rates)
     qmatrix_dict_list = []
-    for i in np.arange(n_sim):
+    for i in np.arange(n_rates):
         rates = transition_rates.iloc[:,i]
-        print('Calculating q-matrices for rep',i)
+        sys.stdout.write('\rCalculating q-matrices for rate-replicate %i/%i '%(i,n_rates))
         en_risks_rep = en_ext_data.T[i]
         cr_risks_rep = cr_ext_data.T[i]
         q_matrix_dict = {}
@@ -101,48 +143,40 @@ def main(args):
             dd_rates.append(rates[0])
     dd_probs = dd_rates/sum(np.array(dd_rates))
 
+    if n_sim == 0:
+        n_rep = n_rates
+    else:
+        n_rep = n_sim
 
-    # simulations______________________________________________________________
-    n_rep = n_sim
+    # simulations______________________________________________________________    
+    # add dd frequencies for additional simulation replicates
+    resampling_rates_indexes = np.random.choice(np.arange(n_rates),(n_rep-n_rates))
+    append_this_dd = np.array([i[resampling_rates_indexes] for i in dd_probs])
+    final_dd_probs = np.concatenate([dd_probs,append_this_dd],axis=1)
+    # redraw n samples of transition rates to fill all simulation replicates
+    append_this = np.array(qmatrix_dict_list)[resampling_rates_indexes]
+    final_qmatrix_dict_list = list(qmatrix_dict_list) + list(append_this)
+
     current_year = datetime.datetime.now().year 
     final_year = current_year+int(n_years)
     all_lc=False
     status_change=True
     dynamic_qmatrix=True
-    print('Starting simulations ...')
-    diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,final_year,current_year,species_list_status,dd_probs,qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+    print('\nStarting simulations ...')
     
-    
+    diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,final_year,current_year,species_list_status,final_dd_probs,final_qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
     # calculate some extinction stats__________________________________________
-    sim_species_list = te_array[:,0]
-    ext_date_data = te_array[:,1:]
+    sim_species_list = te_array[:,0].copy()
+    ext_date_data = te_array[:,1:].copy()
     extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
     extinction_prob = extinction_occs/ext_date_data.shape[1]
-    # sample rates
-    sampled_extinction_rates = []
-    for i in extinction_prob:
-        sampled_rates = []
-        for j in np.arange(100):
-            rate = np.random.normal(i,0.01)
-            while rate < 0:
-                rate = np.random.normal(i,0.01)
-            sampled_rates.append(rate)
-        sampled_extinction_rates.append(sampled_rates)
-    sampled_extinction_rates = np.array(sampled_extinction_rates)
-    # get mean and upper and lower boundary
-    sampled_extinction_rates_mean = np.mean(sampled_extinction_rates,axis=1)
-    upper_lower_boundaries = np.array([np.array(cust_func.calcHPD(i,0.95)) for i in sampled_extinction_rates])
-    lower_boundaries = upper_lower_boundaries[:,0]
-    upper_boundaries = upper_lower_boundaries[:,1]    
-    # get yearly extinction probabilities
-    yearly_extinction_prob = np.array([p_e_year(int(n_years),species_rates) for species_rates in sampled_extinction_rates])
-    yearly_extinction_prob_mean = np.mean(yearly_extinction_prob,axis=1)
-    upper_lower_boundaries_yearly = np.array([np.array(cust_func.calcHPD(i,0.95)) for i in yearly_extinction_prob])
-    lower_boundaries_yearly = upper_lower_boundaries_yearly[:,0]
-    upper_boundaries_yearly = upper_lower_boundaries_yearly[:,1]
+    # estimate extinction rates scaled by year
+    print('\nEstimating extinction rates from simulation output...')
+    sampled_rates = np.array([get_rate_estimate(species_values,n_years,i+1,ext_date_data.shape[0]) for i,species_values in enumerate(ext_date_data)])
+
     # export extinction stats to file
-    column_names = ['species','yearly_extinction_rate_mean','yearly_extinction_rate_lower','yearly_extinction_rate_upper','extinct_by_%iAD_mean'%final_year,'extinct_by_%iAD_lower'%final_year,'extinct_by_%iAD_upper'%final_year,'extinct_by_%iAD_sim_frequency'%final_year]
-    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,yearly_extinction_prob_mean,lower_boundaries_yearly,upper_boundaries_yearly,sampled_extinction_rates_mean,lower_boundaries,upper_boundaries,extinction_prob]).T,columns=column_names)
+    column_names = ['species','rate_e_mean','rate_e_lower','rate_e_upper','simulated_p_e_by_%iAD'%final_year]
+    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,sampled_rates[:,0],sampled_rates[:,1],sampled_rates[:,2],extinction_prob]).T,columns=column_names)
 #    extinction_prob_df.iloc[:,1:] = extinction_prob_df.iloc[:,1:].astype(float).round(decimals=6)
     extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
     extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.9f')
@@ -175,7 +209,7 @@ def main(args):
         # plot histograms of extinction times
         with PdfPages(os.path.join(outdir,'extinction_time_histograms.pdf')) as pdf:
             for i,species in enumerate(te_array[:,0]):
-                print('Plotting extinction histogram for',species)
+                sys.stdout.write('\rPlotting extinction histogram for species %i/%i'%(i,len(te_array[:,0])))
                 plt.figure()
                 species_te_array = te_array[:,1:][i]
                 not_na_values = species_te_array[~np.isnan(list(species_te_array))]

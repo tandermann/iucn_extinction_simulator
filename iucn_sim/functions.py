@@ -262,7 +262,7 @@ def run_multi_sim(n_rep,final_year,current_year,species_list_status,dd_probs,qma
     status_through_time_dict = {}
     status_through_time = np.zeros([6,(final_year-current_year)+1,n_rep])
     for n in range(n_rep):
-        print('Running rep', n+1)
+        sys.stdout.write('\rRunning simulation rep %i/%i' %(n+1,n_rep))
         if dynamic_qmatrix:
             qmatrix_dict = qmatrix_dict_list[n]
         else:
