@@ -181,7 +181,7 @@ def round_up(value):
     except ValueError:
         return value
 
-def simulate_extinction_and_status_change(final_year,current_year,list_of_all_current_species_statuses,species_list,outdir,qmatrix_dict,status_change=False,dynamic_qmatrix=True):
+def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_statuses,species_list,outdir,qmatrix_dict,status_change=False,dynamic_qmatrix=True):
 	# write the species name and the index to a separate txt file
     # this is necessary because two years get lost when summarizing the simulated data into year bins
     #final_year = final_year+2
@@ -191,7 +191,7 @@ def simulate_extinction_and_status_change(final_year,current_year,list_of_all_cu
     species_cat_arg = [iucn_code[x] for x in list_of_all_current_species_statuses]
     species_cat = np.array(species_cat_arg)+0
     current_state=species_cat
-    root = -(final_year-current_year)
+    root = -delta_t
     n_columns = abs(root)
     status_array = np.tile(np.array([current_state]).transpose(), (1, n_columns))
     species_list_log = open("%s/species_list.txt" %outdir, "w")
@@ -234,7 +234,7 @@ def simulate_extinction_and_status_change(final_year,current_year,list_of_all_cu
                     break
                 else:
                     status_array[taxon,np.arange(int(time_of_extinction), abs(root))] = 5
-                    extinction = current_year+time_of_extinction
+                    extinction = time_of_extinction
                     break
         extinction_time_list.append(extinction)
     a = np.array(species_list)
@@ -252,35 +252,46 @@ def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_
     diversity_through_time
     return diversity_through_time
 
-def run_multi_sim(n_rep,final_year,current_year,species_list_status,dd_probs,qmatrix_dict_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True):
+def run_multi_sim(n_rep,delta_t,species_list_status,dd_probs,qmatrix_dict_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
     current_spec_list = species_list_status.species.values
     current_status_list = species_list_status.current_status.values
-    extinct_per_year_array = np.zeros([n_rep,(final_year-current_year)+1])
+    extinct_per_year_array = np.zeros([n_rep,delta_t+1])
     te_array = np.zeros((len(species_list_status),n_rep+1)).astype(object)
     te_array[:,0]=current_spec_list
     status_through_time_dict = {}
-    status_through_time = np.zeros([6,(final_year-current_year)+1,n_rep])
+    status_through_time = np.zeros([6,delta_t+1,n_rep])
     for n in range(n_rep):
         sys.stdout.write('\rRunning simulation rep %i/%i' %(n+1,n_rep))
         if dynamic_qmatrix:
             qmatrix_dict = qmatrix_dict_list[n]
         else:
             qmatrix_dict = qmatrix_dict_list
-        # these are the simulator functions that need to be repeated (new modeling of DD species every rep)
+    
+        # these are the simulator functions that need to be repeated
+        # new modeling of DD species every rep
         current_status_list_new_dd = current_status_list.copy()
         dd_indices = np.where([current_status_list_new_dd=='DD'])[1]    
         dd_prob_vector = dd_probs.T[n]
         new_draws = np.random.choice(['LC','NT','VU','EN','CR'], size=len(dd_indices), replace=True, p=dd_prob_vector)
         current_status_list_new_dd[dd_indices] = new_draws
-        future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(final_year,current_year,current_status_list_new_dd,current_spec_list,outdir,qmatrix_dict,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+        # new modeling of NE species every rep
+        status_count_dict = Counter(current_status_list)
+        counts = np.array([status_count_dict[key] for key in status_count_dict.keys() if key not in ['DD','NE']])
+        ne_probs = counts/sum(counts)
+        status_array_count = [key for key in status_count_dict.keys() if key not in ['DD','NE']]        
+        ne_indices = np.where([current_status_list_new_dd=='NE'])[1]    
+        new_draws = np.random.choice(status_array_count, size=len(ne_indices), replace=True, p=ne_probs)
+        current_status_list_new_dd[ne_indices] = new_draws
+    
+        future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,current_spec_list,outdir,qmatrix_dict,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
         # diversity_through time array
         for year in extinction_dict.keys():
             if not year == 'extant':
-                pos = int(year)-current_year
+                pos = int(year)
                 extinct_per_year_array[n,pos] = extinction_dict[year]
         # status through time array
-        year = current_year+1
+        year = 1
         for column in future_status_array.T:
             the_dict = dict(Counter(list(column)))
             for status in range(6):
@@ -301,14 +312,14 @@ def run_multi_sim(n_rep,final_year,current_year,species_list_status,dd_probs,qma
             if extinction_array[1][species] == 'extant':
                 extinction_date = np.nan
             else:
-                extinction_date = np.round(float(final_year)-float(extinction_array[1][species]),2)
+                extinction_date = np.round(float(extinction_array[1][species]),2)
             te_array[species,n+1]=extinction_date
     # finish diversity through time array
     diversity_through_time = sum(extinction_dict.values()) - np.cumsum(extinct_per_year_array,axis=1)
     # finish status_through_time_array
     for key in status_through_time_dict:
         x = int(key.split('_')[1])
-        y = int(key.split('_')[0])-current_year
+        y = int(key.split('_')[0])
         status_through_time[x,y,:] = status_through_time_dict[key]
     # write data-objects to output folder
     with open(os.path.join(outdir,'diversity_through_time.pkl'), 'wb') as f:

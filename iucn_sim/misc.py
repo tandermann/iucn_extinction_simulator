@@ -14,24 +14,47 @@ np.random.seed(1234)
 
 
 
-def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 10000):
-    def get_loglik(count, dT, rate):
-        return np.log(rate)*count - dT*rate
-    mle = count/tot_time
-    if count == 0:
-        minRange = 1*np.exp(-10)
-        maxRange = range_factor/tot_time
-    else:
-        minRange = mle/range_factor
-        maxRange = mle*range_factor
-    rates = np.linspace(minRange, maxRange,n_bins)
-    lik = get_loglik(count,tot_time,rates)
-    lik = lik - np.max(lik)
-    sample_rates = np.random.choice(rates,size=n_samples,p=np.exp(lik)/np.sum(np.exp(lik)),replace=1)
-    #plt.plot(np.log(rates),lik)
-    #np.log(mle)
-    return sample_rates
+n100_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_100.txt'
+n10k_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_10k.txt'
+n100_t10k_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir/simulations_100sim_10kyears/extinction_prob_all_species.txt'
 
+n100_sim = pd.read_csv(n100_sim_file,sep='\t').rate_e_mean.values
+n10k_sim = pd.read_csv(n10k_sim_file,sep='\t').rate_e_mean.values
+n100_t10k_sim = pd.read_csv(n100_t10k_file,sep='\t').rate_e_mean.values
+
+fig = plt.figure()
+plt.plot(np.log10(n100_t10k_sim),np.log10(n10k_sim),'o')
+plt.xlabel('np.log10(n100_t10k_sim)')
+plt.ylabel('np.log10(n10k_sim)')
+plt.tight_layout()
+#plt.xlim([0,0.05])
+#plt.ylim([0,0.05])
+fig.savefig('/Users/tobias/Desktop/plot_log.pdf',bbox_inches='tight', dpi = 500)
+
+
+
+
+
+
+
+
+def calcHPD(data, level):
+    assert (0 < level < 1)
+    d = list(data)
+    d.sort()
+    nData = len(data)
+    nIn = int(round(level * nData))
+    if nIn < 2 :
+        raise RuntimeError("not enough data")
+    i = 0
+    r = d[i+nIn-1] - d[i]
+    for k in range(len(d) - (nIn - 1)):
+         rk = d[k+nIn-1] - d[k]
+         if rk < r :
+             r = rk
+             i = k
+    assert 0 <= i <= i+nIn-1 < len(d)
+    return (d[i], d[i+nIn-1])
 
 
 max_t = 100
@@ -52,11 +75,17 @@ for x_value in x:
     sample_rates = np.random.choice(q_samples,size=n_samples,p=p,replace=1)
     all_sampled_rates.append(sample_rates)
 all_rates = [item for sublist in all_sampled_rates for item in sublist]
+log_rates = np.log(all_rates)
+
+all_rates[all_rates<=0]
+
+
 np.mean(all_rates)
+calcHPD(all_rates,0.95)
 
+plt.hist(all_rates,100)
 
-
-
+np.random.random(n_bins)
 
 # 10000 q-s from uniform between 0 and 1
 # calculate posterior for all q-s and each given x-value

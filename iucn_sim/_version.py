@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = "v"
-    cfg.parentdir_prefix = "secapr-"
-    cfg.versionfile_source = "secapr/_version.py"
+    cfg.parentdir_prefix = "iucn_sim-"
+    cfg.versionfile_source = "iucn_sim/_version.py"
     cfg.verbose = False
     return cfg
 

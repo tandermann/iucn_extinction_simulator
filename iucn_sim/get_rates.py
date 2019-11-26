@@ -102,6 +102,7 @@ def add_arguments(parser):
     
     
 def main(args):
+    
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -194,7 +195,6 @@ def main(args):
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
     print('Observed the following status changes (type: count)')
-    print(change_type_dict)
     print('Filling in missing status data...')
     df_for_year_count = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict,iucn_start_year,current_year)
     # count years spent in each category for all species
@@ -214,7 +214,6 @@ def main(args):
         else:
             print('ERROR: Use --n_rep flag to set the number of simulation replicates.')
             quit()
-    print('Preparing data for %i simulation replicates'%sim_reps)
     status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
     for status_change in change_type_dict.keys():
         states = status_change.split('->')
@@ -222,6 +221,9 @@ def main(args):
         new_state = states[1]
         count = change_type_dict[status_change]
         status_change_coutn_df.loc[original_state,new_state] = count
+    status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
+    print(status_change_coutn_df)
+    print('Preparing data for %i simulation replicates'%sim_reps)
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)])
     for status_a in status_change_coutn_df.columns:
         column = status_change_coutn_df[status_a]
@@ -234,6 +236,7 @@ def main(args):
     sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]].apply(pd.to_numeric)
     sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')
 
+    
     # get current status for all species we want to simulate___________________
     # get list of all species that we don't have IUCN data for already
     if status_list:
@@ -265,8 +268,8 @@ def main(args):
             else:
                 current_status = missing_species_status_data[missing_species_status_data[0]==species][1].values[0]
                 if current_status not in ['LC','NT','VU','EN','CR','DD']:
-                    print('Species %s was not found in IUCN database. Current status is therefore set to DD (data deficient).'%species)
-                    current_status = 'DD'
+                    print('Species %s was not found in IUCN database. Current status is therefore set to NE (Not Evaluated).'%species)
+                    current_status = 'NE'
             current_status_list.append(current_status)
     final_df_current_status = pd.DataFrame(np.array([species_list,current_status_list]).T,columns=['species','current_status'])
     final_df_current_status.to_csv(os.path.join(iucn_outdir,'current_status_all_species.txt'),sep='\t',index=False)
