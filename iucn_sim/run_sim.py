@@ -13,8 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 np.random.seed(1234)
-import os, glob
-import datetime
+import os
 import sys
 import iucn_sim.functions as cust_func
 
@@ -59,57 +58,53 @@ def add_arguments(parser):
         help="0=off, 1=on (default=0)."
     )
 
+def update_multiplier(q,d=1.1):
+    u = np.random.uniform(0,1)
+    l = 2*np.log(d)
+    m = np.exp(l*(u-.5))
+    new_q = q * m
+    return new_q, np.log(m)
 
-#true_rate = 0.0001
-#max_sim = 1000
-#ext_time_array = (np.random.exponential(1./true_rate, max_sim)).astype(int)
-#max_t=1000000
-#ext_time_array[ext_time_array>max_t] = max_t
-
-def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
+def get_rate_estimate(ext_time_array,max_t,index,final_index,n_gen = 100000,burnin = 1000):
     sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
     ext_time_array_new = ext_time_array.copy()
     ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
     ext_time_array_new = ext_time_array_new.astype(float)
-    q_samples = np.random.random(n_bins)
-    # extinction occurrences
-    n_extinct = len(ext_time_array_new[ext_time_array_new< float(max_t)])
-    n_alive = len(ext_time_array_new[ext_time_array_new== float(max_t)])
-    p = np.zeros([ext_time_array_new.shape[0],n_bins])
-    if n_extinct>0:
-        p[ext_time_array_new< float(max_t),:] = q_samples*np.exp(-np.array([q_samples for i in np.arange(n_extinct)]).T*ext_time_array_new[ext_time_array_new< float(max_t)]).T
-    # non extinct occurrences
-    if n_alive>0:
-        p[ext_time_array_new==float(max_t),:] = np.exp(-np.array([q_samples for i in np.arange(n_alive)]).T*ext_time_array_new[ext_time_array_new==float(max_t)]).T
-    #p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
-    p = (p.T/np.sum(p,axis=1))
-    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
-    all_rates = [item for sublist in all_sampled_rates for item in sublist]
-    mean_value = np.mean(all_rates)
-    lower,upper = cust_func.calcHPD(all_rates,0.95)
+    w_times = np.sum(ext_time_array_new)
+    ext_events = len(ext_time_array_new[ext_time_array_new<max_t])
+    post_samples = []
+    q = 0.01
+    likA = np.log(q)*ext_events -q*w_times    
+    for i in range(n_gen):
+        new_q, hast = update_multiplier(q)
+        lik = np.log(new_q)*ext_events -new_q*w_times
+        if lik-likA + hast >= np.log(np.random.random()):
+            q = new_q
+            likA = lik
+        if i > burnin and i % 10==0:
+            post_samples.append(q)
+    mean_value = np.mean(post_samples)
+    lower,upper = cust_func.calcHPD(post_samples,0.95)
     return [mean_value,lower,upper]
 
-#def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
-#    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
-#    ext_time_array_new = ext_time_array.copy()
-#    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
-#    ext_time_array_new = ext_time_array_new.astype(float)
-#    q_samples = np.random.random(n_bins)
-#    p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
-#    p = (p.T/np.sum(p,axis=1))
-#    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
-#    all_rates = [item for sublist in all_sampled_rates for item in sublist]
-#    mean_value = np.mean(all_rates)
-#    lower,upper = cust_func.calcHPD(all_rates,0.95)
-#    return [mean_value,lower,upper]
+#true_rate = 0.01
+#n_sim = 100
+#ext_time_array = (np.random.exponential(1./true_rate, n_sim)).astype(int)
+#max_t=100
+#ext_time_array[ext_time_array>max_t] = max_t
+#n_bins = 10000
+#n_samples = 100
+#
+#get_rate_estimate(ext_time_array,max_t)
+
 
 def main(args): 
 
 #    import argparse
 #    p = argparse.ArgumentParser()
 #    args = p.parse_args()    
-#    args.indir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_carnivora_test'
-#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_carnivora_test/simulation_results'
+#    args.indir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir'
+#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir/simulations'
 #    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator/'
 #    args.n_years = 100
 #    args.plot_diversity_trajectory = 1
@@ -274,5 +269,43 @@ def main(args):
     print('\n')
 
         
-        
+
+
+#def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
+#    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
+#    ext_time_array_new = ext_time_array.copy()
+#    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
+#    ext_time_array_new = ext_time_array_new.astype(float)
+#    q_samples = np.random.random(n_bins)
+#    # extinction occurrences
+#    n_extinct = len(ext_time_array_new[ext_time_array_new< float(max_t)])
+#    n_alive = len(ext_time_array_new[ext_time_array_new== float(max_t)])
+#    p = np.zeros([ext_time_array_new.shape[0],n_bins])
+#    if n_extinct>0:
+#        p[ext_time_array_new< float(max_t),:] = q_samples*np.exp(-np.array([q_samples for i in np.arange(n_extinct)]).T*ext_time_array_new[ext_time_array_new< float(max_t)]).T
+#    # non extinct occurrences
+#    if n_alive>0:
+#        p[ext_time_array_new==float(max_t),:] = np.exp(-np.array([q_samples for i in np.arange(n_alive)]).T*ext_time_array_new[ext_time_array_new==float(max_t)]).T
+#    #p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
+#    p = (p.T/np.sum(p,axis=1))
+#    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
+#    all_rates = [item for sublist in all_sampled_rates for item in sublist]
+#    mean_value = np.mean(all_rates)
+#    lower,upper = cust_func.calcHPD(all_rates,0.95)
+#    return [mean_value,lower,upper]
+
+#def get_rate_estimate(ext_time_array,max_t,index,final_index,n_bins = 10000,n_samples = 100):
+#    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
+#    ext_time_array_new = ext_time_array.copy()
+#    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
+#    ext_time_array_new = ext_time_array_new.astype(float)
+#    q_samples = np.random.random(n_bins)
+#    p = np.array([q_samples*np.exp(-q_samples*sim_value) if sim_value < float(max_t) else np.exp(-q_samples*sim_value) for sim_value in ext_time_array_new])
+#    p = (p.T/np.sum(p,axis=1))
+#    all_sampled_rates = [np.random.choice(q_samples,size=n_samples,p=p_rep,replace=1) for p_rep in p.T]
+#    all_rates = [item for sublist in all_sampled_rates for item in sublist]
+#    mean_value = np.mean(all_rates)
+#    lower,upper = cust_func.calcHPD(all_rates,0.95)
+#    return [mean_value,lower,upper]
+
         

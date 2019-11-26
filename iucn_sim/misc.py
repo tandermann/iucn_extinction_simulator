@@ -11,7 +11,31 @@ np.set_printoptions(suppress=True)
 import pandas as pd
 import matplotlib.pyplot as plt
 np.random.seed(1234)
+import os
 
+
+
+from urllib.request import urlopen
+import re
+
+url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/iucn_history/MAMMALIA_iucn_history.txt'
+outdir = '/Users/tobias/Desktop'
+urlpath =urlopen(url)
+string = urlpath.read().decode('utf-8')
+print(string)
+
+pattern = re.compile('[A-Z]*_iucn_history.txt"') #the pattern actually creates duplicates in the list
+
+filelist = pattern.findall(string)
+print(filelist)
+
+for filename in filelist:
+    filename=filename[:-1]
+    remotefile = urlopen(url + filename)
+    localfile = open(os.path.join(outdir,filename),'wb')
+    localfile.write(remotefile.read())
+    localfile.close()
+    remotefile.close()
 
 
 n100_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_100.txt'
@@ -27,8 +51,8 @@ plt.plot(np.log10(n100_t10k_sim),np.log10(n10k_sim),'o')
 plt.xlabel('np.log10(n100_t10k_sim)')
 plt.ylabel('np.log10(n10k_sim)')
 plt.tight_layout()
-#plt.xlim([0,0.05])
-#plt.ylim([0,0.05])
+plt.xlim([-2.6,-1.0])
+plt.ylim([-2.6,-1.0])
 fig.savefig('/Users/tobias/Desktop/plot_log.pdf',bbox_inches='tight', dpi = 500)
 
 

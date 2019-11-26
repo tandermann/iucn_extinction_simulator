@@ -15,9 +15,9 @@ np.random.seed(1234)
 import subprocess
 import os, glob
 import datetime
-import sys
 import iucn_sim.functions as cust_func
-
+from urllib.request import urlopen
+from io import StringIO
 
 # get extinction probs_________________________________________________________
 def p_e_year(years,p_e):
@@ -75,11 +75,6 @@ def add_arguments(parser):
         help="Provide path to outdir where results will be saved."
     )
     parser.add_argument(
-        '--github_repo',
-        default=0,
-        help="Provide path to a copy of the iucn_extinction_simulator GitHub repo. This is needed to search for pre-compiled files that significantly shorten the computation time. Download link: https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip (make sure to unzip the downloaded repo)."
-    )
-    parser.add_argument(
         '--status_list',
         default=0,
         help="Provide a text file containing a valid IUCN status (LC,NT,VU,EN,CR,DD) for each species, separated by newline (same order as species names provided under --input_data)."
@@ -102,7 +97,7 @@ def add_arguments(parser):
     
     
 def main(args):
-    
+
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -110,10 +105,9 @@ def main(args):
     n_rep = int(args.n_rep)
     iucn_key = args.iucn_key
     outdir = args.outdir
-    github_repo = args.github_repo
-    allow_precompiled_iucn_data = args.allow_precompiled_iucn_data
-    rate_sampling_range = args.rate_sampling_range
-    rate_bins = args.rate_bins
+    allow_precompiled_iucn_data = int(args.allow_precompiled_iucn_data)
+    rate_sampling_range = int(args.rate_sampling_range)
+    rate_bins = int(args.rate_bins)
     status_list = args.status_list
     
     # create the r-scripts to be used later on:
@@ -144,15 +138,29 @@ def main(args):
     iucn_outdir = os.path.join(outdir,'iucn_data')    
     if not os.path.exists(iucn_outdir):
         os.makedirs(iucn_outdir)
-    precompiled_taxon_groups=[]
-    if github_repo:
-        precompiled_taxon_group_files = glob.glob('%s/data/precompiled/iucn_history/*_iucn_history.txt'%github_repo)
-        precompiled_taxon_groups = [str.lower(os.path.basename(filename).replace('_iucn_history.txt','')) for filename in precompiled_taxon_group_files]
+    precompiled_taxon_groups = []
+    precompiled_taxon_group_files = []
+    if allow_precompiled_iucn_data:
+        for taxon_group in taxon_reference_groups:
+            try:
+                # look for precompiled files online    
+                url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/iucn_history/%s_iucn_history.txt'%taxon_group.upper()
+                urlpath =urlopen(url)
+                string = urlpath.read().decode('utf-8')        
+                string_input = StringIO(string)
+                ref_group_data = pd.read_csv(string_input, sep="\t")
+                hist_outfile = os.path.join(iucn_outdir,'iucn_history_%s.txt'%taxon_group)
+                ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
+                precompiled_taxon_groups.append(str.lower(taxon_group))
+                precompiled_taxon_group_files.append(hist_outfile)
+            except:
+                pass
+
     iucn_history_files = []
     for i,taxon_group in enumerate(taxon_reference_groups):
         if str.lower(taxon_group) in precompiled_taxon_groups and allow_precompiled_iucn_data:
-            print('Loading precompiled IUCN history data from %s/data/precompiled/iucn_history/'%github_repo)
-            iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).startswith(str.upper(taxon_group))][0])
+            print('Using precompiled IUCN history data for %s.'%taxon_group)                    
+            iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).endswith(str.lower(taxon_group)+'.txt')][0])
         else:
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
@@ -194,7 +202,6 @@ def main(args):
     print('Current IUCN status distribution in specified reference group:',dict(zip(unique, counts)))
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
-    print('Observed the following status changes (type: count)')
     print('Filling in missing status data...')
     df_for_year_count = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict,iucn_start_year,current_year)
     # count years spent in each category for all species
