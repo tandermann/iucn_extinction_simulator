@@ -16,29 +16,22 @@ import os
 
 
 from urllib.request import urlopen
-import re
+from io import StringIO
 
 url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/iucn_history/MAMMALIA_iucn_history.txt'
 outdir = '/Users/tobias/Desktop'
 urlpath =urlopen(url)
 string = urlpath.read().decode('utf-8')
-print(string)
 
-pattern = re.compile('[A-Z]*_iucn_history.txt"') #the pattern actually creates duplicates in the list
-
-filelist = pattern.findall(string)
-print(filelist)
-
-for filename in filelist:
-    filename=filename[:-1]
-    remotefile = urlopen(url + filename)
-    localfile = open(os.path.join(outdir,filename),'wb')
-    localfile.write(remotefile.read())
-    localfile.close()
-    remotefile.close()
+string_input = StringIO(string)
+pd.read_csv(string_input, sep="\t")
 
 
-n100_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_100.txt'
+
+
+
+
+n100_sim_file = ''
 n10k_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_10k.txt'
 n100_t10k_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir/simulations_100sim_10kyears/extinction_prob_all_species.txt'
 

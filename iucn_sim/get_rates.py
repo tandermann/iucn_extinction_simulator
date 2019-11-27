@@ -24,24 +24,47 @@ def p_e_year(years,p_e):
     pe_year = 1-(1-float(p_e))**(1/years)
     return pe_year
 
-def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 10000):
+def update_multiplier(q,d=1.1):
+    u = np.random.uniform(0,1)
+    l = 2*np.log(d)
+    m = np.exp(l*(u-.5))
+    new_q = q * m
+    return new_q, np.log(m)
+
+def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 1000):
     def get_loglik(count, dT, rate):
         return np.log(rate)*count - dT*rate
-    mle = count/tot_time
-    if count == 0:
-        minRange = 1*np.exp(-10)
-        maxRange = range_factor/tot_time
-    else:
-        minRange = mle/range_factor
-        maxRange = mle*range_factor
-    rates = np.linspace(minRange, maxRange,n_bins)
-    lik = get_loglik(count,tot_time,rates)
-    lik = lik - np.max(lik)
-    sample_rates = np.random.choice(rates,size=n_samples,p=np.exp(lik)/np.sum(np.exp(lik)),replace=1)
-    #plt.plot(np.log(rates),lik)
-    #np.log(mle)
-    return sample_rates
-                
+    post_samples = []
+    q = 0.01
+    likA = get_loglik(count,tot_time,q)    
+    for i in range(n_gen):
+        new_q, hast = update_multiplier(q)
+        lik = get_loglik(count,tot_time,new_q) 
+        if lik-likA + hast >= np.log(np.random.random()):
+            q = new_q
+            likA = lik
+        if i > burnin and i % 10==0:
+            post_samples.append(q)
+    sampled_rates = np.random.choice(post_samples,n_samples,replace=False)
+    return sampled_rates
+
+#def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 10000):
+#    def get_loglik(count, dT, rate):
+#        return np.log(rate)*count - dT*rate
+#    mle = count/tot_time
+#    if count == 0:
+#        minRange = 1*np.exp(-10)
+#        maxRange = range_factor/tot_time
+#    else:
+#        minRange = mle/range_factor
+#        maxRange = mle*range_factor
+#    rates = np.linspace(minRange, maxRange,n_bins)
+#    lik = get_loglik(count,tot_time,rates)
+#    lik = lik - np.max(lik)
+#    sample_rates = np.random.choice(rates,size=n_samples,p=np.exp(lik)/np.sum(np.exp(lik)),replace=1)
+#    #plt.plot(np.log(rates),lik)
+#    #np.log(mle)
+#    return sample_rates
 
 def add_arguments(parser):
     parser.add_argument(
@@ -96,8 +119,7 @@ def add_arguments(parser):
     )
     
     
-def main(args):
-
+def main(args):  
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -238,7 +260,7 @@ def main(args):
             if not status_a == status_b:
                 count = column[status_b]
                 total_time = years_in_each_category[status_a]
-                rates = sample_rate(count, total_time, n_samples = sim_reps, range_factor = rate_sampling_range, n_bins = rate_bins)
+                rates = sample_rate_mcmc(count, total_time, n_samples = sim_reps, range_factor = rate_sampling_range, n_bins = rate_bins)
                 sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)]),ignore_index=True)
     sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]].apply(pd.to_numeric)
     sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')

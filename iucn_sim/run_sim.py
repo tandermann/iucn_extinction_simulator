@@ -92,25 +92,11 @@ def get_rate_estimate(ext_time_array,max_t,index,final_index,n_gen = 100000,burn
 #ext_time_array = (np.random.exponential(1./true_rate, n_sim)).astype(int)
 #max_t=100
 #ext_time_array[ext_time_array>max_t] = max_t
-#n_bins = 10000
-#n_samples = 100
 #
 #get_rate_estimate(ext_time_array,max_t)
 
 
-def main(args): 
-
-#    import argparse
-#    p = argparse.ArgumentParser()
-#    args = p.parse_args()    
-#    args.indir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir'
-#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir/simulations'
-#    args.github_repo = '/Users/tobias/GitHub/iucn_extinction_simulator/'
-#    args.n_years = 100
-#    args.plot_diversity_trajectory = 1
-#    args.plot_histograms = 1
-#    args.n_sim = 100
-#    args.status_change = 1
+def main(args):
     
     indir = args.indir
     outdir = args.outdir
