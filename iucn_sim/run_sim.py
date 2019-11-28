@@ -17,9 +17,6 @@ import os
 import sys
 import iucn_sim.functions as cust_func
 
-def p_e_year(years,p_e):
-    pe_year = 1-(1-p_e)**(1/years)
-    return pe_year
 
 def add_arguments(parser):
     parser.add_argument(
@@ -48,15 +45,54 @@ def add_arguments(parser):
         help="Model IUCN status changes in future simulations. 0=off, 1=on (default=1)."
     )
     parser.add_argument(
+        '--conservation_increase_factor',
+        default=1,
+        help="The transition rates leading to improvements in IUCN conservation status are multiplied by this factor."
+    )
+    parser.add_argument(
+        '--threat_increase_factor',
+        default=1,
+        help="Opposite of conservation_increase_factor, multiplies the transition rates leading to worsening in IUCN conservation status."
+    )
+    parser.add_argument(
+        '--model_unknown_as_lc',
+        default=1,
+        help="Model new status for all DD and NE species as LC (best case scenario). 0=off, 1=on (default=0)."
+    )
+    parser.add_argument(
+        '--extinction_rates',
+        default=1,
+        help="Estimation of extinction rates from simulation results: 0=off, 1=on (default=1)."
+    )
+    parser.add_argument(
+        '--n_gen',
+        default=100000,
+        help="Number of generations for MCMC for extinction rate estimation (default=100000)."
+    )
+    parser.add_argument(
+        '--burnin',
+        default=1000,
+        help="Burn-in for MCMC for extinction rate estimation (default=1000)."
+    )
+    parser.add_argument(
         '--plot_diversity_trajectory',
         default=1,
-        help="0=off, 1=on (default=1)."
+        help="Plots the simulated diversity trajectory: 0=off, 1=on (default=1)."
     )
     parser.add_argument(
         '--plot_histograms',
         default=0,
-        help="0=off, 1=on (default=0)."
+        help="Plots histograms of simulated extinction times for each species: 0=off, 1=on (default=0)."
     )
+    parser.add_argument(
+        '--plot_posterior',
+        default=0,
+        help="Plots histograms of posterior rate estimates for each species: 0=off, 1=on (default=0)."
+    )
+
+def p_e_year(years,p_e):
+    pe_year = 1-(1-p_e)**(1/years)
+    return pe_year
 
 def update_multiplier(q,d=1.1):
     u = np.random.uniform(0,1)
@@ -65,8 +101,8 @@ def update_multiplier(q,d=1.1):
     new_q = q * m
     return new_q, np.log(m)
 
-def get_rate_estimate(ext_time_array,max_t,index,final_index,n_gen = 100000,burnin = 1000):
-    sys.stdout.write('\rProcessing species: %i/%i '%(index,final_index))
+def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,pdf=0,n_gen = 100000,burnin = 1000):
+    sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
     ext_time_array_new = ext_time_array.copy()
     ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
     ext_time_array_new = ext_time_array_new.astype(float)
@@ -85,27 +121,61 @@ def get_rate_estimate(ext_time_array,max_t,index,final_index,n_gen = 100000,burn
             post_samples.append(q)
     mean_value = np.mean(post_samples)
     lower,upper = cust_func.calcHPD(post_samples,0.95)
+    if plot_posterior:
+        plt.figure()
+        plt.hist(post_samples,100)
+        plt.xlabel('Extinction rate estimates')
+        plt.ylabel('Counts')
+        plt.title(species_list[index])
+        plt.tight_layout()
+        pdf.savefig()
+        plt.close()
+        #fig.savefig(os.path.join(posterior_plot_dir,'%s.pdf'%species_list[index]),bbox_inches='tight', dpi = 500)
     return [mean_value,lower,upper]
 
+## test rate estimator
 #true_rate = 0.01
 #n_sim = 100
 #ext_time_array = (np.random.exponential(1./true_rate, n_sim)).astype(int)
 #max_t=100
 #ext_time_array[ext_time_array>max_t] = max_t
-#
 #get_rate_estimate(ext_time_array,max_t)
 
 
 def main(args):
+ 
+#    import argparse
+#    p = argparse.ArgumentParser()
+#    args = p.parse_args()    
+#    args.indir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output/transition_rates/'
+#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output/future_simulations/'
+#    args.n_years = 100
+#    args.n_sim = 10000
+#    args.status_change = 1
+#    args.model_unknown_as_lc = 0
+#    args.conservation_increase_factor = 1
+#    args.threat_increase_factor = 1
+#    args.extinction_rates = 1
+#    args.n_gen = 100000
+#    args.burnin = 1000
+#    args.plot_diversity_trajectory = 1
+#    args.plot_histograms = 0
+#    args.plot_posterior = 0
     
     indir = args.indir
     outdir = args.outdir
     n_years = int(args.n_years)
-    plot_diversity_trajectory = int(args.plot_diversity_trajectory)
-    plot_histograms = int(args.plot_histograms)
     n_sim = int(args.n_sim)
     allow_status_change = int(args.status_change)
-    print(allow_status_change)
+    conservation_increase_factor = int(args.conservation_increase_factor)
+    threat_increase_factor = int(args.threat_increase_factor)
+    extinction_rates = int(args.extinction_rates)
+    n_gen = int(args.n_gen)
+    burnin = int(args.burnin)
+    plot_diversity_trajectory = int(args.plot_diversity_trajectory)
+    plot_histograms = int(args.plot_histograms)
+    plot_posterior = int(args.plot_posterior)
+    model_unknown_as_lc = int(args.model_unknown_as_lc)
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -136,6 +206,16 @@ def main(args):
             cr_risk = cr_risks_rep[j]
             status_specific_p_e = np.array([0.000000155728,0.000041551152,0.001053050310,en_risk,cr_risk]) # These values are the category specific probabilities of extinction per year calculated from IUCN definition of each category
             q_matrix = cust_func.qmatrix(rates, status_specific_p_e)
+            if conservation_increase_factor != 1:
+                indeces_lower_triangle = np.tril_indices(q_matrix.shape[0],-1)
+                q_matrix[indeces_lower_triangle] = q_matrix[indeces_lower_triangle] * conservation_increase_factor
+                np.fill_diagonal(q_matrix,0)
+                np.fill_diagonal(q_matrix, -np.sum(q_matrix,axis=1))
+            if threat_increase_factor != 1:
+                indeces_upper_triangle = np.triu_indices(q_matrix.shape[0],1)
+                q_matrix[indeces_upper_triangle] = q_matrix[indeces_upper_triangle] * threat_increase_factor
+                np.fill_diagonal(q_matrix,0)
+                np.fill_diagonal(q_matrix, -np.sum(q_matrix,axis=1))                
             q_matrix_dict[species] = q_matrix
         qmatrix_dict_list.append(q_matrix_dict)
 
@@ -173,7 +253,11 @@ def main(args):
     #current_year = datetime.datetime.now().year 
     #final_year = current_year+int(n_years)
     delta_t = n_years
-    all_lc=False
+    if model_unknown_as_lc:
+        print('\nSetting all DD and NE species to LC.')
+        all_lc=True
+    else:
+        all_lc=False
     if allow_status_change:
         status_change=True
     else:
@@ -183,23 +267,7 @@ def main(args):
     print('\nStarting simulations ...')
     diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,delta_t,species_list_status,final_dd_probs,final_qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
 
-    # calculate some extinction stats__________________________________________
-    sim_species_list = te_array[:,0].copy()
-    ext_date_data = te_array[:,1:].copy()
-    extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
-    extinction_prob = extinction_occs/ext_date_data.shape[1]
-    # estimate extinction rates scaled by year
-    print('\nEstimating extinction rates from simulation output...')
-    sampled_rates = np.array([get_rate_estimate(species_values,n_years,i+1,ext_date_data.shape[0]) for i,species_values in enumerate(ext_date_data)])
 
-    # export extinction stats to file
-    column_names = ['species','rate_e_mean','rate_e_lower','rate_e_upper','simulated_p_e_in_%i_years'%delta_t]
-    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,sampled_rates[:,0],sampled_rates[:,1],sampled_rates[:,2],extinction_prob]).T,columns=column_names)
-#    extinction_prob_df.iloc[:,1:] = extinction_prob_df.iloc[:,1:].astype(float).round(decimals=6)
-    extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
-    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.9f')
-    print('\n')
-    
     if plot_diversity_trajectory:
         # plot diversity trajectory of species list________________________________
         #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
@@ -223,6 +291,32 @@ def main(args):
         plt.ylabel('Lost species')
         plt.tight_layout()
         fig.savefig(os.path.join(outdir,'future_diversity_trajectory.pdf'),bbox_inches='tight', dpi = 500)
+
+    
+    if extinction_rates:
+        # calculate some extinction stats__________________________________________
+        sim_species_list = te_array[:,0].copy()
+        ext_date_data = te_array[:,1:].copy()
+        extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
+        extinction_prob = extinction_occs/ext_date_data.shape[1]
+        # estimate extinction rates scaled by year
+        print('\nEstimating extinction rates from simulation output...')
+        #ext_date_data = ext_date_data[:10,:]
+        if plot_posterior:
+            with PdfPages(os.path.join(outdir,'posterior_ext_rate_histograms.pdf')) as pdf:
+                sampled_rates = np.array([get_rate_estimate(species_values,n_years,i,sim_species_list,plot_posterior=plot_posterior,pdf=pdf,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
+        else:
+            sampled_rates = np.array([get_rate_estimate(species_values,n_years,i,sim_species_list,plot_posterior=plot_posterior,pdf=0,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
+        # export extinction stats to file
+        column_names = ['species','rate_e_mean','rate_e_lower','rate_e_upper','simulated_p_e_in_%i_years'%delta_t]
+        extinction_prob_df = pd.DataFrame(np.array([sim_species_list,sampled_rates[:,0],sampled_rates[:,1],sampled_rates[:,2],extinction_prob]).T,columns=column_names)
+    else:
+        column_names = ['species','simulated_p_e_in_%i_years'%delta_t]
+        extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=column_names)        
+    extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
+    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.5f')
+    print('\n')    
+
 
     if plot_histograms:
         # plot histograms of extinction times

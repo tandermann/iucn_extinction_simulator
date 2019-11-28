@@ -273,15 +273,21 @@ def run_multi_sim(n_rep,delta_t,species_list_status,dd_probs,qmatrix_dict_list,o
         current_status_list_new_dd = current_status_list.copy()
         dd_indices = np.where([current_status_list_new_dd=='DD'])[1]    
         dd_prob_vector = dd_probs.T[n]
-        new_draws = np.random.choice(['LC','NT','VU','EN','CR'], size=len(dd_indices), replace=True, p=dd_prob_vector)
+        if all_lc:
+	        new_draws = np.array(['LC']*len(dd_indices))
+        else:
+            new_draws = np.random.choice(['LC','NT','VU','EN','CR'], size=len(dd_indices), replace=True, p=dd_prob_vector)
         current_status_list_new_dd[dd_indices] = new_draws
         # new modeling of NE species every rep
         status_count_dict = Counter(current_status_list)
         counts = np.array([status_count_dict[key] for key in status_count_dict.keys() if key not in ['DD','NE']])
         ne_probs = counts/sum(counts)
         status_array_count = [key for key in status_count_dict.keys() if key not in ['DD','NE']]        
-        ne_indices = np.where([current_status_list_new_dd=='NE'])[1]    
-        new_draws = np.random.choice(status_array_count, size=len(ne_indices), replace=True, p=ne_probs)
+        ne_indices = np.where([current_status_list_new_dd=='NE'])[1]
+        if all_lc:
+	        new_draws = np.array(['LC']*len(ne_indices))
+        else:
+            new_draws = np.random.choice(status_array_count, size=len(ne_indices), replace=True, p=ne_probs)
         current_status_list_new_dd[ne_indices] = new_draws
     
         future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,current_spec_list,outdir,qmatrix_dict,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)

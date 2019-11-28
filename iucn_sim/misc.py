@@ -31,21 +31,28 @@ pd.read_csv(string_input, sep="\t")
 
 
 
-n100_sim_file = ''
-n10k_sim_file = '/Users/tobias/Desktop/extinction_prob_all_species_10k.txt'
-n100_t10k_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/output_dir/simulations_100sim_10kyears/extinction_prob_all_species.txt'
+n100_sim_file = '/Users/tobias/Desktop/runsim_test/100sim_100years/extinction_prob_all_species.txt'
+n10k_sim_file = '/Users/tobias/Desktop/runsim_test/10ksim_100years/extinction_prob_all_species.txt'
+n100_t10k_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output/future_simulations_10k_years/extinction_prob_all_species.txt'
 
 n100_sim = pd.read_csv(n100_sim_file,sep='\t').rate_e_mean.values
+uncertainty_interval_n100_sim = np.abs(n100_sim-pd.read_csv(n100_sim_file,sep='\t').iloc[:,2:4].values.T)
 n10k_sim = pd.read_csv(n10k_sim_file,sep='\t').rate_e_mean.values
+uncertainty_interval_n10k_sim = np.abs(n10k_sim-pd.read_csv(n10k_sim_file,sep='\t').iloc[:,2:4].values.T)
+
 n100_t10k_sim = pd.read_csv(n100_t10k_file,sep='\t').rate_e_mean.values
 
 fig = plt.figure()
-plt.plot(np.log10(n100_t10k_sim),np.log10(n10k_sim),'o')
-plt.xlabel('np.log10(n100_t10k_sim)')
-plt.ylabel('np.log10(n10k_sim)')
+#plt.plot(np.log10(n100_sim),np.log10(n10k_sim),'o')
+plt.errorbar(n100_sim,n10k_sim, xerr=uncertainty_interval_n100_sim, yerr=uncertainty_interval_n10k_sim, fmt='o',ecolor='black')
+plt.xlim(0.00005,0.05)
+plt.ylim(0.00005,0.05)
+ax=plt.gca()
+ax.set_xscale('log')
+ax.set_yscale('log')
+plt.xlabel('np.log(n100_sim)')
+plt.ylabel('np.log(n10k_sim)')
 plt.tight_layout()
-plt.xlim([-2.6,-1.0])
-plt.ylim([-2.6,-1.0])
 fig.savefig('/Users/tobias/Desktop/plot_log.pdf',bbox_inches='tight', dpi = 500)
 
 

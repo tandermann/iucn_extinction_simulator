@@ -48,24 +48,6 @@ def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 100
     sampled_rates = np.random.choice(post_samples,n_samples,replace=False)
     return sampled_rates
 
-#def sample_rate(count, tot_time, n_samples = 1, range_factor = 100, n_bins = 10000):
-#    def get_loglik(count, dT, rate):
-#        return np.log(rate)*count - dT*rate
-#    mle = count/tot_time
-#    if count == 0:
-#        minRange = 1*np.exp(-10)
-#        maxRange = range_factor/tot_time
-#    else:
-#        minRange = mle/range_factor
-#        maxRange = mle*range_factor
-#    rates = np.linspace(minRange, maxRange,n_bins)
-#    lik = get_loglik(count,tot_time,rates)
-#    lik = lik - np.max(lik)
-#    sample_rates = np.random.choice(rates,size=n_samples,p=np.exp(lik)/np.sum(np.exp(lik)),replace=1)
-#    #plt.plot(np.log(rates),lik)
-#    #np.log(mle)
-#    return sample_rates
-
 def add_arguments(parser):
     parser.add_argument(
         '--input_data',
@@ -108,18 +90,19 @@ def add_arguments(parser):
         help="Set this flag to 0 if you want to avoid using precompiled IUCN history data. By default (1) this data is used if available for your specified reference organism group."
     )
     parser.add_argument(
-        '--rate_sampling_range',
-        default=100,
-        help="Set the range of status change rate sampling. Default = 100 will sample from a uniform distribution centered at the Maximum Likelihood Estimate (MLE) with a range of MLE/100 and MLE*100."
+        '--n_gen',
+        default=100000,
+        help="Number of generations for MCMC for transition rate estimation (default=100000)."
     )
     parser.add_argument(
-        '--rate_bins',
-        default=10000,
-        help="Set number of bins from which to sample the status transition rates (default=10000)."
+        '--burnin',
+        default=1000,
+        help="Burn-in for MCMC for transition rate estimation (default=1000)."
     )
     
     
-def main(args):  
+def main(args):   
+    
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -128,8 +111,8 @@ def main(args):
     iucn_key = args.iucn_key
     outdir = args.outdir
     allow_precompiled_iucn_data = int(args.allow_precompiled_iucn_data)
-    rate_sampling_range = int(args.rate_sampling_range)
-    rate_bins = int(args.rate_bins)
+    n_gen = int(args.n_gen)
+    burnin = int(args.burnin)
     status_list = args.status_list
     
     # create the r-scripts to be used later on:
@@ -171,7 +154,7 @@ def main(args):
                 string = urlpath.read().decode('utf-8')        
                 string_input = StringIO(string)
                 ref_group_data = pd.read_csv(string_input, sep="\t")
-                hist_outfile = os.path.join(iucn_outdir,'iucn_history_%s.txt'%taxon_group)
+                hist_outfile = os.path.join(iucn_outdir,'iucn_history_%s.txt'%str.lower(taxon_group))
                 ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
                 precompiled_taxon_groups.append(str.lower(taxon_group))
                 precompiled_taxon_group_files.append(hist_outfile)
@@ -260,7 +243,7 @@ def main(args):
             if not status_a == status_b:
                 count = column[status_b]
                 total_time = years_in_each_category[status_a]
-                rates = sample_rate_mcmc(count, total_time, n_samples = sim_reps, range_factor = rate_sampling_range, n_bins = rate_bins)
+                rates = sample_rate_mcmc(count, total_time, n_samples = sim_reps, n_gen = n_gen, burnin = burnin)
                 sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)]),ignore_index=True)
     sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]].apply(pd.to_numeric)
     sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')
@@ -332,24 +315,4 @@ def main(args):
     cr_risks_df.to_csv(os.path.join(outdir,'cr_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
 
 
-
-
-
-
-# code scraps__________________________________________________________________    
-#    # count years spent in each category for all species, use df without DD values for this
-#    # replace DD with NaN
-#    master_stat_time_df_no_dd = master_stat_time_df.copy()
-#    master_stat_time_df_no_dd.replace('DD', np.nan,inplace=True)
-#    # extract the valid status series for the no_dd df
-#    valid_status_dict_no_dd,most_recent_status_dict_no_dd,status_series_no_dd,taxon_series_no_dd = cust_func.extract_valid_statuses(master_stat_time_df_no_dd)
-#    # count how often each status change occurs
-#    change_type_dict_no_dd = cust_func.count_status_changes(master_stat_time_df_no_dd,valid_status_dict_no_dd)
-#    # fill in missing fields in dataframe
-#    print('Filling in missing status data...')
-#    df_for_year_count = cust_func.fill_dataframe(master_stat_time_df_no_dd,valid_status_dict_no_dd,iucn_start_year,current_year)
-#    # count years spent in each category
-#    years_in_each_category = cust_func.get_years_spent_in_each_category(df_for_year_count)
-#    change_type_dict_no_dd_array = np.array([list(change_type_dict_no_dd.keys()),list(change_type_dict_no_dd.values())]).T
-#    np.savetxt(os.path.join(outdir,'change_type_dict_no_dd.txt'),change_type_dict_no_dd_array,fmt='%s\t%s')   
 

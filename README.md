@@ -44,11 +44,11 @@ The -h command will show and explain all available flags for each specific `iucn
 
 #### Estimate status transition rates and extinction probabilities for all taxa:
 
-`iucn_sim get_rates --input_data data/example_data/gl_data_carnivora.txt --reference_group Mammalia --reference_rank class --outdir data/example_data/output`
+`iucn_sim get_rates --input_data data/example_data/gl_data_carnivora.txt --reference_group Mammalia --reference_rank class --outdir data/example_data/carnivora_output/transition_rates/`
 
 #### Run simulations for future
 
-`iucn_sim run_sim --indir data/example_data/output/ --outdir data/example_data/output/simulations --n_years 81`
+`iucn_sim run_sim --indir data/example_data/carnivora_output/transition_rates/ --outdir data/example_data/carnivora_output/future_simulations/ --n_years 81`
 
 See below for further explanation of the required input.
 
