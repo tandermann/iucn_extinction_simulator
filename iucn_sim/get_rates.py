@@ -238,10 +238,10 @@ def main(args):
     print('Preparing data for %i simulation replicates'%sim_reps)
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)])
     for status_a in status_change_coutn_df.columns:
-        column = status_change_coutn_df[status_a]
-        for status_b in column.index:
+        row = status_change_coutn_df.loc[status_a]
+        for status_b in row.index.values:
             if not status_a == status_b:
-                count = column[status_b]
+                count = row[status_b]
                 total_time = years_in_each_category[status_a]
                 rates = sample_rate_mcmc(count, total_time, n_samples = sim_reps, n_gen = n_gen, burnin = burnin)
                 sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)]),ignore_index=True)

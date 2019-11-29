@@ -48,7 +48,7 @@ The -h command will show and explain all available flags for each specific `iucn
 
 #### Run simulations for future
 
-`iucn_sim run_sim --indir data/example_data/carnivora_output/transition_rates/ --outdir data/example_data/carnivora_output/future_simulations/ --n_years 81`
+`iucn_sim run_sim --indir data/example_data/carnivora_output/transition_rates/ --outdir data/example_data/carnivora_output/future_simulations/ --n_years 100`
 
 See below for further explanation of the required input.
 

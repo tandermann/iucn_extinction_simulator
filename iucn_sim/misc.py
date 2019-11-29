@@ -28,6 +28,26 @@ pd.read_csv(string_input, sep="\t")
 
 
 
+ext_rate_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output/future_simulations/extinction_prob_all_species.txt'
+ext_rate_df = pd.read_csv(ext_rate_file,sep='\t')
+plt.hist(np.log10(ext_rate_df.rate_e_mean),50)
+
+plt.plot(sorted(ext_rate_df.rate_e_mean))
+
+
+trans_rates_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output/transition_rates/sampled_status_change_rates.txt'
+trans_rates_df = pd.read_csv(trans_rates_file,sep='\t')
+states = ['LC','NT','VU','EN','CR','DD']
+trans_rates_matrix = pd.DataFrame(data=np.zeros([6,6]),index=states,columns=states)
+for i,s_string in enumerate(trans_rates_df.status_change.values):
+    values = trans_rates_df.iloc[i,1:].values.astype(float)
+    min_value = min(values)
+    max_value = max(values)
+    state_a,state_b = s_string.split('->')
+    trans_rates_matrix.loc[state_a,state_b] = '%.4f-%.4f'%(min_value,max_value)
+print(trans_rates_matrix.to_latex())
+
+np.max(np.mean(trans_rates_df.iloc[:,1:].values,axis=1))
 
 
 

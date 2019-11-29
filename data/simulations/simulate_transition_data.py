@@ -65,7 +65,7 @@ def sample_rate_mcmc(count, tot_time, n_gen = 100000,burnin = 1000):
 
 
 # ______________________________Simulate data__________________________________
-size_ref_group = 100
+size_ref_group = 100000
 run_estimation = False
 
 n_gen = 100000
@@ -80,15 +80,6 @@ if run_estimation:
     rate_samples = np.exp(np.random.uniform(np.log(mammal_min_rate),np.log(mammal_max_rate),36))
     true_rates = rate_samples.reshape([6,6])
     np.fill_diagonal(true_rates,0)
-    # empirical rates for Mammalia
-    #rate_matrix = np.array([
-    #        [0.,0.002,0.0001,0.0002,0.00004,0.003],
-    #        [0.01,0.,0.013,0.0036,0.0006,0.005],
-    #        [0.004,0.0034,0.,0.01,0.0014,0.008],
-    #        [0.002,0.003,0.014,0.,0.0076,0.007],
-    #        [0.00087,0.0013,0.0017,0.0145,0.,0.0045],
-    #        [0.003,0.0014,0.0025,0.0004,0.0007,0.]
-    #        ])
     
     # sample starting status from empirical status distribution
     states = ['LC','NT','VU','EN','CR','DD']
@@ -174,8 +165,8 @@ plt.ylim(min(true_rates)-0.4*min(true_rates),max(true_rates)+0.4*max(true_rates)
 ax=plt.gca()
 ax.set_xscale('log')
 ax.set_yscale('log')
-#plt.xlabel('True extinction rates')
-#plt.ylabel('Estimated extinction rates')
+plt.xlabel('True transition rates')
+plt.ylabel('Estimated transition rates')
 plt.tight_layout()
 fig.savefig(os.path.join(outdir,'transition_rate_estimates_%s.pdf'%sim_scenario_string),bbox_inches='tight', dpi = 500)
 
