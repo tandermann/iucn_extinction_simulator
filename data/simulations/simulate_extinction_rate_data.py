@@ -72,7 +72,7 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
 
 
 # ________________________________Simulating data______________________________
-n_sim = 100
+n_sim = 100000
 run_estimation = False
 
 n_species = 1000
@@ -114,7 +114,7 @@ plt.ylim(min(true_rates)-0.4*min(true_rates),max(true_rates)+0.4*max(true_rates)
 ax=plt.gca()
 ax.set_xscale('log')
 ax.set_yscale('log')
-#plt.xlabel('True extinction rates')
-#plt.ylabel('Estimated extinction rates')
+plt.xlabel('True extinction rates')
+plt.ylabel('Estimated extinction rates')
 plt.tight_layout()
 fig.savefig(os.path.join(outdir,'extinction_rate_estimates_%s.pdf'%sim_scenario_string),bbox_inches='tight', dpi = 500)

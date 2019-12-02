@@ -453,7 +453,7 @@ def write_r_scripts(output_folder):
     status_list = c()
     for (i in 1:length(species_list)){
       species = as.character(species_list[i])
-      print(paste0('Extracting current status for ', species,' (',i,' of ',length(species_list),')'))
+      #print(paste0('Extracting current status for ', species,' (',i,' of ',length(species_list),')'))
       iucn_info = rl_search(species,key = iucn_key)
       category = iucn_info$result$category
       if (is.null(category)){

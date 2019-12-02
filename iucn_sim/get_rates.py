@@ -13,7 +13,7 @@ import pandas as pd
 #import matplotlib.pyplot as plt
 np.random.seed(1234)
 import subprocess
-import os, glob
+import os
 import datetime
 import iucn_sim.functions as cust_func
 from urllib.request import urlopen
@@ -103,6 +103,20 @@ def add_arguments(parser):
     
 def main(args):   
     
+#    import argparse
+#    p = argparse.ArgumentParser()
+#    args = p.parse_args()    
+#    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_carnivora_some_missing_gl.txt'
+#    args.reference_group = 'Mammalia'
+#    args.reference_rank = 'class'
+#    args.n_rep = 0
+#    args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
+#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output_test/transition_rates'
+#    args.allow_precompiled_iucn_data = 1
+#    args.n_gen = 100000
+#    args.burnin = 1000
+#    args.status_list = 0    
+    
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -170,6 +184,8 @@ def main(args):
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
             iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
+            if not iucn_key:
+                quit('***IUCN-KEY ERROR:*** Need to download IUCN history for specified reference group. Please provide a valid IUCN key (using the --iucn_key flag). Alternatively choose a precompiled reference group (see available groups at github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/iucn_history/).'%(taxon_group))
             #iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
             seqtk = subprocess.Popen(iucn_cmd)
@@ -234,8 +250,9 @@ def main(args):
         count = change_type_dict[status_change]
         status_change_coutn_df.loc[original_state,new_state] = count
     status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
+    print('Counted the following transition occurrences in IUCN history of reference group:')
     print(status_change_coutn_df)
-    print('Preparing data for %i simulation replicates'%sim_reps)
+    print('Estimating rates for %i simulation replicates'%sim_reps)
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)])
     for status_a in status_change_coutn_df.columns:
         row = status_change_coutn_df.loc[status_a]
@@ -259,10 +276,12 @@ def main(args):
             missing_species_file = os.path.join(outdir,'missing_species_list.txt')
             np.savetxt(missing_species_file,missing_species,fmt='%s')
             # extract the current status for those missing species
-            print('Extracting current status for missing species...')
+            print('Extracting current status for species that were not found in reference group...')
             iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), missing_species_file, iucn_key, iucn_outdir]
             #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
+            if not iucn_key:
+                quit('***IUCN-KEY ERROR:*** Trying to download current status for species %s from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively provide the current IUCN status for all your input species using the --status_list flag.'%(str(list(missing_species))))
             seqtk = subprocess.Popen(iucn_cmd)
             seqtk.wait()
             missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
@@ -290,7 +309,14 @@ def main(args):
     # calculate EN and CR extinction risk using GL information_________________
     # calculate yearly extinction risks for categories EN and CR
     if gl_data_available:
-        en_risks = np.array([p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2) for gl_array in gl_matrix])
+        en_risks = []
+        for gl_array in gl_matrix:
+            #replace all nan values with the standard en extinction risk
+            en_risks_species = p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2)
+            n_nan = len(en_risks_species[en_risks_species!=en_risks_species])
+            en_risks_species[en_risks_species!=en_risks_species] = [p_e_year(20,0.2)]*n_nan
+            en_risks.append(en_risks_species)
+        en_risks = np.array(en_risks)
     else:
         print('Warning: No generation length (GL) data found. Extinction risks for status EN and CR are calculated without using GL data.')
         en_risks = np.array([[p_e_year(20,0.2)]*sim_reps]*len(species_list))
@@ -303,7 +329,14 @@ def main(args):
     en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
 
     if gl_data_available:
-        cr_risks = np.array([p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5) for gl_array in gl_matrix])
+        cr_risks = []
+        for gl_array in gl_matrix:
+            #replace all nan values with the standard en extinction risk
+            cr_risks_species = p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5)
+            n_nan = len(cr_risks_species[cr_risks_species!=cr_risks_species])
+            cr_risks_species[cr_risks_species!=cr_risks_species] = [p_e_year(10,0.5)]*n_nan
+            cr_risks.append(cr_risks_species)
+        cr_risks = np.array(cr_risks)
     else:
         cr_risks = np.array([[p_e_year(10,0.5)]*sim_reps]*len(species_list))
     if cr_risks.shape[1] == 1:
