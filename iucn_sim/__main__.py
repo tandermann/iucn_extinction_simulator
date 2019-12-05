@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 #author: Tobias Andermann, tobias.andermann@bioenv.gu.se
+#__main__.py
 
 import os
 import sys

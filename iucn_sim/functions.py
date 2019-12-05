@@ -328,12 +328,12 @@ def run_multi_sim(n_rep,delta_t,species_list_status,dd_probs,qmatrix_dict_list,o
         y = int(key.split('_')[0])
         status_through_time[x,y,:] = status_through_time_dict[key]
     # write data-objects to output folder
-    with open(os.path.join(outdir,'diversity_through_time.pkl'), 'wb') as f:
-        pickle.dump(diversity_through_time, f, pickle.HIGHEST_PROTOCOL)
-    with open(os.path.join(outdir,'te_array.pkl'), 'wb') as f:
-        pickle.dump(te_array, f, pickle.HIGHEST_PROTOCOL)
-    with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
-        pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
+    #with open(os.path.join(outdir,'diversity_through_time.pkl'), 'wb') as f:
+    #    pickle.dump(diversity_through_time, f, pickle.HIGHEST_PROTOCOL)
+    #with open(os.path.join(outdir,'te_array.pkl'), 'wb') as f:
+    #    pickle.dump(te_array, f, pickle.HIGHEST_PROTOCOL)
+    #with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
+    #    pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
     return diversity_through_time,te_array,status_through_time
 
 def calcHPD(data, level):

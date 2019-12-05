@@ -1,296 +1,296 @@
-species	rate_e_mean	rate_e_lower	rate_e_upper	simulated_p_e_in_100_years
-Acinonyx jubatus	0.00161	0.00153	0.00169	0.15020
-Ailuropoda melanoleuca	0.00107	0.00100	0.00114	0.10170
-Ailurus fulgens	0.00450	0.00435	0.00464	0.36210
-Aonyx capensis	0.00093	0.00088	0.00100	0.08990
-Aonyx cinereus	0.00210	0.00200	0.00219	0.19170
-Aonyx congicus	0.00073	0.00068	0.00078	0.07090
-Arctictis binturong	0.00154	0.00145	0.00161	0.14360
-Arctocephalus australis	0.00010	0.00008	0.00012	0.00990
-Arctocephalus australis	0.00009	0.00007	0.00010	0.00850
-Arctocephalus forsteri	0.00013	0.00010	0.00015	0.01250
-Arctocephalus galapagoensis	0.00340	0.00328	0.00353	0.28870
-Arctocephalus gazella	0.00013	0.00011	0.00015	0.01260
-Arctocephalus philippii	0.00012	0.00010	0.00014	0.01150
-Arctocephalus pusillus	0.00012	0.00010	0.00014	0.01140
-Arctocephalus townsendi	0.00011	0.00009	0.00013	0.01090
-Arctocephalus tropicalis	0.00009	0.00007	0.00011	0.00880
-Arctogalidia trivirgata	0.00015	0.00013	0.00018	0.01520
-Arctonyx albogularis	0.00016	0.00014	0.00019	0.01600
-Arctonyx collaris	0.00218	0.00209	0.00228	0.19830
-Arctonyx hoevenii	0.00013	0.00011	0.00016	0.01320
-Atelocynus microtis	0.00103	0.00097	0.00110	0.09910
-Atilax paludinosus	0.00014	0.00012	0.00017	0.01430
-Bassaricyon alleni	0.00011	0.00009	0.00013	0.01120
-Bassaricyon gabbii	0.00012	0.00010	0.00014	0.01190
-Bassaricyon medius	0.00013	0.00011	0.00015	0.01270
-Bassaricyon neblina	0.00067	0.00062	0.00072	0.06520
-Bassariscus astutus	0.00016	0.00013	0.00018	0.01540
-Bassariscus sumichrasti	0.00012	0.00010	0.00014	0.01140
-Bdeogale crassicauda	0.00017	0.00014	0.00019	0.01670
-Bdeogale jacksoni	0.00101	0.00094	0.00107	0.09640
-Bdeogale nigripes	0.00016	0.00014	0.00019	0.01620
-Bdeogale omnivora	0.00119	0.00112	0.00126	0.11250
-Callorhinus ursinus	0.00112	0.00105	0.00119	0.10660
-Canis adustus	0.00018	0.00015	0.00020	0.01750
-Canis aureus	0.00015	0.00012	0.00017	0.01440
-Canis latrans	0.00015	0.00013	0.00018	0.01500
-Canis lupus	0.00011	0.00009	0.00013	0.01050
-Canis mesomelas	0.00017	0.00015	0.00020	0.01690
-Canis rufus	0.01502	0.01471	0.01538	0.73750
-Canis simensis	0.00575	0.00558	0.00592	0.43540
-Caracal aurata	0.00179	0.00170	0.00188	0.16540
-Caracal caracal	0.00014	0.00012	0.00016	0.01390
-Catopuma badia	0.00499	0.00483	0.00515	0.39240
-Catopuma temminckii	0.00072	0.00067	0.00078	0.07040
-Cerdocyon thous	0.00018	0.00015	0.00020	0.01740
-Chrotogale owstoni	0.00420	0.00406	0.00434	0.34210
-Chrysocyon brachyurus	0.00080	0.00074	0.00085	0.07730
-Civettictis civetta	0.00011	0.00009	0.00013	0.01110
-Conepatus chinga	0.00019	0.00016	0.00022	0.01860
-Conepatus humboldtii	0.00019	0.00016	0.00022	0.01880
-Conepatus leuconotus	0.00021	0.00018	0.00024	0.02070
-Conepatus semistriatus	0.00017	0.00015	0.00020	0.01720
-Crocuta crocuta	0.00009	0.00007	0.00010	0.00840
-Crossarchus alexandri	0.00015	0.00013	0.00018	0.01520
-Crossarchus ansorgei	0.00020	0.00017	0.00022	0.01940
-Crossarchus obscurus	0.00020	0.00017	0.00023	0.01990
-Crossarchus platycephalus	0.00018	0.00016	0.00021	0.01800
-Cryptoprocta ferox	0.00143	0.00136	0.00151	0.13450
-Cuon alpinus	0.00472	0.00457	0.00487	0.37630
-Cynictis penicillata	0.00016	0.00014	0.00018	0.01570
-Cynogale bennettii	0.00646	0.00627	0.00664	0.47120
-Cystophora cristata	0.00113	0.00107	0.00120	0.10790
-Diplogale hosei	0.00160	0.00152	0.00168	0.14930
-Dologale dybowskii	0.00163	0.00155	0.00171	0.14960
-Eira barbara	0.00012	0.00010	0.00014	0.01150
-Enhydra lutris	0.00264	0.00253	0.00274	0.23220
-Erignathus barbatus	0.00008	0.00006	0.00009	0.00740
-Eumetopias jubatus	0.00046	0.00042	0.00050	0.04480
-Eupleres goudotii	0.00160	0.00151	0.00167	0.14880
-Eupleres major	0.00394	0.00381	0.00408	0.32530
-Felis bieti	0.00179	0.00170	0.00187	0.16560
-Felis chaus	0.00015	0.00013	0.00018	0.01490
-Felis margarita	0.00014	0.00011	0.00016	0.01340
-Felis nigripes	0.00219	0.00209	0.00228	0.19880
-Felis silvestris	0.00013	0.00011	0.00015	0.01300
-Fossa fossana	0.00158	0.00150	0.00166	0.14750
-Galictis cuja	0.00020	0.00017	0.00023	0.01960
-Galictis vittata	0.00014	0.00011	0.00016	0.01340
-Galidia elegans	0.00013	0.00011	0.00016	0.01300
-Galidictis fasciata	0.00201	0.00192	0.00211	0.18440
-Galidictis grandidieri	0.00542	0.00525	0.00558	0.41680
-Genetta abyssinica	0.00136	0.00129	0.00144	0.12700
-Genetta angolensis	0.00014	0.00012	0.00017	0.01420
-Genetta bourloni	0.00161	0.00153	0.00170	0.15050
-Genetta cristata	0.00123	0.00116	0.00130	0.11610
-Genetta genetta	0.00009	0.00007	0.00010	0.00840
-Genetta johnstoni	0.00064	0.00059	0.00069	0.06270
-Genetta maculata	0.00012	0.00010	0.00014	0.01140
-Genetta pardina	0.00009	0.00007	0.00011	0.00920
-Genetta piscivora	0.00082	0.00077	0.00088	0.07960
-Genetta poensis	0.00128	0.00121	0.00135	0.11950
-Genetta servalina	0.00016	0.00013	0.00018	0.01540
-Genetta thierryi	0.00015	0.00012	0.00017	0.01460
-Genetta tigrina	0.00013	0.00011	0.00015	0.01250
-Genetta victoriae	0.00012	0.00010	0.00014	0.01160
-Gulo gulo	0.00015	0.00012	0.00017	0.01460
-Halichoerus grypus	0.00008	0.00006	0.00010	0.00800
-Halichoerus grypus	0.00009	0.00007	0.00011	0.00890
-Helarctos malayanus	0.00119	0.00113	0.00126	0.11300
-Helogale hirtula	0.00019	0.00016	0.00022	0.01870
-Helogale parvula	0.00016	0.00014	0.00019	0.01580
-Hemigalus derbyanus	0.00095	0.00089	0.00101	0.09140
-Herpailurus yagouaroundi	0.00015	0.00012	0.00017	0.01450
-Herpestes auropunctatus	0.00017	0.00015	0.00020	0.01700
-Herpestes brachyurus	0.00094	0.00089	0.00101	0.09080
-Herpestes edwardsii	0.00018	0.00015	0.00020	0.01740
-Herpestes flavescens	0.00014	0.00012	0.00017	0.01420
-Herpestes fuscus	0.00017	0.00014	0.00019	0.01640
-Herpestes ichneumon	0.00015	0.00013	0.00017	0.01470
-Herpestes javanicus	0.00017	0.00015	0.00019	0.01670
-Herpestes naso	0.00015	0.00012	0.00017	0.01450
-Herpestes ochraceus	0.00017	0.00015	0.00020	0.01720
-Herpestes pulverulentus	0.00021	0.00018	0.00024	0.02090
-Herpestes sanguineus	0.00018	0.00016	0.00021	0.01820
-Herpestes semitorquatus	0.00079	0.00073	0.00085	0.07650
-Herpestes smithii	0.00014	0.00011	0.00016	0.01360
-Herpestes urva	0.00018	0.00016	0.00021	0.01800
-Herpestes vitticollis	0.00018	0.00016	0.00021	0.01790
-Histriophoca fasciata	0.00011	0.00009	0.00013	0.01070
-Hyaena hyaena	0.00059	0.00054	0.00064	0.05750
-Hydrictis maculicollis	0.00085	0.00080	0.00091	0.08240
-Hydrurga leptonyx	0.00007	0.00005	0.00009	0.00690
-Ichneumia albicauda	0.00015	0.00013	0.00018	0.01530
-Ictonyx libycus	0.00017	0.00015	0.00020	0.01720
-Ictonyx striatus	0.00018	0.00015	0.00020	0.01740
-Leopardus colocolo	0.00071	0.00066	0.00077	0.06960
-Leopardus geoffroyi	0.00010	0.00008	0.00012	0.01010
-Leopardus guigna	0.00179	0.00171	0.00188	0.16540
-Leopardus guttulus	0.00171	0.00163	0.00179	0.15830
-Leopardus jacobita	0.00636	0.00619	0.00655	0.46600
-Leopardus pardalis	0.00014	0.00012	0.00017	0.01430
-Leopardus tigrinus	0.00158	0.00150	0.00166	0.14700
-Leopardus wiedii	0.00071	0.00066	0.00077	0.06950
-Leptailurus serval	0.00013	0.00011	0.00015	0.01310
-Leptonychotes weddellii	0.00011	0.00009	0.00013	0.01060
-Liberiictis kuhni	0.00242	0.00232	0.00252	0.21740
-Lobodon carcinophaga	0.00009	0.00007	0.00011	0.00910
-Lontra canadensis	0.00012	0.00010	0.00014	0.01160
-Lontra felina	0.00632	0.00614	0.00650	0.46470
-Lontra longicaudis	0.00090	0.00084	0.00096	0.08650
-Lontra provocax	0.00423	0.00410	0.00438	0.34600
-Lutra lutra	0.00068	0.00063	0.00073	0.06640
-Lutra sumatrana	0.00433	0.00418	0.00447	0.35120
-Lutrogale perspicillata	0.00186	0.00178	0.00195	0.17200
-Lycalopex culpaeus	0.00018	0.00015	0.00020	0.01760
-Lycalopex fulvipes	0.00586	0.00568	0.00603	0.43950
-Lycalopex griseus	0.00017	0.00015	0.00020	0.01690
-Lycalopex gymnocercus	0.00016	0.00014	0.00019	0.01580
-Lycalopex sechurae	0.00101	0.00095	0.00108	0.09700
-Lycalopex vetulus	0.00017	0.00015	0.00020	0.01710
-Lycaon pictus	0.00495	0.00480	0.00510	0.39070
-Lycaon pictus	0.00473	0.00459	0.00489	0.37750
-Lycaon pictus	0.00495	0.00479	0.00510	0.39010
-Lyncodon patagonicus	0.00018	0.00015	0.00020	0.01750
-Lynx canadensis	0.00012	0.00010	0.00014	0.01190
-Lynx lynx	0.00012	0.00010	0.00015	0.01230
-Lynx pardinus	0.00588	0.00571	0.00605	0.44030
-Lynx rufus	0.00010	0.00008	0.00012	0.00960
-Macrogalidia musschenbroekii	0.00197	0.00187	0.00206	0.18030
-Martes americana	0.00015	0.00012	0.00017	0.01440
-Martes flavigula	0.00015	0.00012	0.00017	0.01440
-Martes foina	0.00014	0.00012	0.00016	0.01380
-Martes gwatkinsii	0.00239	0.00229	0.00249	0.21580
-Martes martes	0.00015	0.00013	0.00018	0.01490
-Martes melampus	0.00018	0.00015	0.00021	0.01790
-Martes pennanti	0.00018	0.00015	0.00021	0.01770
-Martes zibellina	0.00015	0.00013	0.00018	0.01510
-Meles anakuma	0.00012	0.00010	0.00014	0.01190
-Meles leucurus	0.00015	0.00013	0.00018	0.01500
-Meles meles	0.00017	0.00014	0.00019	0.01650
-Mellivora capensis	0.00011	0.00009	0.00013	0.01120
-Melogale cucphuongensis	0.00172	0.00164	0.00180	0.15730
-Melogale everetti	0.00462	0.00447	0.00477	0.37150
-Melogale moschata	0.00018	0.00016	0.00021	0.01800
-Melogale orientalis	0.00013	0.00011	0.00015	0.01290
-Melogale personata	0.00018	0.00015	0.00021	0.01770
-Melursus ursinus	0.00118	0.00112	0.00125	0.11220
-Mephitis macroura	0.00017	0.00015	0.00020	0.01720
-Mephitis mephitis	0.00019	0.00016	0.00021	0.01840
-Mirounga angustirostris	0.00012	0.00010	0.00014	0.01140
-Mirounga leonina	0.00011	0.00009	0.00013	0.01120
-Monachus monachus	0.00295	0.00283	0.00306	0.25610
-Monachus monachus	0.00304	0.00293	0.00315	0.26300
-Mungos gambianus	0.00020	0.00017	0.00023	0.01970
-Mungos mungo	0.00017	0.00014	0.00019	0.01640
-Mungotictis decemlineata	0.00473	0.00458	0.00488	0.37610
-Mustela africana	0.00019	0.00017	0.00022	0.01910
-Mustela altaica	0.00093	0.00087	0.00099	0.08970
-Mustela erminea	0.00019	0.00017	0.00022	0.01920
-Mustela eversmanii	0.00020	0.00017	0.00023	0.01980
-Mustela felipei	0.00204	0.00195	0.00213	0.18670
-Mustela frenata	0.00019	0.00016	0.00022	0.01870
-Mustela itatsi	0.00086	0.00080	0.00092	0.08270
-Mustela kathiah	0.00020	0.00017	0.00022	0.01950
-Mustela lutreola	0.02313	0.02262	0.02360	0.84730
-Mustela lutreolina	0.00017	0.00015	0.00020	0.01680
-Mustela nigripes	0.00623	0.00606	0.00642	0.46140
-Mustela nivalis	0.00019	0.00017	0.00022	0.01920
-Mustela nudipes	0.00014	0.00011	0.00016	0.01350
-Mustela putorius	0.00021	0.00018	0.00024	0.02100
-Mustela russelliana	0.00184	0.00175	0.00193	0.16630
-Mustela sibirica	0.00017	0.00014	0.00019	0.01680
-Mustela strigidorsa	0.00015	0.00013	0.00018	0.01520
-Mustela subpalmata	0.00014	0.00012	0.00017	0.01390
-Mustela tonkinensis	0.00195	0.00186	0.00204	0.17570
-Mydaus javanensis	0.00016	0.00013	0.00018	0.01570
-Mydaus marchei	0.00013	0.00010	0.00015	0.01250
-Nandinia binotata	0.00011	0.00009	0.00013	0.01110
-Nasua narica	0.00013	0.00010	0.00015	0.01240
-Nasua nasua	0.00012	0.00010	0.00014	0.01200
-Nasuella meridensis	0.00399	0.00386	0.00413	0.32930
-Nasuella olivacea	0.00072	0.00067	0.00078	0.07000
-Neofelis diardi	0.00166	0.00158	0.00175	0.15460
-Neofelis nebulosa	0.00170	0.00162	0.00179	0.15840
-Neomonachus schauinslandi	0.00302	0.00290	0.00313	0.26090
-Neophoca cinerea	0.00338	0.00325	0.00350	0.28640
-Neovison vison	0.00018	0.00015	0.00020	0.01750
-Nyctereutes procyonoides	0.00015	0.00013	0.00018	0.01500
-Odobenus rosmarus	0.00107	0.00100	0.00113	0.10210
-Ommatophoca rossii	0.00012	0.00010	0.00014	0.01190
-Otaria byronia	0.00010	0.00008	0.00012	0.01020
-Otocolobus manul	0.00082	0.00077	0.00088	0.07960
-Otocyon megalotis	0.00015	0.00013	0.00017	0.01480
-Pagophilus groenlandicus	0.00008	0.00006	0.00009	0.00750
-Paguma larvata	0.00013	0.00011	0.00015	0.01280
-Panthera leo	0.00132	0.00124	0.00139	0.12410
-Panthera leo	0.00139	0.00131	0.00146	0.13050
-Panthera onca	0.00059	0.00055	0.00064	0.05800
-Panthera pardus	0.00144	0.00137	0.00152	0.13510
-Panthera tigris	0.00306	0.00294	0.00318	0.26460
-Panthera uncia	0.00167	0.00158	0.00175	0.15490
-Paracynictis selousi	0.00017	0.00015	0.00020	0.01720
-Paradoxurus hermaphroditus	0.00015	0.00013	0.00018	0.01500
-Paradoxurus jerdoni	0.00018	0.00015	0.00020	0.01760
-Paradoxurus zeylonensis	0.00012	0.00010	0.00014	0.01160
-Parahyaena brunnea	0.00060	0.00056	0.00065	0.05890
-Pardofelis marmorata	0.00094	0.00088	0.00100	0.09030
-Phoca largha	0.00009	0.00007	0.00011	0.00880
-Phoca vitulina	0.00007	0.00005	0.00009	0.00680
-Phocarctos hookeri	0.00320	0.00308	0.00332	0.27430
-Poecilogale albinucha	0.00019	0.00016	0.00021	0.01840
-Poiana leightoni	0.00152	0.00144	0.00160	0.14250
-Poiana richardsonii	0.00021	0.00018	0.00024	0.02060
-Potos flavus	0.00009	0.00007	0.00011	0.00910
-Prionailurus bengalensis	0.00015	0.00013	0.00017	0.01480
-Prionailurus planiceps	0.00490	0.00475	0.00505	0.38750
-Prionailurus rubiginosus	0.00082	0.00076	0.00088	0.07910
-Prionailurus viverrinus	0.00243	0.00233	0.00254	0.21900
-Prionodon linsang	0.00021	0.00018	0.00023	0.02030
-Prionodon pardicolor	0.00018	0.00015	0.00020	0.01760
-Procyon cancrivorus	0.00016	0.00014	0.00019	0.01610
-Procyon lotor	0.00012	0.00009	0.00014	0.01150
-Procyon pygmaeus	0.01826	0.01787	0.01866	0.79140
-Proteles cristata	0.00011	0.00009	0.00013	0.01080
-Pteronura brasiliensis	0.00517	0.00500	0.00532	0.40240
-Puma concolor	0.00013	0.00011	0.00015	0.01270
-Pusa caspica	0.00176	0.00167	0.00184	0.16150
-Pusa hispida	0.00009	0.00007	0.00010	0.00850
-Pusa sibirica	0.00006	0.00004	0.00007	0.00570
-Rhynchogale melleri	0.00017	0.00014	0.00019	0.01640
-Salanoia concolor	0.00243	0.00233	0.00253	0.21840
-Speothos venaticus	0.00098	0.00092	0.00105	0.09450
-Spilogale angustifrons	0.00015	0.00013	0.00017	0.01490
-Spilogale gracilis	0.00018	0.00015	0.00021	0.01770
-Spilogale putorius	0.00242	0.00232	0.00252	0.21760
-Spilogale pygmaea	0.00211	0.00201	0.00220	0.19230
-Suricata suricatta	0.00018	0.00016	0.00021	0.01810
-Taxidea taxus	0.00012	0.00010	0.00014	0.01190
-Tremarctos ornatus	0.00110	0.00103	0.00117	0.10470
-Urocyon cinereoargenteus	0.00015	0.00013	0.00018	0.01490
-Urocyon littoralis	0.00107	0.00101	0.00114	0.10240
-Ursus americanus	0.00010	0.00008	0.00011	0.00940
-Ursus arctos	0.00007	0.00005	0.00008	0.00670
-Ursus maritimus	0.00101	0.00094	0.00107	0.09640
-Ursus thibetanus	0.00122	0.00115	0.00129	0.11550
-Viverra civettina	0.01425	0.01393	0.01458	0.72420
-Viverra megaspila	0.00441	0.00427	0.00456	0.35680
-Viverra tangalunga	0.00012	0.00010	0.00015	0.01230
-Viverra zibetha	0.00011	0.00009	0.00014	0.01140
-Viverricula indica	0.00017	0.00015	0.00020	0.01710
-Vormela peregusna	0.00244	0.00233	0.00253	0.21900
-Vulpes bengalensis	0.00021	0.00018	0.00024	0.02050
-Vulpes cana	0.00018	0.00015	0.00020	0.01730
-Vulpes chama	0.00019	0.00016	0.00022	0.01890
-Vulpes corsac	0.00013	0.00011	0.00016	0.01310
-Vulpes ferrilata	0.00020	0.00018	0.00023	0.02020
-Vulpes lagopus	0.00013	0.00011	0.00016	0.01320
-Vulpes macrotis	0.00014	0.00012	0.00016	0.01360
-Vulpes pallida	0.00016	0.00014	0.00019	0.01620
-Vulpes rueppellii	0.00015	0.00013	0.00018	0.01500
-Vulpes velox	0.00016	0.00014	0.00019	0.01620
-Vulpes vulpes	0.00014	0.00012	0.00017	0.01430
-Vulpes zerda	0.00017	0.00015	0.00020	0.01700
-Zalophus californianus	0.00008	0.00007	0.00010	0.00820
-Zalophus wollebaeki	0.00239	0.00229	0.00249	0.21390
+species	simulated_p_e_in_100_years
+Acinonyx jubatus	0.12000
+Ailuropoda melanoleuca	0.11000
+Ailurus fulgens	0.51000
+Aonyx capensis	0.04000
+Aonyx cinereus	0.18000
+Aonyx congicus	0.08000
+Arctictis binturong	0.14000
+Arctocephalus australis	0.02000
+Arctocephalus australis	0.01000
+Arctocephalus forsteri	0.02000
+Arctocephalus galapagoensis	0.32000
+Arctocephalus gazella	0.00000
+Arctocephalus philippii	0.02000
+Arctocephalus pusillus	0.01000
+Arctocephalus townsendi	0.00000
+Arctocephalus tropicalis	0.00000
+Arctogalidia trivirgata	0.00000
+Arctonyx albogularis	0.01000
+Arctonyx collaris	0.19000
+Arctonyx hoevenii	0.05000
+Atelocynus microtis	0.07000
+Atilax paludinosus	0.03000
+Bassaricyon alleni	0.02000
+Bassaricyon gabbii	0.01000
+Bassaricyon medius	0.01000
+Bassaricyon neblina	0.07000
+Bassariscus astutus	0.00000
+Bassariscus sumichrasti	0.02000
+Bdeogale crassicauda	0.03000
+Bdeogale jacksoni	0.09000
+Bdeogale nigripes	0.00000
+Bdeogale omnivora	0.17000
+Callorhinus ursinus	0.12000
+Canis adustus	0.01000
+Canis aureus	0.00000
+Canis latrans	0.01000
+Canis lupus	0.00000
+Canis mesomelas	0.02000
+Canis rufus	0.79000
+Canis simensis	0.38000
+Caracal aurata	0.20000
+Caracal caracal	0.03000
+Catopuma badia	0.40000
+Catopuma temminckii	0.09000
+Cerdocyon thous	0.02000
+Chrotogale owstoni	0.34000
+Chrysocyon brachyurus	0.05000
+Civettictis civetta	0.02000
+Conepatus chinga	0.02000
+Conepatus humboldtii	0.03000
+Conepatus leuconotus	0.01000
+Conepatus semistriatus	0.03000
+Crocuta crocuta	0.01000
+Crossarchus alexandri	0.01000
+Crossarchus ansorgei	0.03000
+Crossarchus obscurus	0.03000
+Crossarchus platycephalus	0.03000
+Cryptoprocta ferox	0.15000
+Cuon alpinus	0.31000
+Cynictis penicillata	0.01000
+Cynogale bennettii	0.42000
+Cystophora cristata	0.09000
+Diplogale hosei	0.10000
+Dologale dybowskii	0.13000
+Eira barbara	0.01000
+Enhydra lutris	0.24000
+Erignathus barbatus	0.02000
+Eumetopias jubatus	0.08000
+Eupleres goudotii	0.12000
+Eupleres major	0.31000
+Felis bieti	0.22000
+Felis chaus	0.01000
+Felis margarita	0.02000
+Felis nigripes	0.23000
+Felis silvestris	0.00000
+Fossa fossana	0.10000
+Galictis cuja	0.00000
+Galictis vittata	0.03000
+Galidia elegans	0.02000
+Galidictis fasciata	0.25000
+Galidictis grandidieri	0.47000
+Genetta abyssinica	0.11000
+Genetta angolensis	0.01000
+Genetta bourloni	0.18000
+Genetta cristata	0.12000
+Genetta genetta	0.00000
+Genetta johnstoni	0.02000
+Genetta maculata	0.02000
+Genetta pardina	0.01000
+Genetta piscivora	0.06000
+Genetta poensis	0.09000
+Genetta servalina	0.01000
+Genetta thierryi	0.02000
+Genetta tigrina	0.02000
+Genetta victoriae	0.02000
+Gulo gulo	0.01000
+Halichoerus grypus	0.00000
+Halichoerus grypus	0.01000
+Helarctos malayanus	0.12000
+Helogale hirtula	0.03000
+Helogale parvula	0.01000
+Hemigalus derbyanus	0.08000
+Herpailurus yagouaroundi	0.01000
+Herpestes auropunctatus	0.02000
+Herpestes brachyurus	0.09000
+Herpestes edwardsii	0.01000
+Herpestes flavescens	0.01000
+Herpestes fuscus	0.03000
+Herpestes ichneumon	0.03000
+Herpestes javanicus	0.05000
+Herpestes naso	0.04000
+Herpestes ochraceus	0.00000
+Herpestes pulverulentus	0.02000
+Herpestes sanguineus	0.01000
+Herpestes semitorquatus	0.11000
+Herpestes smithii	0.03000
+Herpestes urva	0.05000
+Herpestes vitticollis	0.02000
+Histriophoca fasciata	0.01000
+Hyaena hyaena	0.07000
+Hydrictis maculicollis	0.06000
+Hydrurga leptonyx	0.00000
+Ichneumia albicauda	0.02000
+Ictonyx libycus	0.00000
+Ictonyx striatus	0.04000
+Leopardus colocolo	0.06000
+Leopardus geoffroyi	0.05000
+Leopardus guigna	0.22000
+Leopardus guttulus	0.19000
+Leopardus jacobita	0.39000
+Leopardus pardalis	0.00000
+Leopardus tigrinus	0.19000
+Leopardus wiedii	0.04000
+Leptailurus serval	0.00000
+Leptonychotes weddellii	0.00000
+Liberiictis kuhni	0.27000
+Lobodon carcinophaga	0.00000
+Lontra canadensis	0.04000
+Lontra felina	0.45000
+Lontra longicaudis	0.10000
+Lontra provocax	0.39000
+Lutra lutra	0.09000
+Lutra sumatrana	0.39000
+Lutrogale perspicillata	0.21000
+Lycalopex culpaeus	0.01000
+Lycalopex fulvipes	0.39000
+Lycalopex griseus	0.04000
+Lycalopex gymnocercus	0.02000
+Lycalopex sechurae	0.10000
+Lycalopex vetulus	0.02000
+Lycaon pictus	0.33000
+Lycaon pictus	0.42000
+Lycaon pictus	0.41000
+Lyncodon patagonicus	0.01000
+Lynx canadensis	0.02000
+Lynx lynx	0.01000
+Lynx pardinus	0.46000
+Lynx rufus	0.03000
+Macrogalidia musschenbroekii	0.14000
+Martes americana	0.00000
+Martes flavigula	0.01000
+Martes foina	0.04000
+Martes gwatkinsii	0.25000
+Martes martes	0.01000
+Martes melampus	0.05000
+Martes pennanti	0.00000
+Martes zibellina	0.02000
+Meles anakuma	0.01000
+Meles leucurus	0.00000
+Meles meles	0.02000
+Mellivora capensis	0.00000
+Melogale cucphuongensis	0.18000
+Melogale everetti	0.36000
+Melogale moschata	0.02000
+Melogale orientalis	0.00000
+Melogale personata	0.02000
+Melursus ursinus	0.18000
+Mephitis macroura	0.01000
+Mephitis mephitis	0.01000
+Mirounga angustirostris	0.00000
+Mirounga leonina	0.02000
+Monachus monachus	0.23000
+Monachus monachus	0.31000
+Mungos gambianus	0.03000
+Mungos mungo	0.04000
+Mungotictis decemlineata	0.37000
+Mustela africana	0.03000
+Mustela altaica	0.06000
+Mustela erminea	0.02000
+Mustela eversmanii	0.01000
+Mustela felipei	0.21000
+Mustela frenata	0.01000
+Mustela itatsi	0.09000
+Mustela kathiah	0.03000
+Mustela lutreola	0.83000
+Mustela lutreolina	0.04000
+Mustela nigripes	0.35000
+Mustela nivalis	0.02000
+Mustela nudipes	0.01000
+Mustela putorius	0.01000
+Mustela russelliana	0.13000
+Mustela sibirica	0.01000
+Mustela strigidorsa	0.00000
+Mustela subpalmata	0.02000
+Mustela tonkinensis	0.23000
+Mydaus javanensis	0.05000
+Mydaus marchei	0.01000
+Nandinia binotata	0.02000
+Nasua narica	0.01000
+Nasua nasua	0.03000
+Nasuella meridensis	0.43000
+Nasuella olivacea	0.09000
+Neofelis diardi	0.13000
+Neofelis nebulosa	0.15000
+Neomonachus schauinslandi	0.30000
+Neophoca cinerea	0.30000
+Neovison vison	0.02000
+Nyctereutes procyonoides	0.02000
+Odobenus rosmarus	0.08000
+Ommatophoca rossii	0.01000
+Otaria byronia	0.00000
+Otocolobus manul	0.06000
+Otocyon megalotis	0.00000
+Pagophilus groenlandicus	0.00000
+Paguma larvata	0.01000
+Panthera leo	0.15000
+Panthera leo	0.09000
+Panthera onca	0.04000
+Panthera pardus	0.15000
+Panthera tigris	0.20000
+Panthera uncia	0.18000
+Paracynictis selousi	0.01000
+Paradoxurus hermaphroditus	0.01000
+Paradoxurus jerdoni	0.03000
+Paradoxurus zeylonensis	0.00000
+Parahyaena brunnea	0.05000
+Pardofelis marmorata	0.08000
+Phoca largha	0.02000
+Phoca vitulina	0.00000
+Phocarctos hookeri	0.25000
+Poecilogale albinucha	0.01000
+Poiana leightoni	0.10000
+Poiana richardsonii	0.02000
+Potos flavus	0.00000
+Prionailurus bengalensis	0.03000
+Prionailurus planiceps	0.35000
+Prionailurus rubiginosus	0.09000
+Prionailurus viverrinus	0.24000
+Prionodon linsang	0.01000
+Prionodon pardicolor	0.01000
+Procyon cancrivorus	0.01000
+Procyon lotor	0.01000
+Procyon pygmaeus	0.75000
+Proteles cristata	0.00000
+Pteronura brasiliensis	0.44000
+Puma concolor	0.01000
+Pusa caspica	0.18000
+Pusa hispida	0.00000
+Pusa sibirica	0.00000
+Rhynchogale melleri	0.05000
+Salanoia concolor	0.16000
+Speothos venaticus	0.07000
+Spilogale angustifrons	0.00000
+Spilogale gracilis	0.03000
+Spilogale putorius	0.33000
+Spilogale pygmaea	0.20000
+Suricata suricatta	0.00000
+Taxidea taxus	0.00000
+Tremarctos ornatus	0.04000
+Urocyon cinereoargenteus	0.01000
+Urocyon littoralis	0.12000
+Ursus americanus	0.00000
+Ursus arctos	0.00000
+Ursus maritimus	0.12000
+Ursus thibetanus	0.09000
+Viverra civettina	0.70000
+Viverra megaspila	0.36000
+Viverra tangalunga	0.02000
+Viverra zibetha	0.00000
+Viverricula indica	0.01000
+Vormela peregusna	0.19000
+Vulpes bengalensis	0.03000
+Vulpes cana	0.01000
+Vulpes chama	0.03000
+Vulpes corsac	0.03000
+Vulpes ferrilata	0.03000
+Vulpes lagopus	0.02000
+Vulpes macrotis	0.01000
+Vulpes pallida	0.01000
+Vulpes rueppellii	0.01000
+Vulpes velox	0.04000
+Vulpes vulpes	0.00000
+Vulpes zerda	0.00000
+Zalophus californianus	0.01000
+Zalophus wollebaeki	0.18000

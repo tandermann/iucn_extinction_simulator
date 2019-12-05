@@ -80,6 +80,11 @@ def add_arguments(parser):
         help="Plots the simulated diversity trajectory: 0=off, 1=on (default=1)."
     )
     parser.add_argument(
+        '--plot_status_trajectories',
+        default=1,
+        help="Plots the simulated IUCN status trajectory: 0=off, 1=on (default=0)."
+    )
+    parser.add_argument(
         '--plot_histograms',
         default=0,
         help="Plots histograms of simulated extinction times for each species: 0=off, 1=on (default=0)."
@@ -89,6 +94,12 @@ def add_arguments(parser):
         default=0,
         help="Plots histograms of posterior rate estimates for each species: 0=off, 1=on (default=0)."
     )
+    parser.add_argument(
+        '--plot_status_piechart',
+        default=1,
+        help="Plots pie charts of status distribution: 0=off, 1=on (default=1)."
+    )
+    
 
 def p_e_year(years,p_e):
     pe_year = 1-(1-p_e)**(1/years)
@@ -141,7 +152,6 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
 #ext_time_array[ext_time_array>max_t] = max_t
 #get_rate_estimate(ext_time_array,max_t)
 
-
 def main(args):
     
     indir = args.indir
@@ -158,6 +168,8 @@ def main(args):
     plot_histograms = int(args.plot_histograms)
     plot_posterior = int(args.plot_posterior)
     model_unknown_as_lc = int(args.model_unknown_as_lc)
+    plot_status_trajectories = int(args.plot_status_trajectories)
+    plot_status_piechart = int(args.plot_status_piechart)
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -248,6 +260,11 @@ def main(args):
     dynamic_qmatrix=True
     print('\nStarting simulations ...')
     diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,delta_t,species_list_status,final_dd_probs,final_qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+    # summarize simulation results
+    sim_species_list = te_array[:,0].copy()
+    ext_date_data = te_array[:,1:].copy()
+    extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
+    extinction_prob = extinction_occs/ext_date_data.shape[1]
 
 
     if plot_diversity_trajectory:
@@ -274,13 +291,81 @@ def main(args):
         plt.tight_layout()
         fig.savefig(os.path.join(outdir,'future_diversity_trajectory.pdf'),bbox_inches='tight', dpi = 500)
 
+    if plot_status_trajectories:
+        # color palette
+        colors = ["#227a00","#6956cb","#f3d248","#79262a","#a5c279","#e34349"]
+        # define time axis
+        time_axis = np.array(range(len(diversity_through_time[0])))
+        # plot results
+        fig = plt.figure(figsize=(10,10))
+        plt.plot(time_axis,np.mean(status_through_time[0,:,:],axis=1),color=colors[0],label='LC')
+        plt.plot(time_axis,status_through_time[0,:,:],color=colors[0],alpha=.08)
+        plt.plot(time_axis,np.mean(status_through_time[1,:,:],axis=1),color=colors[4],label='NT')
+        plt.plot(time_axis,status_through_time[1,:,:],color=colors[4],alpha=.08)
+        plt.plot(time_axis,np.mean(status_through_time[2,:,:],axis=1),color=colors[2],label='VU')
+        plt.plot(time_axis,status_through_time[2,:,:],color=colors[2],alpha=.08)
+        plt.plot(time_axis,np.mean(status_through_time[3,:,:],axis=1),color=colors[1],label='EN')
+        plt.plot(time_axis,status_through_time[3,:,:],color=colors[1],alpha=.08)
+        plt.plot(time_axis,np.mean(status_through_time[4,:,:],axis=1),color=colors[3],label='CR')
+        plt.plot(time_axis,status_through_time[4,:,:],color=colors[3],alpha=.08)
+        plt.plot(time_axis,np.mean(status_through_time[5,:,:],axis=1),color=colors[5],label='EX')
+        plt.plot(time_axis,status_through_time[5,:,:],color=colors[5],alpha=.08)
+        # add title, legend and axis-labels
+        plt.legend(loc='best',fancybox=True)
+        plt.title('Diversity trajectory IUCN categories - status change') #10x higher conservation
+        plt.ylabel('Number species in category')
+        plt.xlabel('Years from present')
+        ax = plt.gca()
+        ax1 = ax.twinx()
+        # Set the limits of the new axis from the original axis limits
+        ax1.set_ylim(ax.get_ylim())
+        # annotate final counts with labels
+        right_ticks = [int(np.round(np.mean(status_through_time[i,-1,:]))) for i in range(status_through_time.shape[0])]
+        plt.yticks(right_ticks,right_ticks)
+        #plt.xticks(modified_q_matrix.year[::10],modified_q_matrix.year[::10])
+        plt.ylabel('Lost species')
+        plt.tight_layout()
+        fig.savefig(os.path.join(outdir,'future_status_trajectory.pdf'),bbox_inches='tight', dpi = 500)
     
+    if plot_status_piechart:
+        statuses, counts = np.unique(species_list_status.current_status.values,return_counts=True)
+        init_status_dict = dict(zip(statuses, counts))
+        init_status_dict['EX'] = 0
+        iucn_status_code = {0:'LC', 1:'NT', 2:'VU', 3:'EN', 4:'CR', 5:'EX', 6:'DD'}
+        status_count_list = []
+        for status_id in np.arange(status_through_time.shape[0]+1):
+            status = iucn_status_code[status_id]
+            pre_dd_modeling_count = init_status_dict[status]
+            if not status == 'DD':
+                present_status_count = int(np.round(np.mean(status_through_time[status_id][0])))
+                final_status_count = int(np.round(np.mean(status_through_time[status_id][-1])))
+            else:
+                present_status_count = 0
+                final_status_count = 0
+            status_count_list.append([pre_dd_modeling_count,present_status_count,final_status_count])
+        status_count_list = np.array(status_count_list).T
+        colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349",'black'])
+        labels = np.array(['LC', 'NT', 'VU', 'EN', 'CR', 'EX', 'DD'])
+        def func(pct, allvals):
+            absolute = int(np.round((pct/100.*np.sum(allvals))))
+            return "{:d}".format(absolute)
+        fig, axs = plt.subplots(1, 3,figsize=(12,10))
+        # status distribution beginning
+        wedges, texts, autotexts =axs[1].pie(status_count_list[1][status_count_list[1] >0], colors= colors[status_count_list[1] >0], autopct=lambda pct: func(pct, status_count_list[1][status_count_list[1] >0]), shadow=False,textprops=dict(color="w"))
+        # status distribution end
+        wedges, texts, autotexts =axs[2].pie(status_count_list[2][status_count_list[2] >0], colors= colors[status_count_list[2] >0], autopct=lambda pct: func(pct, status_count_list[2][status_count_list[2] >0]), shadow=False,textprops=dict(color="w"))
+        ext = wedges[-1]
+        # status distribution pre-dd
+        wedges, texts, autotexts =axs[0].pie(status_count_list[0][status_count_list[0] >0], colors= colors[status_count_list[0] >0], autopct=lambda pct: func(pct, status_count_list[0][status_count_list[0] >0]), shadow=False,textprops=dict(color="w"))
+        axs[0].set_title('Current (inlcuding DD)')
+        axs[1].set_title('Current (DD corrected)')
+        axs[2].set_title('Final (%i years)'%delta_t)
+        final_labels = list(labels[status_count_list[0] >0]) + ['EX']
+        plt.legend(wedges+[ext], final_labels,title="IUCN status",loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
+        fig.savefig(os.path.join(outdir,'status_pie_chart.pdf'),bbox_inches='tight', dpi = 500)
+
     if extinction_rates:
         # calculate some extinction stats__________________________________________
-        sim_species_list = te_array[:,0].copy()
-        ext_date_data = te_array[:,1:].copy()
-        extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
-        extinction_prob = extinction_occs/ext_date_data.shape[1]
         # estimate extinction rates scaled by year
         print('\nEstimating extinction rates from simulation output...')
         #ext_date_data = ext_date_data[:10,:]
@@ -298,7 +383,6 @@ def main(args):
     extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
     extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.5f')
     print('\n')    
-
 
     if plot_histograms:
         # plot histograms of extinction times
