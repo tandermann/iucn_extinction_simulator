@@ -265,18 +265,25 @@ def main(args):
     ext_date_data = te_array[:,1:].copy()
     extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
     extinction_prob = extinction_occs/ext_date_data.shape[1]
-
+    # produce output file for status distribution through time
+    mean_status_through_time = np.mean(status_through_time,axis=2)
+    year = np.arange(delta_t+1).astype(int)
+    status_df_data = np.round(np.vstack([year,mean_status_through_time])).astype(int)
+    status_df = pd.DataFrame(data = status_df_data.T,columns=['year','LC','NT','VU','EN','CR','EX'])
+    status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
 
     if plot_diversity_trajectory:
         # plot diversity trajectory of species list________________________________
         #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
-        colors = ["#b80033","#bf7400","#008349"]
         # define time axis
         time_axis = np.array(range(len(diversity_through_time[0])))
         fig = plt.figure()
-        plt.plot(time_axis,np.mean(diversity_through_time, axis =0),color=colors[0], label='accounting for GL')
-        for rep in diversity_through_time:
-            plt.plot(time_axis,rep,color=colors[0],alpha=.08)  
+        y_values = np.mean(diversity_through_time, axis =0)
+        plt.plot(time_axis,y_values,color="#b80033", label='accounting for GL')
+        # get upper and lower confidence interval boundaries
+        min_hpd, max_hpd = np.array([cust_func.calcHPD(i,0.95) for i in diversity_through_time.T]).T
+        plt.fill_between(time_axis, min_hpd, max_hpd,
+                 color="#b80033", alpha=0.2)
         #plt.legend()
         plt.ylabel('Total diversity')
         plt.xlabel('Years from present')
@@ -293,23 +300,22 @@ def main(args):
 
     if plot_status_trajectories:
         # color palette
-        colors = ["#227a00","#6956cb","#f3d248","#79262a","#a5c279","#e34349"]
+        colors = ["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349"]
         # define time axis
         time_axis = np.array(range(len(diversity_through_time[0])))
         # plot results
+        def plot_mean_and_interval(div,color,label,fig):
+            plt.plot(time_axis,np.mean(div,axis=0),color=color,label=label);
+            min_hpd, max_hpd = np.array([cust_func.calcHPD(i,0.95) for i in div.T]).T
+            plt.fill_between(time_axis, min_hpd, max_hpd, color=color, alpha=0.2);
+            return fig
         fig = plt.figure(figsize=(10,10))
-        plt.plot(time_axis,np.mean(status_through_time[0,:,:],axis=1),color=colors[0],label='LC')
-        plt.plot(time_axis,status_through_time[0,:,:],color=colors[0],alpha=.08)
-        plt.plot(time_axis,np.mean(status_through_time[1,:,:],axis=1),color=colors[4],label='NT')
-        plt.plot(time_axis,status_through_time[1,:,:],color=colors[4],alpha=.08)
-        plt.plot(time_axis,np.mean(status_through_time[2,:,:],axis=1),color=colors[2],label='VU')
-        plt.plot(time_axis,status_through_time[2,:,:],color=colors[2],alpha=.08)
-        plt.plot(time_axis,np.mean(status_through_time[3,:,:],axis=1),color=colors[1],label='EN')
-        plt.plot(time_axis,status_through_time[3,:,:],color=colors[1],alpha=.08)
-        plt.plot(time_axis,np.mean(status_through_time[4,:,:],axis=1),color=colors[3],label='CR')
-        plt.plot(time_axis,status_through_time[4,:,:],color=colors[3],alpha=.08)
-        plt.plot(time_axis,np.mean(status_through_time[5,:,:],axis=1),color=colors[5],label='EX')
-        plt.plot(time_axis,status_through_time[5,:,:],color=colors[5],alpha=.08)
+        plot_mean_and_interval(status_through_time[0,:,:].T,colors[0],'LC',fig)
+        plot_mean_and_interval(status_through_time[1,:,:].T,colors[1],'NT',fig)
+        plot_mean_and_interval(status_through_time[2,:,:].T,colors[2],'VU',fig)
+        plot_mean_and_interval(status_through_time[3,:,:].T,colors[3],'EN',fig)
+        plot_mean_and_interval(status_through_time[4,:,:].T,colors[4],'CR',fig)
+        plot_mean_and_interval(status_through_time[5,:,:].T,colors[5],'EX',fig)
         # add title, legend and axis-labels
         plt.legend(loc='best',fancybox=True)
         plt.title('Diversity trajectory IUCN categories - status change') #10x higher conservation
@@ -323,7 +329,6 @@ def main(args):
         right_ticks = [int(np.round(np.mean(status_through_time[i,-1,:]))) for i in range(status_through_time.shape[0])]
         plt.yticks(right_ticks,right_ticks)
         #plt.xticks(modified_q_matrix.year[::10],modified_q_matrix.year[::10])
-        plt.ylabel('Lost species')
         plt.tight_layout()
         fig.savefig(os.path.join(outdir,'future_status_trajectory.pdf'),bbox_inches='tight', dpi = 500)
     
@@ -344,7 +349,7 @@ def main(args):
                 final_status_count = 0
             status_count_list.append([pre_dd_modeling_count,present_status_count,final_status_count])
         status_count_list = np.array(status_count_list).T
-        colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349",'black'])
+        colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#b80033",'black'])
         labels = np.array(['LC', 'NT', 'VU', 'EN', 'CR', 'EX', 'DD'])
         def func(pct, allvals):
             absolute = int(np.round((pct/100.*np.sum(allvals))))
@@ -357,7 +362,7 @@ def main(args):
         ext = wedges[-1]
         # status distribution pre-dd
         wedges, texts, autotexts =axs[0].pie(status_count_list[0][status_count_list[0] >0], colors= colors[status_count_list[0] >0], autopct=lambda pct: func(pct, status_count_list[0][status_count_list[0] >0]), shadow=False,textprops=dict(color="w"))
-        axs[0].set_title('Current (inlcuding DD)')
+        axs[0].set_title('Current (including DD)')
         axs[1].set_title('Current (DD corrected)')
         axs[2].set_title('Final (%i years)'%delta_t)
         final_labels = list(labels[status_count_list[0] >0]) + ['EX']
@@ -382,7 +387,7 @@ def main(args):
         extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=column_names)        
     extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
     extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.5f')
-    print('\n')    
+    print('\n')
 
     if plot_histograms:
         # plot histograms of extinction times
