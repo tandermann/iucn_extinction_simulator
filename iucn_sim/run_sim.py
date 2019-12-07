@@ -153,7 +153,6 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
 #get_rate_estimate(ext_time_array,max_t)
 
 def main(args):
-    
     indir = args.indir
     outdir = args.outdir
     n_years = int(args.n_years)

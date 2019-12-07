@@ -101,22 +101,7 @@ def add_arguments(parser):
     )
     
     
-def main(args):   
-    
-#    import argparse
-#    p = argparse.ArgumentParser()
-#    args = p.parse_args()    
-#    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_carnivora_some_missing_gl.txt'
-#    args.reference_group = 'Mammalia'
-#    args.reference_rank = 'class'
-#    args.n_rep = 0
-#    args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
-#    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/carnivora_output_test/transition_rates'
-#    args.allow_precompiled_iucn_data = 1
-#    args.n_gen = 100000
-#    args.burnin = 1000
-#    args.status_list = 0    
-    
+def main(args):
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -141,6 +126,13 @@ def main(args):
     # get gl data to calculate en and cr extinction risk for all species
     gl_data = pd.read_csv(input_data,sep='\t',header=None)
     species_list = gl_data.iloc[:,0].values
+    # replace underscores in species name in case they are present
+    species_list = np.array([i.replace('_',' ') for i in species_list])
+    # Check if all species names are binomial
+    for species in species_list:
+        if len(species.split(' ')) != 2:
+            print('ABORTED: All provided species names provided under --input_data flag must be binomial! Found non binomial name:\n%s'%species)
+            quit()
     gl_data_available = False
     if gl_data.shape[1] > 1:
         gl_matrix = gl_data.iloc[:,1:].values

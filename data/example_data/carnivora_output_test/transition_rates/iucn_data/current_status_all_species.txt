@@ -1,12 +1,4 @@
 species	current_status
-New species1	NE
-New species2	NE
-New species3	NE
-New species4	NE
-New species5	NE
-New species6	NE
-New species7	NE
-New species8	NE
 Acinonyx jubatus	VU
 Ailuropoda melanoleuca	VU
 Ailurus fulgens	EN
