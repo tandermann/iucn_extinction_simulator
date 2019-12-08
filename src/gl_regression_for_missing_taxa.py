@@ -45,7 +45,6 @@ final_gl_values_all_species_df.columns = ['species']+ ['gl_years_%i'%i for i in 
 final_gl_values_all_species_df.species = iucn_bird_species_list
 final_gl_array = np.zeros((len(iucn_bird_species_list),100))
 for i,species in enumerate(sorted(iucn_bird_species_list)):
-    print(species)
     # if we have gl data for this species, get the 100 values
     if species in gl_data.iucn_names.values:
         gl_values = gl_data[gl_data.iucn_names==species].values[0][1:101].astype(float)
@@ -79,6 +78,7 @@ for i,species in enumerate(sorted(iucn_bird_species_list)):
         if genus in genus_gl_mean.keys():
             gl_values = genus_gl_mean[genus]
         else:
+            print(species)
             break
     final_gl_array[i,:] = gl_values
 
@@ -87,7 +87,7 @@ final_gl_values_all_species_df.iloc[:,1:] = final_gl_array
 # sort by species name
 final_gl_values_all_species_df = final_gl_values_all_species_df.sort_values(by=['species'])
 # write the final df to file
-final_gl_values_all_species_df.to_csv('/Users/tobias/GitHub/iucn_predictions/data/processed/trait_data/birds/gl_data/gl_data_all_birds.txt',sep='\t',index=False)
+final_gl_values_all_species_df.to_csv('/Users/tobias/GitHub/iucn_predictions/data/processed/trait_data/birds/gl_data/gl_data_all_birds.txt',sep='\t',index=False,header=False)
 
 
 
@@ -181,7 +181,7 @@ final_gl_values_all_species_df.iloc[:,1:] = final_gl_array
 # sort by species name
 final_gl_values_all_species_df = final_gl_values_all_species_df.sort_values(by=['species'])
 # write the final df to file
-final_gl_values_all_species_df.to_csv('/Users/tobias/GitHub/iucn_predictions/data/processed/trait_data/mammals/gl_data/gl_data_all_mammals.txt',sep='\t',index=False)
+final_gl_values_all_species_df.to_csv('/Users/tobias/GitHub/iucn_predictions/data/processed/trait_data/mammals/gl_data/gl_data_all_mammals.txt',sep='\t',index=False,header=False)
     
 
 
