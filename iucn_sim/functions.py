@@ -57,28 +57,17 @@ def count_status_changes(iucn_dataframe,valid_status_dict):
         change_types[category] = sum(change_types[category])
     return change_types
 
-def fill_dataframe(extant_iucn_df,valid_status_dict,start_year,current_year):
-    new_df = pd.DataFrame()
-    new_df['species'] = extant_iucn_df.species
-    for year in range(start_year,current_year+1):
-        new_df[str(year)] = np.nan
-    for species in list(extant_iucn_df.species):
-        species_id = extant_iucn_df[extant_iucn_df.species == species].index.values[0]
-        statuses = valid_status_dict[species]
-        year_column_indices = np.where(extant_iucn_df[extant_iucn_df.species==species].notna().values[0])[0][1:]
-        #years_with_status = extant_iucn_df.columns[year_column_indices]
-        if len(year_column_indices) == 0:
-            new_df.iloc[species_id,-1] = 'NE'
-        else:
-            start = str(start_year)
-            for i in range(0,len(statuses)):
-                status = statuses[i]
-                if not status == 'NaN':
-                    year_id = year_column_indices[i]
-                    end_id = extant_iucn_df.columns.get_loc(str(current_year))
-                    new_df.iloc[species_id,year_id:end_id+1] = status
-                    start = year_id
-    return new_df
+def fill_dataframe(extant_iucn_df,valid_status_dict):
+    species_list = extant_iucn_df.species.values
+    only_year_columns = extant_iucn_df.iloc[:,1:].copy()
+    max_index = only_year_columns.shape[-1]
+    years_in_status = [np.diff(np.append(np.where(only_year_columns[extant_iucn_df.species==species].notna().values[0])[0],max_index)) for species in species_list]
+    status_master_list = np.array([[item for sublist in [[j]*years_in_status[index_i][index_j] for index_j,j in enumerate(valid_status_dict[i])] for item in sublist]+['NA']*(max_index-sum(years_in_status[index_i])) for index_i,i in enumerate(species_list)])
+    status_master_flat_array = np.concatenate(status_master_list)
+    statuses, counts = np.unique(status_master_flat_array,return_counts=True)
+    years_in_each_category = dict(zip(statuses, counts))
+    years_in_each_category.pop('NA')
+    return years_in_each_category
 
 def get_years_spent_in_each_category(final_dataframe):
     new_df = final_dataframe.copy()
@@ -165,7 +154,7 @@ def extract_valid_statuses(formatted_status_through_time_file):
     taxon_list = list(formatted_status_through_time_file.species.values)
     #valid_status_matrix = [list(line[line.isin(['NE','EX','EW','DD','CR','EN','VU','NT','LC'])].values) for it,line in formatted_status_through_time_file.iterrows()]
     df_array = formatted_status_through_time_file.values
-    valid_status_matrix = [list(line[np.isin(line,['NE','EX','EW','DD','CR','EN','VU','NT','LC'])]) for line in df_array]
+    valid_status_matrix = [list(line[np.isin(line,['DD','CR','EN','VU','NT','LC'])]) for line in df_array]
     # if taxon has no single valid status in IUCN history, model as NE at present
     valid_status_matrix = [['NE'] if len(i) == 0 else i for i in valid_status_matrix]
     valid_status_dict = dict(zip(taxon_list, valid_status_matrix))

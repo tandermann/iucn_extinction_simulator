@@ -14,6 +14,17 @@ np.random.seed(1234)
 import os
 
 
+iucn_history_file = '/Users/tobias/GitHub/iucn_extinction_simulator/data/precompiled/iucn_history/MAMMALIA_iucn_history.txt'
+iucn_history_df = pd.read_csv(iucn_history_file,sep='\t')
+iucn_history_df = iucn_history_df.sort_values(by='species')
+iucn_history_df = iucn_history_df.drop_duplicates()
+iucn_history_df.index = np.arange(len(iucn_history_df))
+iucn_history_df.to_csv(iucn_history_file,sep='\t',index=False)
+
+
+
+
+
 
 from urllib.request import urlopen
 from io import StringIO

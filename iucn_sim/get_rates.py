@@ -117,8 +117,13 @@ def main(args):
     # create the r-scripts to be used later on:
     cust_func.write_r_scripts(outdir)
     
-    taxon_reference_groups = taxon_reference_group.split(',')
-    reference_ranks = reference_rank.split(',')
+    if taxon_reference_group:
+        taxon_reference_groups = taxon_reference_group.split(',')
+    else:
+        print('No reference group provided. Use the --reference_group to provide the name of a taxonomic group, e.g. Mammalia')
+        quit()
+    if reference_rank:
+        reference_ranks = reference_rank.split(',')
     
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -186,19 +191,15 @@ def main(args):
 
     
     # process the IUCN history data____________________________________________
-    iucn_start_year = 2000
+    iucn_start_year = 2001
     current_year = datetime.datetime.now().year  
     master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
     for iucn_history in iucn_history_files:
+        temp_df = master_stat_time_df.copy()
         statuses_through_time = pd.read_csv(iucn_history, delimiter = '\t')
-        data = np.zeros([len(statuses_through_time),(current_year-iucn_start_year)+2]).astype(object)
-        data[:] = np.nan
-        data[:,0] = statuses_through_time.species.values
-        for year in statuses_through_time.columns[1:]:
-            array_col = (int(year)-iucn_start_year)+1
-            if array_col >= 0:
-                data[:,array_col] = statuses_through_time[year].values
-        master_stat_time_df = master_stat_time_df.append(pd.DataFrame(data,columns = ['species']+list(np.arange(iucn_start_year,current_year+1).astype(str))),ignore_index=True)
+        target_columns = [column for column in master_stat_time_df.columns if column in statuses_through_time.columns]
+        temp_df[target_columns] = statuses_through_time[target_columns]
+        master_stat_time_df = master_stat_time_df.append(temp_df,ignore_index=True)
     # check if we have sufficient number of species for rate estimation
     if len(master_stat_time_df) < 1000:
         print('\n\n','#'*50,'\nWarning: Only %i species in reference dataset. This may not be sufficient for proper estimation of status transition rates. It is recommended to choose a larger reference group encompassing >1000 species!'%len(master_stat_time_df),'#'*50,'\n\n')
@@ -207,7 +208,17 @@ def main(args):
     # replace EX with NaN
     master_stat_time_df.replace('EX', np.nan,inplace=True)
     # write IUCN history df to file
+    master_stat_time_df = master_stat_time_df.sort_values(by='species')
+    master_stat_time_df = master_stat_time_df.drop_duplicates()
+    master_stat_time_df.index = np.arange(len(master_stat_time_df))
+    # If species is not assessed at all, set last year to NE
+    na_row_indeces = np.where(master_stat_time_df.iloc[:,1:].T.isnull().all().values)
+    for index in na_row_indeces:
+        master_stat_time_df.iloc[index,-1] = 'NE'
     master_stat_time_df.to_csv(os.path.join(iucn_outdir,'iucn_history_reference_taxa.txt'),sep='\t')
+    # remove the temporary downloaded files
+    for iucn_history in iucn_history_files:
+        os.remove(iucn_history)
     # extract most recent valid status for each taxon
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
     # count current status distribution
@@ -215,10 +226,11 @@ def main(args):
     print('Current IUCN status distribution in specified reference group:',dict(zip(unique, counts)))
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
-    print('Filling in missing status data...')
-    df_for_year_count = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict,iucn_start_year,current_year)
-    # count years spent in each category for all species
-    years_in_each_category = cust_func.get_years_spent_in_each_category(df_for_year_count)
+    print('Summing up years spend in each category...')
+    years_in_each_category = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict)
+    #df_for_year_count.to_csv('/Users/tobias/Desktop/temp.txt')
+    #years_in_each_category = cust_func.get_years_spent_in_each_category(df_for_year_count)
+
     # write the status change data to file
     final_years_count_array = np.array([list(years_in_each_category.keys()),list(years_in_each_category.values())]).T
     np.savetxt(os.path.join(outdir,'years_spent_in_each_category.txt'),final_years_count_array,fmt='%s\t%s')
