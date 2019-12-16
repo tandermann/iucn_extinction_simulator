@@ -1,0 +1,2 @@
+species	rate_e_mean	rate_e_lower	rate_e_upper	simulated_p_e_in_100_years
+Sarcogyps calvus	0.01534	0.01500	0.01570	0.74730

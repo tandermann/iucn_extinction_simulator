@@ -144,6 +144,35 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
         #fig.savefig(os.path.join(posterior_plot_dir,'%s.pdf'%species_list[index]),bbox_inches='tight', dpi = 500)
     return [mean_value,lower,upper]
 
+def select_target_species(species,species_list_status,species_list,en_ext_data,cr_ext_data):
+    target_species = species
+    target_index = species_list_status[species_list_status.species==target_species].index.values[0]
+    species_list_status = species_list_status.iloc[target_index,:]
+    species_list = np.array([species_list[target_index]])
+    en_ext_data = np.array([en_ext_data[target_index]])
+    cr_ext_data = np.array([cr_ext_data[target_index]])
+    return pd.DataFrame(species_list_status).T,species_list,en_ext_data,cr_ext_data
+
+def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 100000,burnin = 1000):
+    sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
+    ext_time_array_new = ext_time_array.copy()
+    ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
+    ext_time_array_new = ext_time_array_new.astype(float)
+    w_times = np.sum(ext_time_array_new)
+    ext_events = len(ext_time_array_new[ext_time_array_new<max_t])
+    post_samples = []
+    q = 0.01
+    likA = np.log(q)*ext_events -q*w_times    
+    for i in range(n_gen):
+        new_q, hast = update_multiplier(q)
+        lik = np.log(new_q)*ext_events -new_q*w_times
+        if lik-likA + hast >= np.log(np.random.random()):
+            q = new_q
+            likA = lik
+        if i > burnin and i % 10==0:
+            post_samples.append(q)
+    return post_samples
+
 ## test rate estimator
 #true_rate = 0.01
 #n_sim = 100
@@ -169,10 +198,8 @@ def main(args):
     model_unknown_as_lc = int(args.model_unknown_as_lc)
     plot_status_trajectories = int(args.plot_status_trajectories)
     plot_status_piechart = int(args.plot_status_piechart)
-
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    
     species_list_status_file = os.path.join(indir,'iucn_data/current_status_all_species.txt')
     transition_rates_file = os.path.join(indir,'sampled_status_change_rates.txt')
     en_ext_risk_file = os.path.join(indir,'en_extinction_risks_all_species.txt')
@@ -182,8 +209,11 @@ def main(args):
     species_list = pd.read_csv(en_ext_risk_file,sep='\t').iloc[:,0].values
     en_ext_data = pd.read_csv(en_ext_risk_file,sep='\t').iloc[:,1:].values
     cr_ext_data = pd.read_csv(cr_ext_risk_file,sep='\t').iloc[:,1:].values
-    
-    
+#    target_species=0
+#    target_species = 'Sarcogyps calvus'
+#    target_species = 'Cathartes aura'
+#    if target_species:
+#        species_list_status,species_list,en_ext_data,cr_ext_data = select_target_species(target_species,species_list_status,species_list,en_ext_data,cr_ext_data)   
     # calculate all q-matrices (all species and sim replicates)________________
     n_rates = transition_rates.shape[1]
     print("\nCalculating species-specific q-matrices ...")
@@ -270,7 +300,14 @@ def main(args):
     status_df_data = np.round(np.vstack([year,mean_status_through_time])).astype(int)
     status_df = pd.DataFrame(data = status_df_data.T,columns=['year','LC','NT','VU','EN','CR','EX'])
     status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
-
+    np.savetxt(os.path.join(outdir,'simulated_extinctions_array.txt'),status_through_time[-1],fmt='%i')
+    
+#    if target_species:
+#        posterior = get_rate_estimate_posterior(ext_date_data[0],n_years,0,sim_species_list,n_gen=n_gen,burnin=burnin)
+#        np.savetxt('/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/posterior_samples/%s_gl_no_status_change.txt'%target_species.replace(' ','_'),posterior,fmt='%.8f')
+#        print('\nPrinted posterior')
+        
+        
     if plot_diversity_trajectory:
         # plot diversity trajectory of species list________________________________
         #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
@@ -281,6 +318,8 @@ def main(args):
         plt.plot(time_axis,y_values,color="#b80033", label='accounting for GL')
         # get upper and lower confidence interval boundaries
         min_hpd, max_hpd = np.array([cust_func.calcHPD(i,0.95) for i in diversity_through_time.T]).T
+        mean_min_max = np.vstack([y_values,min_hpd,max_hpd])
+        np.savetxt(os.path.join(outdir,'future_diversity_trajectory.txt'),mean_min_max,fmt='%.2f')
         plt.fill_between(time_axis, min_hpd, max_hpd,
                  color="#b80033", alpha=0.2)
         #plt.legend()
@@ -339,7 +378,10 @@ def main(args):
         status_count_list = []
         for status_id in np.arange(status_through_time.shape[0]+1):
             status = iucn_status_code[status_id]
-            pre_dd_modeling_count = init_status_dict[status]
+            if status in init_status_dict.keys():
+                pre_dd_modeling_count = init_status_dict[status]
+            else:
+                pre_dd_modeling_count = 0
             if not status == 'DD':
                 present_status_count = int(np.round(np.mean(status_through_time[status_id][0])))
                 final_status_count = int(np.round(np.mean(status_through_time[status_id][-1])))
@@ -365,7 +407,7 @@ def main(args):
         axs[1].set_title('Current (DD corrected)')
         axs[2].set_title('Final (%i years)'%delta_t)
         final_labels = list(labels[status_count_list[0] >0]) + ['EX']
-        plt.legend(wedges+[ext], final_labels,title="IUCN status",loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
+        plt.legend(wedges+[ext], final_labels,title="IUCN status\n(N=%i sp.)"%status_count_list[2].sum(),loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
         fig.savefig(os.path.join(outdir,'status_pie_chart.pdf'),bbox_inches='tight', dpi = 500)
 
     if extinction_rates:

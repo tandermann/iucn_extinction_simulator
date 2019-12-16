@@ -57,7 +57,7 @@ def count_status_changes(iucn_dataframe,valid_status_dict):
         change_types[category] = sum(change_types[category])
     return change_types
 
-def fill_dataframe(extant_iucn_df,valid_status_dict):
+def get_years_spent_in_each_category(extant_iucn_df,valid_status_dict):
     species_list = extant_iucn_df.species.values
     only_year_columns = extant_iucn_df.iloc[:,1:].copy()
     max_index = only_year_columns.shape[-1]
@@ -68,22 +68,6 @@ def fill_dataframe(extant_iucn_df,valid_status_dict):
     years_in_each_category = dict(zip(statuses, counts))
     years_in_each_category.pop('NA')
     return years_in_each_category
-
-def get_years_spent_in_each_category(final_dataframe):
-    new_df = final_dataframe.copy()
-    new_df.drop(new_df.columns[[0]], axis=1, inplace=True)
-    value_counts = [new_df[c].value_counts() for c in list(new_df.select_dtypes(include=['O']).columns)]
-    status_counts_dict = {}
-    for element in value_counts:
-        list_statuses = list(element.index)
-        counts = list(element.values)
-        for index in range(len(list_statuses)):
-            status_counts_dict.setdefault(list_statuses[index],[])
-            status_counts_dict[list_statuses[index]].append(counts[index])
-    for status in status_counts_dict:
-        status_counts_dict[status] = sum(status_counts_dict[status])
-    status_counts_dict.pop('NaN',None)
-    return status_counts_dict  
 
 def replace_iucn_status_with_int(change_types,sum_years):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}

@@ -67,7 +67,7 @@ def add_arguments(parser):
     parser.add_argument(
         '--n_rep',
         default=0,
-        help="How many different transition-rate and extinction risk estimates to produce for simulations (default == number of provided GL value columns per species under 'input_data' flag)."
+        help="How many different transition-rate and extinction risk estimates to produce for simulations (default == 0 -> assumes same as number of provided GL values for each species)."
     )
     parser.add_argument(
         '--iucn_key',
@@ -100,8 +100,8 @@ def add_arguments(parser):
         help="Burn-in for MCMC for transition rate estimation (default=1000)."
     )
     
-    
-def main(args):
+
+def main(args):    
     # get user input
     input_data = args.input_data
     taxon_reference_group = args.reference_group
@@ -136,7 +136,7 @@ def main(args):
     # Check if all species names are binomial
     for species in species_list:
         if len(species.split(' ')) != 2:
-            print('ABORTED: All provided species names provided under --input_data flag must be binomial! Found non binomial name:\n%s'%species)
+            print('ERROR','*'*50,'\nABORTED: All provided species names provided under --input_data flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*55)
             quit()
     gl_data_available = False
     if gl_data.shape[1] > 1:
@@ -147,7 +147,7 @@ def main(args):
         status_list_data = list(pd.read_csv(status_list,sep='\t',header=None).iloc[:,0].values)
 
         if len(species_list) != len(status_list_data):
-            print('Error: Length of provided status list does not match length of species list provided as --input_data!')
+            print('ERROR','*'*50,'\nLength of provided status list does not match length of species list provided as --input_data!','*'*55)
             quit()
 
     # get IUCN history_________________________________________________________
@@ -182,7 +182,8 @@ def main(args):
             rank = reference_ranks[i]
             iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.upper(taxon_group), str.lower(rank), iucn_key, iucn_outdir]
             if not iucn_key:
-                quit('***IUCN-KEY ERROR:*** Need to download IUCN history for specified reference group. Please provide a valid IUCN key (using the --iucn_key flag). Alternatively choose a precompiled reference group (see available groups at github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/iucn_history/).'%(taxon_group))
+                print('ERROR','*'*50,'\nIUCN-KEY ERROR: Need to download IUCN history for specified reference group: %s. Please provide a valid IUCN key (using the --iucn_key flag). Alternatively choose a precompiled reference group (see available groups at github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/iucn_history/)'%(taxon_group),'*'*55)
+                quit()
             #iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
             seqtk = subprocess.Popen(iucn_cmd)
@@ -227,9 +228,7 @@ def main(args):
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
     print('Summing up years spend in each category...')
-    years_in_each_category = cust_func.fill_dataframe(master_stat_time_df,valid_status_dict)
-    #df_for_year_count.to_csv('/Users/tobias/Desktop/temp.txt')
-    #years_in_each_category = cust_func.get_years_spent_in_each_category(df_for_year_count)
+    years_in_each_category = cust_func.get_years_spent_in_each_category(master_stat_time_df,valid_status_dict)
 
     # write the status change data to file
     final_years_count_array = np.array([list(years_in_each_category.keys()),list(years_in_each_category.values())]).T
@@ -244,7 +243,7 @@ def main(args):
         if gl_data_available:
             sim_reps = gl_matrix.shape[1]
         else:
-            print('ERROR: Use --n_rep flag to set the number of simulation replicates.')
+            print('ERROR','*'*50,'\nUse --n_rep flag to set the number of simulation replicates.','*'*55)
             quit()
     status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
     for status_change in change_type_dict.keys():
