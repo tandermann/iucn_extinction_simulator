@@ -74,4 +74,5 @@ However, if for some reason you have problems obtaining an IUCN token or don't w
 - `--n_years` How many years to simulate into the future, e.g. `80` if the next 80 years (starting at present) should be simulated.
 
 
-
+## Info about IUCN colors and font
+https://www.withoutnations.com/portfolio/iucn-red-list/

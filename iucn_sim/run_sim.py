@@ -12,7 +12,6 @@ np.set_printoptions(suppress=True)
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-np.random.seed(1234)
 import os
 import sys
 import iucn_sim.functions as cust_func
@@ -99,7 +98,12 @@ def add_arguments(parser):
         default=1,
         help="Plots pie charts of status distribution: 0=off, 1=on (default=1)."
     )
-    
+    parser.add_argument(
+        '--random_seed',
+        default=None,
+        help="Set random seed for your analysis for reproducability (default None, i.e. it is randomely drawn)."
+    )
+
 
 def p_e_year(years,p_e):
     pe_year = 1-(1-p_e)**(1/years)
@@ -182,6 +186,12 @@ def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 
 #get_rate_estimate(ext_time_array,max_t)
 
 def main(args):
+    random_seed = args.random_seed
+    try:
+        random_seed = int(random_seed)
+        np.random.seed(random_seed)
+    except:
+        pass
     indir = args.indir
     outdir = args.outdir
     n_years = int(args.n_years)
@@ -301,6 +311,7 @@ def main(args):
     status_df = pd.DataFrame(data = status_df_data.T,columns=['year','LC','NT','VU','EN','CR','EX'])
     status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
     np.savetxt(os.path.join(outdir,'simulated_extinctions_array.txt'),status_through_time[-1],fmt='%i')
+    pd.DataFrame(data=te_array).to_csv(os.path.join(outdir,'te_all_species.txt'),sep='\t',header=False,index=False)
     
 #    if target_species:
 #        posterior = get_rate_estimate_posterior(ext_date_data[0],n_years,0,sim_species_list,n_gen=n_gen,burnin=burnin)

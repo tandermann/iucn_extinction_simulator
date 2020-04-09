@@ -138,7 +138,7 @@ def extract_valid_statuses(formatted_status_through_time_file):
     taxon_list = list(formatted_status_through_time_file.species.values)
     #valid_status_matrix = [list(line[line.isin(['NE','EX','EW','DD','CR','EN','VU','NT','LC'])].values) for it,line in formatted_status_through_time_file.iterrows()]
     df_array = formatted_status_through_time_file.values
-    valid_status_matrix = [list(line[np.isin(line,['DD','CR','EN','VU','NT','LC'])]) for line in df_array]
+    valid_status_matrix = [list(line[np.isin(line,['DD','EX','CR','EN','VU','NT','LC'])]) for line in df_array]
     # if taxon has no single valid status in IUCN history, model as NE at present
     valid_status_matrix = [['NE'] if len(i) == 0 else i for i in valid_status_matrix]
     valid_status_dict = dict(zip(taxon_list, valid_status_matrix))
@@ -342,6 +342,7 @@ def write_r_scripts(output_folder):
     group_rank = args[2]
     iucn_key = args[3]
     outdir = args[4]
+    exclude_extinct = args[5]
     
     # load all IUCN data
     data = c()
@@ -364,13 +365,15 @@ def write_r_scripts(output_folder):
       }
     }
     
-    # exclude extinct taxa
-    boolean = !grepl('EX|EW',status_list)
-    taxon_list = taxon_list[boolean]
-    group_list = group_list[boolean]
-    status_list = status_list[boolean]
-    taxon_id = taxon_id[boolean]
-    
+    # exclude extinct taxa if needed
+    if (exclude_extinct){
+      boolean = !grepl('EX|EW',status_list)
+      taxon_list = taxon_list[boolean]
+      group_list = group_list[boolean]
+      status_list = status_list[boolean]
+      taxon_id = taxon_id[boolean]
+    }
+
     # remove all non-species level identifications
     boolean = !grepl('subsp.|ssp.|subpopulation|Subpopulation',taxon_list)
     taxon_list = taxon_list[boolean]
@@ -378,31 +381,32 @@ def write_r_scripts(output_folder):
     status_list = status_list[boolean]
     taxon_id = taxon_id[boolean]
     
-    # select mammals
+    # select target taxa
     selected_taxon_list = taxon_list[group_list==taxon_group]
     selected_ids = taxon_id[group_list==taxon_group]
     final_sorted_taxon_list = selected_taxon_list
     #final_taxon_list = as.data.frame(cbind(selected_taxon_list,selected_ids))
     #final_sorted_taxon_list = final_taxon_list[order(final_taxon_list$selected_taxon_list),]
-    write.table(final_sorted_taxon_list,file=paste0(outdir,'/',taxon_group,"_species_list.txt"), quote=F,row.names=F,sep='\t',col.names = FALSE)
+    write.table(final_sorted_taxon_list,file=paste0(outdir,'/',taxon_group,"_species_list.txt"), quote=F,row.names=F,sep='	',col.names = FALSE)
     
     
     # get historic data __________________________
-    species_list = selected_taxon_list
     # create new dataframe with species as first column
-    historic_assessments = species_list
+    historic_assessments = selected_taxon_list
     historic_assessments = as.data.frame(historic_assessments)
     colnames(historic_assessments) = c('species')
     # find historic assessments and fill into dataframe
     counter = 1
-    for (species in species_list){
-      print(paste0('Downloading IUCN history: species ',counter, ' of ',length(species_list)))
+    for (i in seq(1, length(selected_taxon_list), 1)){
+      species = selected_taxon_list[i]
+      species_id = selected_ids[i]
+      print(paste0('Downloading IUCN history: species ',counter, ' of ',length(selected_taxon_list)))
       #print(species)
       row_id = which(historic_assessments$species == species)
-      hist_data <- rl_history(species,key=iucn_key)
+      hist_data <- rl_history(id=species_id,key=iucn_key)
       for (year in hist_data$result$year){
         id = which(hist_data$result$year == year)
-        #some species have multiple assignmen ts for some years
+        #some species have multiple assignments for some years
         if (length(hist_data$result$code[id])>1){
           historic_assessments[row_id,year] <- hist_data$result$code[id][1]
         }
@@ -412,9 +416,12 @@ def write_r_scripts(output_folder):
       }
       counter = counter+1
     }
-    write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='\t')
-    #___________________________________
-    
+    if (exclude_extinct){
+      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
+    }else{
+      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history_incl_extinct.txt"), quote=F,row.names=F,sep='	')
+    }
+    #___________________________________    
     """
     
     script_2_content = """
