@@ -125,7 +125,7 @@ def add_arguments(parser):
     # args.status_list = 0        
 
 
-    
+
 def main(args):    
     # get user input
     input_data = args.input_data
@@ -192,7 +192,7 @@ def main(args):
                     string = urlpath.read().decode('utf-8')        
                     string_input = StringIO(string)
                     ref_group_data = pd.read_csv(string_input, sep="\t")
-                    hist_outfile = os.path.join(iucn_outdir,'iucn_history_%s.txt'%str.lower(taxon_group))
+                    hist_outfile = os.path.join(iucn_outdir,os.path.basename(url))
                     ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
                     precompiled_taxon_groups.append(str.lower(taxon_group))
                     precompiled_taxon_group_files.append(hist_outfile)
@@ -207,7 +207,7 @@ def main(args):
                     string = urlpath.read().decode('utf-8')        
                     string_input = StringIO(string)
                     ref_group_data = pd.read_csv(string_input, sep="\t")
-                    hist_outfile = os.path.join(iucn_outdir,'iucn_history_%s.txt'%str.lower(taxon_group))
+                    hist_outfile = os.path.join(iucn_outdir,os.path.basename(url))
                     ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
                     precompiled_taxon_groups.append(str.lower(taxon_group))
                     precompiled_taxon_group_files.append(hist_outfile)
@@ -218,7 +218,7 @@ def main(args):
     for i,taxon_group in enumerate(taxon_reference_groups):
         if str.lower(taxon_group) in precompiled_taxon_groups and allow_precompiled_iucn_data:
             print('Using precompiled IUCN history data for %s.'%taxon_group)                    
-            iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).endswith(str.lower(taxon_group)+'.txt')][0])
+            iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).startswith(str.upper(taxon_group))][0])
         else:
             print('Fetching IUCN history using rredlist')
             rank = reference_ranks[i]
@@ -228,8 +228,8 @@ def main(args):
                 quit()
             #iucn_error_file = os.path.join(iucn_outdir,'get_iucn_status_data_and_species_list_error_file.txt')
             #with open(iucn_error_file, 'w') as err:
-            seqtk = subprocess.Popen(iucn_cmd)
-            seqtk.wait()
+            run_iucn_cmd = subprocess.Popen(iucn_cmd)
+            run_iucn_cmd.wait()
             iucn_history_files.append(os.path.join(iucn_outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
 
     
@@ -261,8 +261,8 @@ def main(args):
         master_stat_time_df.iloc[index,-1] = 'NE'
     master_stat_time_df.to_csv(os.path.join(iucn_outdir,'iucn_history_reference_taxa.txt'),sep='\t')
     # remove the temporary downloaded files
-    for iucn_history in iucn_history_files:
-        os.remove(iucn_history)
+    #for iucn_history in iucn_history_files:
+    #    os.remove(iucn_history)
     # extract most recent valid status for each taxon
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
     # count current status distribution

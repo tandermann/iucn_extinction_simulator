@@ -6,7 +6,6 @@
     group_rank = args[2]
     iucn_key = args[3]
     outdir = args[4]
-    exclude_extinct = args[5]
     
     # load all IUCN data
     data = c()
@@ -29,15 +28,13 @@
       }
     }
     
-    # exclude extinct taxa if needed
-    if (exclude_extinct){
-      boolean = !grepl('EX|EW',status_list)
-      taxon_list = taxon_list[boolean]
-      group_list = group_list[boolean]
-      status_list = status_list[boolean]
-      taxon_id = taxon_id[boolean]
-    }
-
+    # exclude extinct taxa
+    boolean = !grepl('EX|EW',status_list)
+    taxon_list = taxon_list[boolean]
+    group_list = group_list[boolean]
+    status_list = status_list[boolean]
+    taxon_id = taxon_id[boolean]
+    
     # remove all non-species level identifications
     boolean = !grepl('subsp.|ssp.|subpopulation|Subpopulation',taxon_list)
     taxon_list = taxon_list[boolean]
@@ -45,7 +42,7 @@
     status_list = status_list[boolean]
     taxon_id = taxon_id[boolean]
     
-    # select target taxa
+    # select mammals
     selected_taxon_list = taxon_list[group_list==taxon_group]
     selected_ids = taxon_id[group_list==taxon_group]
     final_sorted_taxon_list = selected_taxon_list
@@ -55,22 +52,21 @@
     
     
     # get historic data __________________________
+    species_list = selected_taxon_list
     # create new dataframe with species as first column
-    historic_assessments = selected_taxon_list
+    historic_assessments = species_list
     historic_assessments = as.data.frame(historic_assessments)
     colnames(historic_assessments) = c('species')
     # find historic assessments and fill into dataframe
     counter = 1
-    for (i in seq(1, length(selected_taxon_list), 1)){
-      species = selected_taxon_list[i]
-      species_id = selected_ids[i]
-      print(paste0('Downloading IUCN history: species ',counter, ' of ',length(selected_taxon_list)))
+    for (species in species_list){
+      print(paste0('Downloading IUCN history: species ',counter, ' of ',length(species_list)))
       #print(species)
       row_id = which(historic_assessments$species == species)
-      hist_data <- rl_history(id=species_id,key=iucn_key)
+      hist_data <- rl_history(species,key=iucn_key)
       for (year in hist_data$result$year){
         id = which(hist_data$result$year == year)
-        #some species have multiple assignments for some years
+        #some species have multiple assignmen ts for some years
         if (length(hist_data$result$code[id])>1){
           historic_assessments[row_id,year] <- hist_data$result$code[id][1]
         }
@@ -80,11 +76,7 @@
       }
       counter = counter+1
     }
-    if (exclude_extinct){
-      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
-    }else{
-      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history_incl_extinct.txt"), quote=F,row.names=F,sep='	')
-    }
+    write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
     #___________________________________
     
     
