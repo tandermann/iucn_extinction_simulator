@@ -1,0 +1,963 @@
+Scientific name	Common name	Category	Year of Assessment	Date last recorded in the wild
+Bos sauveli	Kouprey	CR(PE)	2008	1969/70
+Crocidura trichura	Christmas Island Shrew	CR(PE)	2008	1985
+Cryptochloris wintoni	De Winton's Golden Mole	CR(PE)	2008	1937
+Dendrolagus mayri	Wondiwoi Tree-kangaroo	CR(PE)	2008	1928
+Dipodomys gravipes	San Quintin Kangaroo Rat	CR(PE)	2008	1986
+Gyldenstolpia fronto	Fossorial Giant Rat	CR(PE)	2018	1896
+Lipotes vexillifer	Yangtze River Dolphin	CR(PE)	2008	2002
+Melanomys zunigae	Zuniga's Dark Rice Rat	CR(PE)	2008	1949
+Mesocapromys nanus	Dwarf Hutia	CR(PE)	2008	1937
+Mesocapromys sanfelipensis	Little Earth Hutia	CR(PE)	2008	1978
+Monodelphis unistriata	Single-striped Opossum	CR(PE)	2011	1899
+Murina tenebrosa	Gloomy Tube-nosed Bat	CR(PE)	2008	1962
+Mystacina robusta	New Zealand Greater Short-tailed Bat	CR(PE)	2008	1967
+Nilopegamys plumbeus	Ethiopian Amphibious Rat	CR(PE)	2008	1920s
+Nyctophilus howensis	Lord Howe Long-eared Bat	CR(PE)	2008	1972
+Peromyscus guardia	Angel Island Mouse	CR(PE)	2008	1991
+Peromyscus mekisturus	Puebla Deer Mouse	CR(PE)	2008	before 1948
+Phalanger matanim	Telefomin Cuscus	CR(PE)	2008	1997
+Pharotis imogene	Thomas's Big-eared Bat	CR(PE)	2008	1890
+Piliocolobus waldroni	Miss Waldron’s Red Colobus	CR(PE)	2019	2008
+Pteralopex pulchra	Montane Monkey-faced Bat	CR(PE)	2008	1991
+Pteropus aruensis	Aru Flying Fox	CR(PE)	2008	1992
+Pteropus tuberculatus	Vanikoro Flying Fox	CR(PE)	2008	before 1930
+Tylomys bullaris	Chiapan Climbing Rat	CR(PE)	2019	1970
+Tylomys tumbalensis	Tumbalá Climbing Rat	CR(PE)	2019	1970
+Uromys emmae	Emma's Giant Rat	CR(PE)	2008	1946
+Uromys imperator	Emperor Rat	CR(PE)	2008	1886-1888 (confirmed); 1960s (possible)
+Uromys porculus	Guadalcanal Rat	CR(PE)	2008	1886-1888
+Viverra civettina	Malabar Civet	CR(PE)	2015	?
+Anodorhynchus glaucus	Glaucous Macaw	CR(PE)	2019	2001
+Callaeas cinereus	South Island Kokako	CR(PE)	2016	2007
+Campephilus imperialis	Imperial Woodpecker	CR(PE)	2013	1956
+Charmosyna diadema	New Caledonian Lorikeet	CR(PE)	2019	1913
+Eriocnemis godini	Turquoise-throated Puffleg	CR(PE)	2012	1850
+Eurostopodus exul	New Caledonian Nightjar	CR(PE)	2014	1939
+Glaucidium mooreorum	Pernambuco Pygmy-owl	CR(PE)	2019	2001
+Hemignathus affinis	Maui Nukupuu	CR(PE)	2016	1896
+Hemignathus hanapepe	Kauai Nukupuu	CR(PE)	2016	1899
+Hydrobates  macrodactylus	Guadalupe Storm-petrel	CR(PE)	2012	1912
+Loxops ochraceus	Maui Akepa	CR(PE)	2016	1988
+Myadestes lanaiensis	Olomao	CR(PE)	2013	1994
+Numenius borealis	Eskimo Curlew	CR(PE)	2012	1963
+Paroreomyza maculata	Oahu Alauahio	CR(PE)	2012	1985
+Pomarea mira	Ua Pou Monarch	CR(PE)	2013	2010
+Psittirostra psittacea	Ou	CR(PE)	2012	1989
+Pterodroma caribbaea	Jamaican Petrel	CR(PE)	2013	1879
+Pyrrhura subandina	Sinu Parakeet	CR(PE)	2014	1949
+Siphonorhis americana	Jamaican Poorwill	CR(PE)	2012	1860
+Turnix novaecaledoniae	New  Caledonian Buttonquail	CR(PE)	2014	1911
+Vanellus macropterus	Javan Lapwing	CR(PE)	2019	1939
+Vermivora bachmanii	Bachman's Warbler	CR(PE)	2013	1988
+Alinea lanceolata	Barbados Skink	CR(PE)	2015	1889
+Anilios insperatus	Fassifern Blind Snake	CR(PE)	2017	1992
+Anolis roosevelti	Culebra Giant Anole	CR(PE)	2009	1932
+Borikenophis sanctaecrucis	Saint Croix Racer	CR(PE)	2015	19th or early 20th Century
+Calamaria prakkei	Prakke's Reed Snake	CR(PE)	2011	?
+Capitellum mariagalantae	Marie-Galante Skink	CR(PE)	2015	1830s
+Capitellum metallicum	Lesser Martinique Skink	CR(PE)	2015	before 1879
+Capitellum parvicruzae	Lesser Saint Croix Skink	CR(PE)	2013	?
+Celestus anelpistus	Giant Hispaniolan Galliwasp	CR(PE)	2004	1977
+Celestus occiduus	Jamaica Giant Galliwasp	CR(PE)	2017	1851
+Chelonoidis phantasticus	Fernandina Giant Tortoise	CR(PE)	2015	1964
+Cynisca gansi		CR(PE)	2012	?
+Erythrolamprus cursor	Lacépède's Ground Snake	CR(PE)	2015	1968
+Gallotia auaritae	La Palma Giant Lizard	CR(PE)	2008	?
+Holcosus orcesi	Peters' Ameiva	CR(PE)	2017	1959
+Hypsirhynchus ater	Jamaican Racer	CR(PE)	2015	1900
+Hypsirhynchus melanichnus	La Vega Racer	CR(PE)	2015	1910
+Leiocephalus endomychus	Central Haitian Curlytail	CR(PE)	2015	1976
+Leiocephalus pratensis	Atalaye Curlytail Lizard	CR(PE)	2015	1966
+Leiocephalus rhutidira	Lapierre Curlytail Lizard	CR(PE)	2015	1978
+Lepidoblepharis miyatai		CR(PE)	2013	1964
+Liolaemus cranwelli	Cranwell's Tree Iguana	CR(PE)	2014	1973
+Mabuya hispaniolae	Hispaniolan Two-lined Skink	CR(PE)	2015	1937
+Mabuya mabouya	Greater Martinique Skink	CR(PE)	2015	1889
+Mabuya montserratae	Montserrat Skink	CR(PE)	2015	1984
+Mitophis leptepileptus	Haitian Border Threadsnake	CR(PE)	2015	1984
+Omoadiphas cannula		CR(PE)	2012	1989
+Pseudoxyrhopus ankafinaensis		CR(PE)	2011	1881
+Rhampholeon chapmanorum	Chapman's Pygmy Chameleon	CR(PE)	2014	1998
+Sphaerodactylus  elasmorhynchus	Marche Leon Least Gecko	CR(PE)	2015	1966
+Sphaerodactylus lazelli	Cap-Haitien Least Gecko	CR(PE)	2015	1960
+Sphaerodactylus williamsi	Haitian Striped Sphaero	CR(PE)	2015	before 1983
+Spondylurus anegadae	Anegada Skink	CR(PE)	2015	1966
+Spondylurus haitiae	Hispaniolan Four-lined Skink	CR(PE)	2015	1857-1858
+Spondylurus lineolatus	Hispaniolan Ten-lined Skink	CR(PE)	2015	1985
+Spondylurus  magnacruzae	Greater Saint Croix Skink	CR(PE)	2013	2000
+Spondylurus martinae	Saint Martin Skink	CR(PE)	2015	1965
+Spondylurus monitae	Monito Skink	CR(PE)	2013	1993
+Spondylurus spilonotus	Greater Virgin Islands Skink	CR(PE)	2013	1877
+Stenocercus haenschi	Haensch's Whorltail Iguana	CR(PE)	2009	1901
+Trimetopon viquezi	Viquez's Tropical Ground Snake	CR(PE)	2012	1927
+Allobates ranoides	Llanos Rocket Frog	CR(PE)	2019	2001
+Altiphrynoides osgoodi	Osgood's Ethiopian Toad	CR(PE)	2012	2003
+Andinobates abditus	Collins' Poison Frog	CR(PE)	2004	?
+Andinobates viridis	Green Poison Frog	CR(PE)	2016	2005
+Aquiloeurycea praecellens	Admirable False Brook Salamander	CR(PE)	2009	1940-12-24 00:00:00
+Aromobates nocturnus	Skunk Frog	CR(PE)	2006	1991
+Arthroleptides dutoiti	Du Toit's Torrent Frog	CR(PE)	2004	1962
+Arthroleptis  kutogundua	Overlooked Squeaker Frog	CR(PE)	2012	1930
+Arthroleptis troglodytes	Cave Squeaker	CR(PE)	2014	1962
+Atelopus angelito		CR(PE)	2019	2000
+Atelopus ardila		CR(PE)	2012	1989
+Atelopus carbonerensis	La Carbonera Stubfoot Toad	CR(PE)	2004	1998
+Atelopus chiriquiensis	Chiriqui Harlequin Frog	CR(PE)	2008	late 1990s
+Atelopus chirripoensis		CR(PE)	2012	1980
+Atelopus chocoensis		CR(PE)	2016	1998
+Atelopus chrysocorallus		CR(PE)	2004	1988
+Atelopus ebenoides	Huila Stubfoot Toad	CR(PE)	2017	2005
+Atelopus erythropus	Carabaya Stubfoot Toad	CR(PE)	2018	2004
+Atelopus eusebianus	Malvasa Stubfoot Toad	CR(PEW)	2016	2005
+Atelopus eusebiodiazi		CR(PE)	2010	1997
+Atelopus farci	Forest Stubfoot Toad	CR(PE)	2016	2003
+Atelopus gigas		CR(PE)	2016	1970
+Atelopus guanujo	Puca Sapo	CR(PE)	2004	1988
+Atelopus halihelos	Morona-Santiago Stubfoot Toad	CR(PE)	2006	1984
+Atelopus lynchi		CR(PE)	2004	1984
+Atelopus mindoensis	Mindo Stubfoot Toad	CR(PE)	2004	1989
+Atelopus minutulus	Colombian Stubfoot Toad	CR(PE)	2016	1985
+Atelopus monohernandezii		CR(PE)	2016	1982
+Atelopus nicefori	Niceforo's Stubfoot Toad	CR(PE)	2016	1988
+Atelopus onorei		CR(PE)	2008	1990
+Atelopus orcesi		CR(PE)	2016	1988
+Atelopus oxyrhynchus	Rednose Stubfoot Toad	CR(PE)	2004	1994
+Atelopus pachydermus	Schmidt's Stubfoot Toad	CR(PE)	2008	1995
+Atelopus pastuso		CR(PE)	2012	1993
+Atelopus pedimarmoratus	San Isidro Stubfoot Toad	CR(PEW)	2016	1963
+Atelopus peruensis	Peru Stubfoot Toad	CR(PE)	2006	?
+Atelopus petersi		CR(PE)	2008	1996
+Atelopus petriruizi	Painted Stubfoot Toad	CR(PE)	2016	1998
+Atelopus pictiventris	Painted Stubfoot Toad	CR(PE)	2016	1996
+Atelopus pinangoi	Pinango Stubfoot Toad	CR(PE)	2004	1997
+Atelopus planispina	Flat-spined Atelopus	CR(PE)	2004	1985
+Atelopus podocarpus		CR(PE)	2012	1994
+Atelopus quimbaya		CR(PE)	2016	1997
+Atelopus sernai		CR(PE)	2004	2000
+Atelopus simulatus		CR(PE)	2014	2003
+Atelopus sonsonensis		CR(PE)	2016	1996
+Atelopus sorianoi	Cloud Forest Stubfoot Toad	CR(PE)	2004	1990
+Atelopus subornatus	Bogota Stubfoot Toad	CR(PE)	2016	1993
+Atelopus zeteki	Cerro Campana Stubfoot Toad	CR(PEW)	2019	2009
+Boana cymbalum		CR(PE)	2004	?
+Bokermannohyla izecksohni		CR(PE)	2004	?
+Bradytriton silus	Finca Chiblac Salamander	CR(PE)	2008	1976
+Bromeliohyla  dendroscarta	Greater Bromeliad Treefrog	CR(PE)	2004	1974
+Centrolene geckoideum	Pacific Giant Glass Frog	CR(PE)	2019	1997
+Centrolene pipilata	Amazon Giant Glass Frog	CR(PE)	2019	1977
+Charadrahyla altipotens	Yellow-bellied Voiceless Treefrog	CR(PE)	2004	1960s
+Chiropterotriton  magnipes	Bigfoot Splayfoot Salamander	CR(PE)	2008	?
+Colostethus  jacobuspetersi		CR(PE)	2004	1960s
+Conraua derooi	Togo Slippery Frog	CR(PE)	2004	?
+Craugastor angelicus	Angel Robber Frog	CR(PE)	2008	1994
+Craugastor chrysozetetes	McCranie's Robber Frog	CR(PE)	2019	1989
+Craugastor cruzi	Cruz Robber Frog	CR(PE)	2004	1988
+Craugastor  epochthidius		CR(PE)	2019	1999
+Craugastor fecundus		CR(PE)	2004	?
+Craugastor gulosus		CR(PE)	2013	1983
+Craugastor merendonensis	San Pedro Robber Frog	CR(PE)	2019	1968
+Craugastor obesus		CR(PE)	2013	1984
+Craugastor olanchano		CR(PE)	2004	?
+Craugastor  polymniae	Sierra Juarez Robber Frog	CR(PE)	2004	1983
+Craugastor saltuarius		CR(PE)	2019	early 1990s
+Craugastor trachydermus		CR(PE)	2004	?
+Ecnomiohyla echinata	Oaxacan Fringe-limbed Treefrog	CR(PE)	2004	1962
+Ecnomiohyla rabborum	Rabb’s Fringe-limbed Treefrog	CR(PE)	2019	2008
+Ectopoglossus atopoglossus		CR(PE)	2019	1990s
+Eleutherodactylus  eneidae	Villalba Robber Frog	CR(PE)	2008	1990
+Eleutherodactylus glanduliferoides	La Visite Robber Frog	CR(PE)	2008	1985
+Eleutherodactylus karlschmidti	Karl's Robber Frog	CR(PE)	2008	1976 or 1988
+Eleutherodactylus orcutti	Arntully Robber Frog	CR(PE)	2008	mid 1980s
+Eleutherodactylus schmidti	Schmidt's Robber Frog	CR(PE)	2008	mid 1980s
+Eleutherodactylus  semipalmatus	Foothill Robber Frog	CR(PE)	2008	1985
+Gastrotheca angustifrons	Pacific Marsupial Frog	CR(PE)	2019	1990s
+Gastrotheca antomia		CR(PE)	2016	1997
+Gastrotheca lauzuricae	La Siberia Marsupial Frog	CR(PE)	2004	1989
+Holoaden bradei	Itatiaia Highland Frog	CR(PE)	2004	1976
+Hyloscirtus chlorosteus	Parjacti Treefrog	CR(PE)	2004	1970s
+Hyloxalus abditaurantius	Bello Rocket Frog	CR(PE)	2019	1990s
+Hyloxalus edwardsi	Edwards' Rocket Frog	CR(PE)	2004	1996
+Hyloxalus ruizi	Ruiz's Rocket Frog	CR(PE)	2004	1979
+Incilius fastidiosus	Pico Blanco Toad	CR(PE)	2008	?
+Isthmohyla debilis	Isla Bonita Treefrog	CR(PE)	2008	1998
+Isthmura naucampatepetl	Cofre de Perote Salamander	CR(PE)	2008	1981-10-24 00:00:00
+Lithobates omiltemanus	Guerreran Leopard Frog	CR(PE)	2004	1978
+Lithobates pueblae	Puebla Frog	CR(PE)	2004	?
+Lithobates tlaloci	Tlaloc's Leopard Frog	CR(PE)	2004	1985
+Litoria castanea	Yellow-spotted Tree Frog	CR(PE)	2004	1980
+Litoria piperata	Peppered Tree Frog	CR(PE)	2004	1973
+Mannophryne neblina	Sapito Acollarado De Rancho Grande	CR(PE)	2004	?
+Melanophryniscus peritus		CR(PE)	2013	1953
+Nannophryne cophotis	Paramo Toad	CR(PE)	2018	2005
+Nectophrynoides poyntoni	Poynton's Forest Toad	CR(PE)	2014	2003
+Nymphargus truebae	Trueb's Cochran Frog	CR(PE)	2017	2005
+Oedipina paucidentata	El Empalme Worm Salamander	CR(PE)	2008	1952
+Oedipina petiola		CR(PE)	2019	1995
+Oreobates zongoensis		CR(PE)	2004	1996
+Parhoplophryne usambarica	Amani Forest Frog	CR(PE)	2012	1920s
+Paruwrobates andina	La Planada Poison Frog	CR(PE)	2019	1990s
+Peltophryne fluviatica	Hispaniolan Crestless Toad	CR(PE)	2004	?
+Philautus jacobsoni		CR(PE)	2004	?
+Phrynobatrachus manengoubensis	Manengouba River Frog	CR(PE)	2019	Before 2009
+Phrynobatrachus njiomock	Lake Oku Puddle Frog	CR(PE)	2019	2010
+Plectrohyla ephemera	Cerro Las Flores Spikethumb Frog	CR(PE)	2006	?
+Pristimantis albericoi		CR(PE)	2019	1986
+Pristimantis bernali	Argelia Robber Frog	CR(PE)	2004	1981
+Pristimantis molybrignus	Uribe Robber Frog	CR(PE)	2016	1999
+Pristimantis  phragmipleuron	Sugar Robber Frog	CR(PE)	2016	1983
+Proceratophrys moratoi	Botucatu Escuerzo	CR(PE)	2004	1990
+Prostherapis dunni	Sapito Ninera De Dunn	CR(PE)	2006	?
+Pseudoeurycea anitae	Anita's False Brook Salamander	CR(PE)	2008	1976-08-09 00:00:00
+Pseudoeurycea aquatica	Aquatic Salamander	CR(PE)	2008	1978
+Pseudoeurycea tlahcuiloh	Green-flecked  Salamander	CR(PE)	2008	1960s
+Pseudoeurycea  unguidentis	Claw-toothed Salamander	CR(PE)	2009	1976
+Rana chevronta	Chevron-spotted Brown Frog	CR(PE)	2019	1983
+Rhinella rostrata	Mesopotamia Beaked Toad	CR(PE)	2004	1914
+Rhinoderma rufum	Northern Darwin's frog	CR(PE)	2008	1981
+Sarcohyla calvicollina	Cerro Pelón Treefrog	CR(PE)	2019	1984
+Sarcohyla celata	Oaxaca Treefrog	CR(PE)	2019	1984
+Sarcohyla cembra	Southern Sierra Madre Treefrog	CR(PE)	2019	1993
+Sarcohyla cyanomma	Blue-eyed Aquatic Treefrog	CR(PE)	2019	1980
+Sarcohyla hazelae	Hazel's Treefrog	CR(PE)	2019	1984
+Sarcohyla siopela	Voiceless Treefrog	CR(PE)	2019	?
+Sarcohyla thorectes	Adler's Mottled Treefrog	CR(PE)	2019	1984
+Scutiger maculatus	Piebald Alpine Toad	CR(PE)	2004	1970s
+Strabomantis cadenai	Nutibara Robber Frog	CR(PE)	2017	1982
+Strabomantis necerus	Mindo Robber Frog	CR(PE)	2019	1995
+Telmatobius ceiorum		CR(PE)	2019	1984
+Telmatobius cirrhacelis	Loja Water Frog	CR(PE)	2008	1981
+Telmatobius laticeps		CR(PE)	2019	1993
+Telmatobius mendelsoni		CR(PE)	2017	2007
+Telmatobius niger	Black Water Frog	CR(PE)	2008	1994
+Telmatobius pefauri	Arico Water Frog	CR(PE)	2015	1976
+Telmatobius vellardi	Vellard's Water Frog	CR(PE)	2008	1987
+Thorius infernalis	Atoyac Minute Salamander	CR(PE)	2008	1980s
+Thorius munificus	McDiarmid Thorius	CR(PE)	2008	1997
+Acanthobrama centisquama	Long-spine Bream	CR(PE)	2013	early 20th century
+Acanthobrama tricolor	Damascus Bream	CR(PE)	2013	1980s
+Acipenser dabryanus	Yangtze Sturgeon	CR(PE)	2009	?
+Acipenser naccarii	Adriatic Sturgeon	CR(PE)	2009	?
+Adrianichthys kruyti	Duck-billed  Buntingi	CR(PE)	2019	1983
+Adrianichthys roseni		CR(PE)	2019	1978
+Alosa vistonica		CR(PE)	2006	?
+Anabarilius qiluensis		CR(PE)	2011	early 1980s
+Anabarilius yangzonensis		CR(PE)	2011	?
+Azurina eupalama	Galapagos Damsel	CR(PE)	2008	1980s
+Balantiocheilos  ambusticauda	Siamese Bala-shak	CR(PE)	2011	1974
+Barbonymus platysoma		CR(PE)	2019	1855
+Betta fusca		CR(PE)	2019	1950s
+Caecocypris basimi	Haditha Cavefish	CR(PE)	2013	1983
+Chapalichthys pardalis	Polka-dot Splitfin	CR(PEW)	2019	2010
+Chirostoma aculeatum	Scowling Silverside	CR(PEW)	2019	1993
+Chirostoma bartoni	Alberca Silverside	CR(PE)	2019	1986
+Chirostoma charari	Least Silverside	CR(PE)	2019	1953
+Cobitis kellei	Diyarbakir Spined Loach	CR(PE)	2013	1974
+Copadichromis nkatae		CR(PE)	2018	1960
+Coregonus hoferi		CR(PE)	2008	1980s
+Coregonus reighardi	Shortnose Cisco	CR(PE)	1996	1985
+Corematodus shiranus		CR(PE)	2018	1997
+Cyprinodon latifasciatus	Parras Pupfish	CR(PE)	2019	2012
+Cyprinus barbatus		CR(PE)	2011	1982
+Cyprinus ilishaestomus		CR(PE)	2009	late 1970s
+Cyprinus micristius	Dianchi Carp	CR(PE)	2008	1980s
+Cyprinus qionghaiensis		CR(PE)	2007	?
+Cyprinus yunnanensis		CR(PE)	2009	late 1970s
+Encheloclarias kelioides		CR(PE)	2019	1993
+Fundulopanchax powelli		CR(PE)	2006	?
+Gobiesox juniperoserrai	Peninsular Clingfish	CR(PEW)	2019	1996
+Haplochromis aelocephalus		CR(PE)	2010	1985
+Haplochromis antleter		CR(PE)	2010	1982
+Haplochromis apogonoides		CR(PE)	2010	1983
+Haplochromis argenteus		CR(PE)	2010	1983
+Haplochromis barbarae		CR(PE)	2010	1985
+Haplochromis bareli		CR(PE)	2010	1985
+Haplochromis brownae		CR(PE)	2010	1980
+Haplochromis cassius		CR(PE)	2010	1986
+Haplochromis cinctus		CR(PE)	2010	1982
+Haplochromis cnester		CR(PE)	2010	1983
+Haplochromis coprologus		CR(PE)	2010	1982
+Haplochromis crassilabris		CR(PE)	2010	1980
+Haplochromis crocopeplus		CR(PE)	2010	1985
+Haplochromis dentex		CR(PE)	2010	1987
+Haplochromis dichrourus		CR(PE)	2010	1986
+Haplochromis flavipinnis		CR(PE)	2010	1984
+Haplochromis granti		CR(PE)	2010	1986
+Haplochromis guiarti		CR(PE)	2010	1985
+Haplochromis heusinkveldi		CR(PE)	2010	1985
+Haplochromis hiatus		CR(PE)	2010	1980
+Haplochromis iris		CR(PE)	2010	1980
+Haplochromis ishmaeli		CR(PE)	2010	1991
+Haplochromis katunzii		CR(PE)	2010	1982
+Haplochromis longirostris		CR(PE)	2010	1985
+Haplochromis  macrognathus		CR(PE)	2010	1985
+Haplochromis martini		CR(PE)	2010	1985
+Haplochromis michaeli		CR(PE)	2010	1985
+Haplochromis microdon		CR(PE)	2010	1985
+Haplochromis mylergates		CR(PE)	2010	1983
+Haplochromis  nanoserranus		CR(PE)	2010	1986
+Haplochromis pancitrinus		CR(PE)	2010	1986
+Haplochromis parvidens		CR(PE)	2010	1995
+Haplochromis percoides		CR(PE)	2010	1986
+Haplochromis perrieri		CR(PE)	2010	1986
+Haplochromis plutonius		CR(PE)	2010	1980
+Haplochromis ptistes		CR(PE)	2010	1984
+Haplochromis pyrrhopteryx		CR(PE)	2010	1983
+Haplochromis sphex		CR(PE)	2010	1986
+Haplochromis sulphureus		CR(PE)	2010	1985
+Haplochromis  teegelaari		CR(PE)	2010	1986
+Haplochromis theliodon		CR(PE)	2010	1993
+Haplochromis ushindi		CR(PE)	2010	1980
+Haplochromis victorianus		CR(PE)	2010	1985
+Haplochromis vonlinnei		CR(PE)	2010	1980
+Haplochromis xenostoma		CR(PE)	2010	1983
+Hemibagrus punctatus	Nilgiri Mystus	CR(PE)	2010	late 1990s
+Hemileiocassis panjang		CR(PE)	2019	1920-1929
+Hyalobagrus ornatus		CR(PE)	2019	1904
+Hypselobarbus pulchellus		CR(PE)	2011	1870
+Kimberleyeleotris notata	Drysdale Gudgeon	CR(PE)	2019	1975
+Knipowitschia cameliae		CR(PE)	2008	1994
+Kryptopterus mononema		CR(PE)	2019	1846
+Lepidocephalus pahangensis		CR(PE)	2019	1933
+Macrognathus pentophthalmos		CR(PE)	2019	2015
+Moema claudiae		CR(PE)	2014	2003
+Mugilogobius amadi	Poso Bungu	CR(PE)	2019	1978
+Neolissochilus bovanicus	Bovany Barb	CR(PE)	2010	1998
+Nothobranchius mkuziensis		CR(PE)	2019	1931
+Nothobranchius  steinforti		CR(PEW)	2019	1976
+Notropis marhabatiensis		CR(PE)	2019	2002
+Nyassachromis breviceps		CR(PE)	2018	1997
+Oreochromis lidole		CR(PE)	2018	1992
+Oryzias timorensis		CR(PE)	2019	1911
+Pantanodon sp. nov. 'Manombo'		CR(PE)	2004	1997
+Parapsilorhynchus  prateri	Deolali Minnow	CR(PE)	2010	1937
+Paraschistura  chrysicristinae	Diyarbakır Loach	CR(PE)	2014	1970s
+Poropuntius chonglingchungi		CR(PE)	2011	1980s
+Psephurus gladius	Chinese Paddlefish	CR(PE)	2009	2003
+Pseudophoxinus sojuchbulagi	Akstafa Spring Roach	CR(PE)	2014	1948
+Pseudophoxinus syriacus	Barada Spring Minnow	CR(PE)	2013	2008
+Pseudoscaphirhynchus fedtschenkoi	Syr-darya Shovelnose Sturgeon	CR(PE)	2009	1960s
+Ptychochromoides  betsileanus	Trondo Mainty	CR(PE)	2016	1994
+Puntius deccanensis	Deccan Barb	CR(PE)	2010	?
+Rhizosomichthys totae	Pez Graso	CR(PE)	2014	1958
+Schistura nasifilis		CR(PE)	2010	1936
+Schistura tenura		CR(PE)	2011	1998
+Sciaena callaensis		CR(PE)	2009	1966
+Stiphodon discotorquatus		CR(PE)	2011	1985
+Stiphodon martenstyni		CR(PE)	2019	1981
+Systomus compressiformis		CR(PE)	2011	1994
+Xenoclarias eupogon	Lake Victoria Deepwater Catfish	CR(PE)	2006	1987
+Tetrapleurodon  spadiceus	Mexican Lamprey	CR(PE)	2019	1987
+Carcharhinus hemiodon	Pondicherry Shark	CR(PE)	2003	1979
+Torpedo suessii	Red Sea Torpedo	CR(PE)	2017	1898
+Urolophus javanicus	Java Stingaree	CR(PE)	2006	mid 19th century
+Aaadonta angaurana		CR(PE)	2011	1936
+Aaadonta kinlochi		CR(PE)	2011	before 2003
+Aaadonta pelewana		CR(PE)	2011	?
+Alzoniella galaica		CR(PE)	2009	?
+Aspatharia divaricata		CR(PE)	2016	1898
+Atlantica engonata		CR(PE)	2016	1852
+Atlantica gomerensis		CR(PE)	2016	dead shells between 2000
+Atlantica guerinianus	Madeiran Land Snail	CR(PE)	2016	1860s
+Atlantica putrescens		CR(PE)	2016	1852
+Beddomeia tumida		CR(PE)	2011	pre 1889
+Belgrandia moitessieri		CR(PE)	2009	?
+Belgrandia varica		CR(PE)	2009	1870
+Belgrandiella boetersi		CR(PE)	2010	?
+Belgrandiella cavernica		CR(PE)	2013	1957
+Belgrandiella kreisslorum		CR(PE)	2010	1981
+Belgrandiella multiformis		CR(PE)	2009	?
+Bellamya phthinotropis		CR(PE)	2015	1954
+Bulimulus achatellinus		CR(PE)	2003	1980s
+Bulimulus adelphus		CR(PE)	2003	?
+Bulimulus deridderi		CR(PE)	2003	?
+Bulimulus duncanus		CR(PE)	2003	before 1893
+Bulimulus eos		CR(PE)	2003	?
+Bulimulus lycodus		CR(PE)	2003	?
+Bulimulus saeronius		CR(PE)	2003	?
+Bulimulus sp. nov. 'josevillani'		CR(PE)	2003	?
+Bulimulus sp. nov. 'krameri'		CR(PE)	2003	?
+Bulimulus sp. nov. 'nilsodhneri'		CR(PE)	2003	?
+Bulimulus sp. nov. 'tuideroyi'		CR(PE)	2003	?
+Bulimulus sp. nov. 'vanmoli'		CR(PE)	2003	?
+Bulimulus tanneri		CR(PE)	2003	?
+Bythinella eutrepha		CR(PE)	2009	?
+Bythiospeum dubium		CR(PE)	2008	?
+Bythiospeum  gonostoma		CR(PE)	2010	?
+Bythiospeum putei		CR(PE)	2010	1961
+Bythiospeum turritum		CR(PE)	2011	?
+Ceratophallus concavus		CR(PE)	2016	1953
+Ceratophallus subtilis		CR(PE)	2016	1951
+Coelatura rothschildi		CR(PE)	2016	1980s
+Coneuplecta turrita		CR(PE)	2011	1936
+Conturbatia crenata		CR(PE)	2006	2000
+Craspedaria delphinuloides		CR(PE)	2010	1870s
+Cryptella tamaranensis		CR(PE)	2016	1887
+Cuneopsis demangei		CR(PE)	2010	1929
+Delos gardineri		CR(PE)	2011	1890s
+Dianella schlickumi		CR(PE)	2009	1980s
+Diplommatina alata		CR(PE)	2011	1936
+Diplommatina aurea		CR(PE)	2011	1936
+Diplommatina gibboni		CR(PE)	2011	1936
+Discula lyelliana		CR(PE)	2010	1870s
+Discula tetrica		CR(PE)	2010	?
+Dreissena caspia		CR(PE)	2011	1980
+Elimia troostiana	Mossy Elimia	CR(PE)	2011	1980s
+Endodonta apiculata		CR(PE)	2000	1930s
+Epioblasma othcaloogensis	Southern Acorn Riffle Shell	CR(PE)	2012	1974
+Eua globosa	Fat Eua snail	CR(PE)	2011	1970
+Eupera crassa		CR(PE)	2016	1954
+Falsipyrgula beysehirana		CR(PE)	2013	1990s
+Gabbiella barthi		CR(PE)	2015	1980
+Gabbiella matadina		CR(PE)	2008	?
+Graecoanatolica brevis		CR(PE)	2013	before 1973
+Graecoanatolica conica		CR(PE)	2013	1973
+Henrigirardia wienini		CR(PE)	2009	?
+Hydrobia anatolica		CR(PE)	2013	before 1994
+Iglica gratulabunda		CR(PE)	2009	before 1992
+Islamia bendidis		CR(PE)	2010	?
+Islamia graeca		CR(PE)	2009	before 2000
+Islamia hadei		CR(PE)	2009	?
+Islamia  pseudorientalica		CR(PE)	2009	before 1973
+Islamia zermanica		CR(PE)	2009	?
+Janulus pompylius		CR(PE)	2016	1865
+Kirelia carinata		CR(PE)	2013	1970s
+Kubaryia pilikia		CR(PE)	2011	2003
+Lamprotula crassa		CR(PE)	2010	1990s
+Lamprotula liedtkei		CR(PE)	2010	?
+Lamprotula nodulosa		CR(PE)	2010	?
+Lantzia carinata		CR(PE)	2016	1992
+Lauopa mbalavuana		CR(PE)	2011	1860s
+Leiostyla abbreviata	Madeiran Land Snail	CR(PE)	2010	1870s
+Leiostyla cassida		CR(PE)	2010	1870s
+Leiostyla gibba	Madeiran Land Snail	CR(PE)	2010	1878 (dead)
+Leiostyla simulator		CR(PE)	2010	?
+Lindbergia gittenbergeri		CR(PE)	2016	1978
+Madgeaconcha sevathiani		CR(PE)	2013	never seen in the wild
+Margarya yangtsunghaiensis		CR(PE)	2008	1949
+Marstonia ozarkensis	Ozark Pyrg	CR(PE)	2012	1997
+Melanoides agglutinans		CR(PE)	2008	1941
+Melanopsis germaini		CR(PE)	2014	1955
+Melanopsis infracincta		CR(PE)	2014	1940s
+Melanopsis khabourensis		CR(PE)	2013	1939
+Melanopsis pachya		CR(PE)	2013	1930s
+Mercuria punica		CR(PE)	2007	?
+Modellnaia siamensis		CR(PE)	2019	1974
+Monilearia  pulverulenta		CR(PE)	2011	?
+Montserratina becasis		CR(PE)	2011	1890s
+Napaeus arinagaensis		CR(PE)	2016	2010 (but not living)
+Neritina tiassalensis		CR(PE)	2006	before 1980s
+Obovaria haddletoni	Haddleton Lampmussel	CR(PE)	2012	around 1970
+Ohridohauffenia minuta		CR(PE)	2009	?
+Omphalotropis ingens		CR(PE)	2011	1850s
+Opisthostoma decrespignyi		CR(PE)	2004	before 1960s
+Opisthostoma otostoma		CR(PE)	2004	before 1960s
+Paladilhiopsis janinensis		CR(PE)	2009	1980s
+Palaina albata		CR(PE)	2011	1936
+Palaina patula		CR(PE)	2011	1936
+Palaina platycheilus		CR(PE)	2011	1936
+Palaina pupa		CR(PE)	2011	1936
+Palaopartula leucothoe	White Palau tree snail	CR(PE)	2011	1936
+Partula guamensis	Pohnpei ground Partula snail	CR(PE)	2011	1936
+Pisidium betafoense		CR(PE)	2016	1949
+Placostylus koroensis	Flax Snail	CR(PE)	2011	1980
+Planorbella columbiensis	Caribou Ramshorn	CR(PE)	2015	1945
+Plectostoma charasense		CR(PE)	2014	2007
+Plectostoma dindingensis		CR(PE)	2014	1997
+Plectostoma turriforme		CR(PE)	2014	1997
+Pleurobema curtum	Black Clubshell	CR(PE)	2012	1990s
+Poecilozonites circumfirmatus	Lesser Bermuda Land Snail	CR(PEW)	2019	2004
+Potamopyrgus acus		CR(PE)	2011	1981
+Pseudogibbula cara		CR(PE)	2008	1920s
+Samoana cramptoni	Crampton's Samoana tree snail	CR(PE)	2011	1933
+Sardohoratia sulcata		CR(PE)	2009	1995
+Soapitia dageti		CR(PE)	2006	pre 1961
+Somatogyrus crassus	Stocky Pebblesnail	CR(PE)	2000	?
+Somatogyrus currierianus	Tennessee Pebblesnail	CR(PE)	2000	?
+Somatogyrus  hendersoni	Fluted Pebblesnail	CR(PE)	2000	?
+Somatogyrus  humerosus	Atlas Pebblesnail	CR(PE)	2000	?
+Somatogyrus nanus	Dwarf Pebblesnail	CR(PE)	2000	?
+Spiralix corsica		CR(PE)	2009	1990s
+Stagnicola utahensis	Thickshell Pondsnail	CR(PE)	2012	1934
+Succinea rotumana		CR(PE)	2011	1938
+Sulawesidrobia datar		CR(PE)	2019	2005
+Sulawesidrobia yunusi		CR(PE)	2019	2013
+Tanousia zrmanjae		CR(PE)	2009	?
+Tryonia brunei	Brune's Springsnail	CR(PE)	2012	1993
+Tsoukatosia evauemgei		CR(PE)	2016	2010-07-01 00:00:00
+Tylomelania zeamais		CR(PE)	2019	2013
+Valvatorbis mauritii		CR(PE)	2008	?
+Vitrea pieperiana		CR(PEW)	2016	1970
+Vitrea striata		CR(PE)	2016	1988
+Wollastonaria  vermetiformis		CR(PE)	2016	1985
+Xerotricha garachicoensis		CR(PE)	2016	1878
+Zaumia sanctizaumi		CR(PE)	2009	?
+Zingis radiolata		CR(PE)	2004	?
+Zonites embolium		CR(PE)	2016	1985
+Acanthothericles bicoloripes	Morogoro Pretty Grasshopper	CR(PE)	2014	1939
+Allaga ambigua	Zanzibar Giant Forest Grasshopper	CR(PE)	2013	1898
+Ameles fasciipennis	Spined Dwarf Mantis	CR(PE)	2014	end of 19th century,
+Andrena labiatula		CR(PE)	2013	1963
+Andriana hancocki	Big Royal Pygmy Grasshopper	CR(PE)	2017	1971
+Anischnansis burtti	Usambara Splendid Grasshopper	CR(PE)	2013	1966
+Anisogomphus solitaris		CR(PE)	2006	1970s
+Anonconotus  apenninigenus	Southern Alpine Bush-cricket	CR(PE)	2015	1881
+Balta crassivenosa		CR(PE)	2007	1908
+Bembidion derelictus	Ground-beetle	CR(PE)	2016	1888
+Bombus rubriventris		CR(PE)	2012	1835
+Ceylonosticta adami		CR(PE)	2006	1930s
+Ceylonosticta austeni		CR(PE)	2006	?
+Ceylonosticta montana		CR(PE)	2006	1930s
+Ceylonosticta submontana		CR(PE)	2006	1930s
+Chlorocypha jejuna	Togo Red Jewel	CR(PE)	2006	1890s
+Chromomastax  movogovodia	Morogoro Monkey Grasshopper	CR(PE)	2014	1934
+Chromousambilla burtti	Mpwapwa Silent Grasshopper	CR(PE)	2014	1947
+Cornicandovia australica	Lord Howe Horn-headed Stick-insect	CR(PE)	2016	ca 1900
+Cryptotettix insularis	Island Hiding Pygmy Grasshopper	CR(PE)	2017	1959
+Ephippiger camillae	Camilla's Saddle Bush-cricket	CR(PE)	2015	1880
+Eupithecia ogilviata	Geometer Moth	CR(PE)	2017	1905
+Eupropacris abbreviata	Kilosa Noble Grasshopper	CR(PE)	2013	1926
+Euschmidtia bidens	Mlingano  Monkey Grasshopper	CR(PE)	2014	1953
+Euschmidtia burtti	Burtt's Monkey Grasshopper	CR(PE)	2014	1954
+Euschmidtia dirshi	Dirsh's Monkey Grasshopper	CR(PE)	2014	1954
+Euschmidtia phippsi	Phipps' Monkey Grasshopper	CR(PE)	2014	1952
+Euschmidtia viridifasciata	Dar-es-Salaam  Monkey Grasshopper	CR(PE)	2014	1964
+Evergoderes cabrerai	Gran Canaria Bush-cricket	CR(PE)	2012	1966
+Geostiba melanocephala	Rove beetle	CR(PE)	2017	1876
+Heliogomphus lyratus		CR(PE)	2006	1930s
+Heliogomphus nietneri		CR(PE)	2006	1870s
+Heteragrion peregrinum		CR(PE)	2014	1917
+Holocompsa pusilla		CR(PE)	2007	1908
+Homoeodera asteris	Flagstaff Fungus Weevil	CR(PE)	2017	1876
+Homoeodera nodulipennis	Knobbly-winged Fungus Weevil	CR(PE)	2017	February 1876
+Hybotettix camelus	Camelback Royal Pygmy Grasshopper	CR(PE)	2017	before 1967
+Isophya boldyrevi	Boldyrev's Plump Bush-cricket	CR(PE)	2015	1915
+Italopodisma baccettii	Baccetti's Apennine Grasshopper	CR(PE)	2015	1996
+Kerzhneria hirsuta	Kerzhner's Bug	CR(PE)	2018	1/4/1967
+Macromia flinti		CR(PE)	2006	1970s
+Megachile cypricola		CR(PE)	2014	1950
+Megalagrion jugorum	Maui Upland Damselfly	CR(PE)	2019	1917
+Megalagrion  molokaiense	Molokai Damselfly	CR(PE)	2006	1940s
+Metaleptobasis gibbosa		CR(PE)	2014	2005-09-22 00:00:00
+Nesotes azoricus	Darkling Beetle	CR(PE)	2017	1867
+Nomada siciliensis		CR(PE)	2014	1885
+Nyhimbricus wollastoni	Wollaston's Leafhopper	CR(PE)	2018	1876
+Orthetrum rubens	Elusive Skimmer	CR(PE)	2011	1977
+Palaemnema edmondi		CR(PE)	2014	1917
+Peringueyella zulu	Zulu Ambush Katydid	CR(PE)	2014	1922
+Perissolestes remus		CR(PE)	2014	1941-02-28 00:00:00
+Phytosus schatzmayri	Rove Beetle	CR(PE)	2017	1935
+Pieris wollastoni	Madeiran Large White	CR(PE)	2009	1970s
+Procytettix fusiformis	Seychelles  Wingless Groundhopper	CR(PE)	2007	1909
+Rhacocleis trilobata	Three-lobed Bush-cricket	CR(PE)	2015	1973
+Risiocnemis laguna		CR(PE)	2019	1916
+Sliferia similis		CR(PE)	2007	1908
+Stonasla undulata	Wavy-lined Hopper	CR(PE)	2018	1967-03-05 00:00:00
+Sympetrum dilatatum	St. Helena Darter	CR(PE)	2019	1963
+Theganopteryx grisea		CR(PE)	2007	1909
+Theganopteryx liturata		CR(PE)	2007	1908
+Theganopteryx scotti		CR(PE)	2007	1908
+Thoracistus peringueyi	Peringuey's Seedpod Shieldback	CR(PE)	2014	1879
+Trechus torretassoi	Ground-beetle	CR(PE)	2016	1985
+Uromenus riggioi	Riggio's Saddle Bush-cricket	CR(PE)	2015	1970
+Valenfriesia congener	Blackened Fungus Weevil	CR(PE)	2018	1967-03-01 00:00:00
+Valenfriesia rotundata	Rotund Fungus Weevil	CR(PE)	2017	1967-03-01 00:00:00
+Afrogarypus seychellesensis		CR(PE)	2012	1940
+Benoitodes caheni	Cahen's Ground Spider	CR(PE)	2019	12-19 March 1967
+Biantes parvulus		CR(PE)	2012	1972
+Bonapruncinia sanctaehelenae	Napoleon's Crab Spider	CR(PE)	2019	1965-11-26 00:00:00
+Euso muehlenbergi		CR(PE)	2012	1975
+Gamasomorpha austera		CR(PE)	2012	1892
+Gnaphosa funerea	Funerial Ground Spider	CR(PE)	2019	1965-12-01 00:00:00
+Hogna cinica	Prosperous Bay Plain Wolf Spider	CR(PE)	2019	1967
+Holozoster ovalis		CR(PE)	2012	1972
+Ibalonius lomani		CR(PE)	2012	1972
+Idioctis intertidalis		CR(PE)	2012	1999
+Meta barreti		CR(PE)	2018	1987
+Mitraceras crassipalpum		CR(PE)	2012	1972
+Moneta coercervea		CR(PE)	2012	1972
+Nesiergus gardineri		CR(PE)	2012	1974
+Nesiergus halophilus		CR(PE)	2012	1972
+Paccius quadridentatus		CR(PE)	2012	1892
+Seychellia lodoiceae		CR(PE)	2012	1972
+Sitalcicus incertus		CR(PE)	2012	1972
+Steriphopus lacertosus		CR(PE)	2012	1892
+Voraptus tenellus		CR(PE)	2012	1972
+Atya brachyrhinus		CR(PE)	2012	1972
+Cambarellus areolatus		CR(PE)	2010	?
+Cambarus veitchorum	White Spring Cave Crayfish	CR(PE)	2010	1968
+Caridina apodosis		CR(PE)	2011	1944
+Caridina dennerli	Sulawesi Cardinal Shrimp	CR(PEW)	2018	2013
+Caridina yilong		CR(PE)	2012	1983
+Cryphiops luscus		CR(PE)	2012	1986
+Macrobrachium denticulatum		CR(PE)	2012	1995
+Macrobrachium oxyphilus		CR(PE)	2011	before 2003
+Macrobrachium purpureamanus		CR(PE)	2012	before 1998
+Macrobrachium scorteccii		CR(PE)	2012	1957
+Palaemonetes cummingi	Florida Cave Shrimp	CR(PE)	2012	1973
+Perbrinckia gabadagei		CR(PE)	2008	1996
+Procambarus delicatus	Big-cheeked Cave Crayfish	CR(PE)	2010	1976
+Procambarus paradoxus		CR(PE)	2010	?
+Sinodina acutipoda		CR(PE)	2012	?
+Strengeriana antioquensis		CR(PE)	2008	?
+Tehuana veracruzana		CR(PE)	2008	?
+Aporodrilus mortenseni		CR(PE)	2017	1915
+Ceratophysella sp. nov. 'HC'		CR(PE)	2016	2006
+Delamarephorura tami		CR(PE)	2016	2004
+Diglossosternoides curiosus		CR(PE)	2012	1984
+Hylekobolus latifrons	Wide-headed  Wood-Millipede	CR(PE)	2017	1926
+Maoridrilus felix		CR(PE)	2017	2010
+Mecistocephalus cyclops		CR(PE)	2012	1892
+Mecistocephalus sechellarum		CR(PE)	2012	1972
+Millepora boschmai		CR(PE)	2008	early 1990s
+Octochaetus levis		CR(PE)	2017	1876
+Octochaetus microchaetus		CR(PE)	2017	1876
+Prosadenoporus agricola		CR(PE)	2013	1966
+Rhinotus albifrons		CR(PE)	2012	1972
+Rhizopsammia wellingtoni	Wellington's Solitary Coral	CR(PE)	2007	2000
+Spirobolellus  simplex		CR(PE)	2012	1951
+Acer hilaense		CR(PEW)	2019	1938
+Aechmea  cymosopaniculata		CR(PE)	2008	1856
+Aeranthes africana		CR(PEW)	2019	2002
+Aeranthes albidiflora		CR(PE)	2015	1959
+Aeranthes parkesii		CR(PEW)	2019	1977
+Aeschynomene ruspoliana		CR(PE)	2009	1893
+Aetheolaena  hypoleuca		CR(PE)	2003	1851
+Aetheolaena ledifolia		CR(PE)	2003	early 19th century
+Aetheolaena pichinchensis		CR(PE)	2003	1864
+Agelanthus guineensis		CR(PE)	2019	1956
+Agelanthus rondensis		CR(PE)	2012	1903
+Alangium circulare		CR(PEW)	2019	1964-10-01 00:00:00
+Albizia verrucosa		CR(PEW)	2019	1968
+Albuca nana		CR(PE)	2012	1911
+Alnus henryi		CR(PE)	2014	1916
+Ammannia alternifolia		CR(PE)	2017	1900
+Amorphophallus lewallei		CR(PEW)	2017	1972
+Amsinckia marginata		CR(PE)	2003	early 20th century
+Andropogon benthamianus		CR(PE)	2004	1841-1843
+Angraecum  mahavavense		CR(PE)	2015	1932
+Angraecum muscicolum		CR(PE)	2015	1925
+Angraecum perhumile		CR(PE)	2015	1925
+Angraecum  potamophilum		CR(PE)	2015	1898
+Angraecum rigidifolium		CR(PE)	2015	1925
+Angraecum rubellum		CR(PE)	2015	1963
+Angraecum serpens		CR(PE)	2015	1942
+Angraecum sterrophyllum		CR(PE)	2015	1913
+Anisopappus burundiensis		CR(PE)	2013	1967
+Anisophyllea impressinervia		CR(PE)	2019	1972
+Aponogeton dioecus		CR(PE)	2017	1963
+Arboa antsingyae		CR(PE)	2019	1952
+Artemisia kauaiensis		CR(PE)	2016	2006
+Aspidostemon inconspicuus		CR(PE)	2015	1955
+Aster quitensis		CR(PE)	2003	1820s
+Athanasia imbricata		CR(PE)	2012	1865
+Baccharis fusca		CR(PE)	2003	1850s
+Baudouinia capuronii		CR(PE)	2019	1968
+Begonia cladocarpoides		CR(PE)	2018	1912
+Begonia eciliata		CR(PE)	2017	previous to 1911
+Beilschmiedia neoletestui		CR(PE)	2019	1929
+Beilschmiedia pellegrinii		CR(PE)	2019	1929
+Beilschmiedia thollonii		CR(PE)	2019	1887
+Beilschmiedia yangambiensis		CR(PE)	2019	1959
+Benthamia catatiana		CR(PE)	2017	1933
+Benthamia nigro-vaginata		CR(PE)	2015	1926
+Berlinia hollandii		CR(PE)	2016	1898
+Betula gynoterminalis		CR(PE)	2014	1956
+Bidens ruyigiensis		CR(PE)	2017	1976
+Blepharis reekmansii		CR(PE)	2017	1981
+Breonia membranacea		CR(PE)	2019	1957
+Breonia richardsonii		CR(PE)	2019	1965
+Brieya latipetala		CR(PE)	2019	1948
+Brighamia insignis		CR(PEW)	2016	2014
+Bulbophyllum conchophyllum		CR(PE)	2018	1911
+Bulbophyllum erythroglossum		CR(PE)	2015	1964
+Bulbophyllum hirsutiusculum		CR(PE)	2015	1928
+Bulbophyllum minax		CR(PE)	2015	1919
+Bulbophyllum sanguineum		CR(PE)	2015	1925
+Bulbophyllum sceliphron		CR(PE)	2019	1983
+Bulbophyllum tampoketsense		CR(PE)	2015	1923
+Callerya neocaledonica		CR(PE)	2007	1992
+Camptocarpus cornutus		CR(PE)	2018	1932
+Canavalia veillonii		CR(PE)	2007	1990
+Capparis grandidieri		CR(PE)	2019	1885
+Capparis lucens		CR(PE)	2019	1933
+Centropogon  brachysiphoniatus		CR(PE)	2003	before 1935
+Ceratostema pensile		CR(PE)	2019	1943
+Cereus estevesii		CR(PEW)	2010	2002
+Cestrum flavescens		CR(PE)	2019	1966
+Cestrum flavinervium		CR(PE)	2019	1937
+Chassalia coursii		CR(PE)	2019	1945
+Cinnamomum  bhamoensis		CR(PE)	2019	1910
+Cinnamomum  englerianum		CR(PE)	2019	1913
+Cinnamomum gracillimum		CR(PE)	2019	1939
+Cinnamomum longipedicellatum		CR(PE)	2019	1964
+Cinnamomum pachypes		CR(PE)	2019	1969
+Cinnamomum  petiolatum		CR(PE)	2019	1966
+Cinnamomum rosselianum		CR(PE)	2019	1956
+Cinnamomum trintaense		CR(PE)	2019	1883
+Clitoria andrei		CR(PE)	2004	1876
+Cloiselia humbertii		CR(PE)	2018	1933
+Coffea alleizettii		CR(PE)	2017	1962
+Coffea decaryana		CR(PE)	2018	1940
+Coffea heterocalyx		CR(PEW)	2018	04/11/2002
+Coffea leonimontana		CR(PE)	2017	1971
+Cola mosserayana		CR(PE)	2019	1936
+Cola vandersmisseniana		CR(PE)	2019	1959
+Costus vinosus		CR(PEW)	2014	2004
+Cotula myriophylloides		CR(PE)	2005	1971
+Curcuma pygmaea		CR(PE)	2019	2010-07-17 00:00:00
+Cyanea kolekoleensis		CR(PE)	2015	1998
+Cyanea kuhihewa		CR(PEW)	2016	2003
+Cyclophyllum tiebaghiense		CR(PE)	2019	2004
+Cynoglossum lowryanum		CR(PE)	2018	1911
+Cynoglossum tsaratananense		CR(PE)	2017	1929
+Cynorkis bimaculata		CR(PE)	2015	1961
+Cynorkis catatii		CR(PE)	2015	1889
+Cynorkis marojejyensis		CR(PE)	2017	1949
+Cynorkis rolfei		CR(PE)	2015	1903
+Cynorkis sylvatica		CR(PE)	2015	1951
+Cynorkis usambarae		CR(PE)	2013	1893
+Cyperus chionocephalus		CR(PE)	2009	1939
+Cyperus multifolius		CR(PE)	2004	early 1800s
+Cyphostemma michelii		CR(PE)	2017	1951
+Cyrtandra crenata		CR(PE)	2016	1947
+Dalea sabinalis	Sabinal Prairie-clover	CR(PE)	2010	1950-1960
+Delissea rhytidosperma		CR(PEW)	2015	2002-01-01 00:00:00
+Delissea takeuchii		CR(PE)	2015	1987
+Delonix tomentosa		CR(PE)	2011	1901
+Dendrobium bandaense		CR(PE)	2018	1901
+Dendrobium brillianum		CR(PE)	2018	1909-1911
+Devillea  flagelliformis		CR(PE)	2008	1840s
+Dicoma pretoriensis		CR(PE)	2003	1925
+Dillenia fischeri		CR(PE)	2019	1913
+Diospyros katendei		CR(PE)	2013	?
+Diospyros ketsensis		CR(PE)	2019	1926
+Diospyros subtrinervis		CR(PE)	2019	1898
+Discocactus  subterraneo-proliferans		CR(PEW)	2010	1984
+Disperis bosseri		CR(PE)	2015	1957
+Disperis egregia		CR(PE)	2013	1944
+Dissotis longisepala		CR(PE)	2017	1952
+Dombeya macropoda		CR(PE)	2019	1987
+Dombeya micrantha		CR(PE)	2019	1952
+Dombeya pauciflora		CR(PE)	2019	1970
+Dombeya sakamaliensis		CR(PE)	2019	1933
+Dombeya sely		CR(PE)	2019	1952
+Dombeya seyrigiana		CR(PE)	2019	1943
+Dombeya tavia		CR(PE)	2019	1951
+Dombeya tsiandrensis		CR(PE)	2019	1952
+Dorstenia bicaudata		CR(PE)	2012	1950
+Drosera allantostigma		CR(PE)	2020	2018-12-01 00:00:00
+Dubautia kenwoodii		CR(PE)	2016	1991
+Dypsis brittiana		CR(PE)	2010	2005
+Egletes humifusa		CR(PE)	2003	1836
+Elaeocarpus occidentalis		CR(PE)	2019	13/8/1955
+Elaphandra retroflexa		CR(PE)	2003	1920s
+Eleocharis lepta		CR(PE)	2008	1897
+Emicocarpus  fissifolius		CR(PE)	2015	1966
+Emilia djalonensis		CR(PE)	2019	1913
+Endiandra  scrobiculata		CR(PE)	2019	1966
+Epidendrum  lanceolatum		CR(PE)	2017	19th century (date not
+Eragrostis fosbergii		CR(PE)	2018	1996
+Eremospatha barendii	Rattan	CR(PE)	2016	2012
+Eriocaulon caesium		CR(PE)	2017	1867
+Eriocaulon hildebrandtii		CR(PE)	2017	1880
+Eriocaulon parvicapitulatum		CR(PE)	2017	1914
+Etlingera newmanii		CR(PE)	2019	1995
+Eugenia albida		CR(PE)	2004	early 19th century
+Eugenia guayaquilensis		CR(PE)	2004	before 1823
+Eugenia scheffleri		CR(PE)	2012	1900
+Eulophia grandidieri		CR(PE)	2015	1901
+Euphorbia alcicornis		CR(PE)	2004	1880
+Euphorbia boinensis		CR(PE)	2004	1920
+Euphorbia capuronii		CR(PEW)	2019	1954
+Euphorbia neospinescens		CR(PE)	2013	1942
+Euphorbia pirahazo		CR(PE)	2004	?
+Euphorbia ramofraga		CR(PE)	2019	1924
+Foetidia rubescens		CR(PE)	2019	1966-05-03 00:00:00
+Gaultheria  stereophylla		CR(PE)	2019	1904
+Geostachys taipingensis		CR(PE)	2019	1949
+Gomphandra dinagatensis		CR(PE)	2012	05/1919
+Gossypium armourianum		CR(PEW)	2017	ca. 2007
+Grewia monantha		CR(PE)	2019	1962
+Grewia perrieri		CR(PE)	2019	1902
+Grewia tsiandrensis		CR(PE)	2019	1933
+Guzmania lepidota		CR(PE)	2003	1876
+Guzmania poortmanii		CR(PE)	2003	1889
+Guzmania striata		CR(PE)	2003	1956
+Gynura campanulata		CR(PE)	2016	1935
+Gyrostipula obtusa		CR(PE)	2019	1967
+Habenaria lewallei		CR(PE)	2019	1970
+Helmiopsis glaberrima		CR(PE)	2019	1954
+Heterosamara bennae		CR(PE)	2019	1937
+Hibiscus grandistipulatus		CR(PE)	2019	1951
+Hibiscus storckii		CR(PEW)	2018	2010
+Hunteria hexaloba		CR(PE)	2012	1902
+Hydrostachys perrieri		CR(PE)	2017	1919
+Hymenodictyon  seyrigii		CR(PE)	2015	1942
+Hypericum  gnidiifolium		CR(PE)	2018	1865
+Impatiens boinensis		CR(PE)	2017	1907
+Impatiens granulifera		CR(PE)	2018	1933
+Impatiens saliensis		CR(PE)	2019	1932
+Indigofera ankaratrensis		CR(PE)	2017	1914
+Indigofera pobeguinii		CR(PE)	2019	1904
+Inversodicraea abbayesii		CR(PE)	2018	1950
+Inversodicraea pygmaea		CR(PE)	2018	4 Dec. 1951
+Ixora trimera		CR(PE)	2019	1952
+Kadua haupuensis		CR(PEW)	2015	1998
+Kanaloa kahoolawensis		CR(PEW)	2015	2014
+Kunkeliella psilotoclada	Escobilla de Masca	CR(PE)	2011	1983
+Kyllinga chrysanthoides		CR(PE)	2017	1977
+Lijndenia brenanii		CR(PE)	2013	1961
+Lijndenia ramiflora		CR(PE)	2019	1964
+Linderniella boutiqueana		CR(PE)	2017	1979
+Linderniella ugandensis		CR(PE)	2019	1906
+Loudetiopsis baldwinii		CR(PE)	2019	1947
+Maclurodendron parviflorum		CR(PE)	2019	1966
+Madhuca markleeana		CR(PE)	2019	1995
+Magnolia dixonii	Cucharillo	CR(PE)	2015	1965
+Magnolia emarginata		CR(PE)	2014	1980s
+Magnolia wolfii	Hojarasco de Santa Rosa	CR(PEW)	2007	2006
+Manettia canescens		CR(PE)	2004	19th century
+Manettia holwayi		CR(PE)	2004	1920
+Manilkara gonavensis		CR(PE)	2017	1927
+Margaritaria hispidula		CR(PE)	2019	1962
+Marsdenia weberlingiana		CR(PE)	2019	1973
+Matelea ecuadorensis		CR(PE)	2003	19th century
+Maxillaria broadwayi		CR(PE)	2017	before 1910
+Maytenus manabiensis		CR(PE)	2003	19th century
+Melanochyla  woodiana		CR(PE)	2019	1955
+Melhania polyneura		CR(PE)	2017	1895
+Melicope fatraina		CR(PE)	2019	1908
+Memecylon isaloense		CR(PE)	2019	1955
+Mesanthemum cupricola		CR(PE)	2019	1959
+Mezoneuron ouenensis		CR(PE)	2017	1868
+Miconia longisetosa		CR(PE)	2004	1886
+Miconia scabra		CR(PE)	2004	1876
+Microglossa caudata		CR(PE)	2019	1905
+Mikania iserniana		CR(PE)	2003	1864
+Mikania seemannii		CR(PE)	2003	1845-1852
+Mimosa kitrokala		CR(PE)	2009	1947
+Musa insularimontana	Lanyu Banana	CR(PEW)	2019	1912
+Musa yamiensis		CR(PE)	2019	2006
+Musa zaifui		CR(PEW)	2019	2006
+Myriophyllum  axilliflorum		CR(PE)	2017	1928
+Nanochilus palembanicus		CR(PE)	2019	June 1857
+Nectandra caudatoacuminata		CR(PE)	2019	1928
+Nidorella burundiensis		CR(PE)	2017	1949
+Noronhia populifolia		CR(PE)	2019	1907
+Onosma griersonii		CR(PE)	2015	before 1994
+Orthosiphon scedastophyllus		CR(PE)	2019	1935
+Orthosiphon schliebenii		CR(PE)	2019	1935
+Panicum pearsonii		CR(PE)	2009	1913
+Pentagonia orthoneura		CR(PE)	2004	1860s
+Peperomia dauleana		CR(PE)	2004	19th century
+Peperomia petraea		CR(PE)	2004	19th century
+Peponidium ihosyense		CR(PE)	2019	1955
+Philodendron balaoanum		CR(PE)	2003	1891
+Phyllanthus burundiensis		CR(PE)	2017	1973
+Phyllanthus felicis		CR(PE)	2019	Unknown
+Phyllanthus mimicus		CR(PE)	2017	1909
+Phyllostegia kahiliensis		CR(PE)	2015	1987
+Phyllostegia knudsenii		CR(PE)	2015	2001
+Phyllostegia mannii		CR(PEW)	2018	2015
+Physalis muelleri		CR(PE)	2017	1933
+Physalis tehuacanensis		CR(PE)	2017	1965
+Pimpinella robynsii		CR(PE)	2017	1926
+Piper molliusculum		CR(PE)	2004	?
+Pittosporum leroyanum		CR(PE)	2015	1980
+Plectranthus scopulicola		CR(PE)	2012	1953
+Polygala quitensis		CR(PE)	2004	before 1854
+Polystachya acuminata		CR(PE)	2013	1943
+Polystachya  canaliculata		CR(PE)	2013	1943-1962
+Polystachya erica-lanzae		CR(PE)	2019	1992
+Polystachya porphyrochila		CR(PE)	2013	1970-1982
+Polystachya rugosilabia		CR(PE)	2013	1942
+Premna aureolepidota		CR(PE)	2019	23/11/1932
+Prestonia schumanniana		CR(PE)	2003	1892
+Psychotria veillonii		CR(PE)	2019	1996
+Pterospermum elmeri		CR(PE)	2017	1909
+Pterospermum havilandii		CR(PEW)	2017	1892
+Pterospermum parvifolium		CR(PE)	2017	1923
+Puccinellia gussonei		CR(PE)	2018	2005
+Rhamnus mildbraedii		CR(PE)	2019	1907
+Rhipidoglossum orientalis		CR(PE)	2019	1933
+Rhododendron wilhelminae		CR(PE)	2019	1904
+Rhynchosia braunii		CR(PE)	2019	1912
+Rhynchosia calobotrya		CR(PE)	2019	1935
+Rhynchosia ledermannii		CR(PE)	2015	1908
+Rhynchospora hildebrandtii		CR(PE)	2017	1880
+Ritchiea afzelii		CR(PE)	2019	1899
+Roupala tobagensis		CR(PE)	2017	1910
+Sabicea bracteolata		CR(PE)	2019	1956
+Saurauia minutiflora		CR(PE)	2019	1995
+Scaphium burkillfilii		CR(PE)	2019	1961
+Schiedea attenuata		CR(PEW)	2015	1994
+Schizenterospermum analamerense		CR(PE)	2019	1938
+Semecarpus angulatus		CR(PE)	2019	1980
+Semecarpus sandakanus		CR(PE)	2019	1977
+Senecio antaisaka		CR(PE)	2018	1926
+Senecio antambolorum		CR(PE)	2018	1928
+Senecio lewallei		CR(PE)	2017	1970
+Senecio navugabensis		CR(PE)	2013	1935
+Senna suarezensis		CR(PE)	2019	2016
+Silene perlmanii		CR(PEW)	2015	1997
+Siphocampylus loxensis		CR(PE)	2003	?
+Solanum semicoalitum		CR(PE)	2004	1864
+Sphyrospermum  spruceanum		CR(PE)	2019	1860
+Stachyandra imberbis		CR(PE)	2019	1954
+Stenogyne bifida		CR(PEW)	2015	2014
+Stenogyne campanulata		CR(PEW)	2016	2006
+Stenogyne kanehoana		CR(PEW)	2015	2013
+Stereospermum zenkeri		CR(PE)	2015	1950
+Steriphoma urbani		CR(PE)	2003	1980s
+Stonesia fascicularis		CR(PE)	2018	1950s
+Stonesia gracilis		CR(PE)	2018	1951
+Syzygium badescens		CR(PE)	2019	1932
+Tachiadenus  umbellatus		CR(PE)	2017	1926
+Taeniophyllum borneense		CR(PE)	2018	1901
+Tephrosia djalonica		CR(PE)	2019	1907
+Tephrosia pinifolia		CR(PE)	2016	1932
+Terminalia exelliana		CR(PE)	2019	1966
+Tetramolopium capillare		CR(PE)	2018	1997
+Thelethylax isalensis		CR(PE)	2017	1910
+Themistoclesia inflata		CR(PE)	2019	1945
+Thesium germainii		CR(PE)	2017	1955
+Thesium lewallei		CR(PE)	2017	1976
+Tournefortia obtusiflora		CR(PE)	2003	19th century
+Triaspis schliebenii		CR(PE)	2012	1935
+Tridactyle sarcodantha		CR(PE)	2013	1933
+Tylostigma herminioides		CR(PE)	2017	1921
+Tylostigma  madagascariense		CR(PE)	2017	1914
+Uvaria decidua		CR(PE)	2008	1935
+Vangueria verticillata		CR(PE)	2017	1954
+Vatica  xishuangbannaensis		CR(PE)	1998	?
+Vernonia ampandrandavensis		CR(PE)	2019	1944
+Viburnum divaricatum		CR(PE)	2003	before 1844
+Wahlenbergia petraea		CR(PE)	2017	1977
+Wikstroemia skottsbergiana	Skottsberg's  Wikstroemia	CR(PE)	2018	2000-01-01 00:00:00
+Xylopia capuronii		CR(PE)	2019	1954
+Xylosma serrata		CR(PE)	2015	1980
+Zanthoxylum subspicatum		CR(PE)	2019	1989
+Zingiber macrocephalum		CR(PE)	2019	1899
+Adenophorus periens		CR(PE)	2015	2014
+Blotiella coriacea		CR(PE)	2013	1971
+Ctenitis pallatangana		CR(PE)	2003	?
+Cyclosorus burundensis		CR(PE)	2017	1966
+Diplazium ulugurense		CR(PE)	2013	1970
+Elaphoglossum gracilipes		CR(PE)	2003	before 1853
+Elaphoglossum polytrichum		CR(PE)	2003	19th century
+Isoetes heldreichii	Pindus Quillwort	CR(PE)	2010	1885
+Isoetes sinensis		CR(PE)	2004	?
+Melpomene brevipes		CR(PE)	2003	19th century
+Cycas fugax		CR(PE)	2009	2004
+Encephalartos cerinus	Waxen Cycad	CR(PE)	2009	before 2000
+Encephalartos  hirsutus	Venda Cycad	CR(PE)	2009	2004
+Encephalartos inopinus	Lydenburg Cycad	CR(PE)	2009	2004
+Podocarpus perrieri		CR(PE)	2011	1951
+Galaxaura barbata		CR(PE)	2007	1963
+Phycodrina elegans		CR(PE)	2007	1977
+Bifurcaria galapagensis	Galapagos Stringweed	CR(PE)	2007	1983
+Desmarestia tropica	Tropical Acidweed	CR(PE)	2007	1972
+Dictyota galapagensis		CR(PE)	2007	1974
+Lepiota luteophylla	Yellow-gilled Lepiota	CR(PE)	2016	1976
+Spatoglossum schmittii		CR(PE)	2007	1978

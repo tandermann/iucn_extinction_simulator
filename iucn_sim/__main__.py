@@ -18,7 +18,8 @@ __author__ = "Tobias Andermann"
 # add_arguments() and main() functions.
 
 COMMANDS = [
-		'get_rates',
+		'get_iucn_data',
+		'estimate_rates',
 		'run_sim'
 ]
 

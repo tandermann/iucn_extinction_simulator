@@ -29,7 +29,7 @@ requirements:
     - matplotlib
     - r-base
     - r-rredlist
-
+    - xlrd
 test:
   imports:
     - iucn_sim

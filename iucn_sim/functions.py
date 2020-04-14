@@ -342,7 +342,7 @@ def write_r_scripts(output_folder):
     group_rank = args[2]
     iucn_key = args[3]
     outdir = args[4]
-    exclude_extinct = args[5]
+    exclude_extinct = FALSE
     
     # load all IUCN data
     data = c()
@@ -416,11 +416,8 @@ def write_r_scripts(output_folder):
       }
       counter = counter+1
     }
-    if (exclude_extinct){
-      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
-    }else{
-      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history_incl_extinct.txt"), quote=F,row.names=F,sep='	')
-    }
+    write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
+
     #___________________________________    
     """
     
@@ -437,7 +434,7 @@ def write_r_scripts(output_folder):
     status_list = c()
     for (i in 1:length(species_list)){
       species = as.character(species_list[i])
-      #print(paste0('Extracting current status for ', species,' (',i,' of ',length(species_list),')'))
+      print(paste0('Extracting current status for ', species,' (',i,' of ',length(species_list),')'))
       iucn_info = rl_search(species,key = iucn_key)
       category = iucn_info$result$category
       if (is.null(category)){
