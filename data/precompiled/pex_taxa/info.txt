@@ -1,0 +1,14 @@
+1. PDF file was downloaded from https://www.iucnredlist.org/resources/summary-statistics
+	(file source: https://nc.iucnredlist.org/redlist/content/attachment_files/2020_1_RL_Stats_Table_9.pdf)
+
+2. Open PDF in Adobe Acrobat, click on 'File -> Export To -> Microsoft Word -> Word Document'
+
+3. In MS Word, remove the text before start of the table.
+
+4. Copy everything into MS Excel
+
+5. In MS Excel remove info rows and other unnecessary stuff, only keeping data rows
+
+6. Fix the header row, making sure that it's only one single line (merge cells if necessary)
+
+7. Run the python script './convert_excel_into_csv.py' to convert the excel sheet into tab-separated text file

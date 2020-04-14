@@ -74,6 +74,12 @@ def add_arguments(parser):
         help="Set to '0' to use IUCN defined extinction probabilities (e.g. Mooers et al, 2008 approach). Set to '1' to simulate extinctions based on recorded extinctions in IUCN history (e.g. Monroe et al, 2019 approach)"
     )
     parser.add_argument(
+        '--include_possibly_extinct',
+        action='store_true',
+        help='Model critically endangered taxa that are listed as probably extinct by IUCN (status CR(PE)) as extinct, starting at the first year of CR(PE) assessment of these species.',
+        default=False
+    )
+    parser.add_argument(
         '--iucn_key',
         default=0,
         metavar='<IUCN-key>',
@@ -112,6 +118,7 @@ def add_arguments(parser):
     args.iucn_history = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/birds_output_test/iucn_data/TROCHILIDAE_iucn_history.txt'
     args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/birds_output_test/transition_rates'
     args.extinction_probs_mode = 0
+    args.include_possibly_extinct = True
     args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
     args.status_list = 0
     args.n_rep = 0

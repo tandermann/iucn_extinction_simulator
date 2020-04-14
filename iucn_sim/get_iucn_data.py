@@ -55,11 +55,12 @@ def add_arguments(parser):
         '--no_online_sync',
         action='store_true',
         help='Turn off the online-search for precompiled IUCN history files for your reference group.',
-        default=False)
+        default=False
+    )
 
     import argparse
     p = argparse.ArgumentParser()
-    args = p.parse_args()    
+    args = p.parse_args()
     args.reference_group = 'Aves'
     args.reference_rank = 'class'
     args.target_species_list = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_all_birds_additional_fake_taxa.txt'
@@ -146,8 +147,9 @@ def main(args):
         outfile_stem = os.path.basename(iucn_history_files[0]).split('_')[0]+'_'
 
 
+    # get current IUCN status all target species_______________________________
     if species_list_file:
-        # process the IUCN history data____________________________________________
+        # process the IUCN history data
         iucn_history_file = os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem))
         iucn_start_year = 2001
         current_year = datetime.datetime.now().year  
@@ -215,12 +217,25 @@ def main(args):
         joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
         joined_df.to_csv(os.path.join(outdir,'current_status_target_species.txt'),sep='\t',index=False,header=False)
 
+    
+    # get info about possibly extinct taxa
+    try:
+        # look for precompiled files online    
+        url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/pex_taxa/2020_1_RL_Stats_Table_9.txt'%taxon_group.upper()
+        urlpath =urlopen(url)
+        string = urlpath.read().decode('utf-8')        
+        string_input = StringIO(string)
+        ref_group_data = pd.read_csv(string_input, sep="\t")
+        hist_outfile = os.path.join(outdir,os.path.basename(url))
+        ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
+        precompiled_taxon_groups.append(str.lower(taxon_group))
+        precompiled_taxon_group_files.append(hist_outfile)
+    except:
+        pass
 
 
 
-
-
-
+/Users/tobias/GitHub/iucn_extinction_simulator/data/precompiled/pex_taxa/2020_1_RL_Stats_Table_9.txt
 
 
 
