@@ -37,14 +37,18 @@ Once installed, `iucn_sim` will be installed in your standard path, so you can s
 
 - `iucn_sim -h` --> Open help page showing available functions
 
-- `iucn_sim get_rates -h` --> Open help page for specific function
+- `iucn_sim get_iucn_data -h` --> Open help page for specific function
 
 The -h command will show and explain all available flags for each specific `iucn_sim` function. An example command could look like this:
 
 
-#### Estimate status transition rates and extinction probabilities for all taxa:
+#### Get IUCN data:
 
-`iucn_sim get_rates --input_data data/example_data/gl_data_carnivora.txt --reference_group Mammalia --reference_rank class --outdir data/example_data/carnivora_output/transition_rates/`
+`iucn_sim get_iucn_data --reference_group Mammalia --target_species_list data/precompiled/gl_data/carnivora_gl.txt --outdir data/iucn_sim_output/carnivora/iucn_data --iucn_key <IUCN-key>`
+
+#### Estimate status transition rates and extinction probabilities for all taxa
+
+`iucn_sim estimate_rates --species_data data/iucn_sim_output/carnivora/iucn_data/species_data.txt --iucn_history data/iucn_sim_output/carnivora/iucn_data/AVES_iucn_history.txt --extinction_probs_mode 0 --possibly_extinct_list data/iucn_sim_output/carnivora/iucn_data/possibly_extinct_reference_taxa.txt --rate_samples 100 --random_seed 1234 --outdir data/iucn_sim_output/carnivora/transition_rates`
 
 #### Run simulations for future
 

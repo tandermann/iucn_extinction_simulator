@@ -229,34 +229,29 @@ def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_
     diversity_through_time
     return diversity_through_time
 
-def run_multi_sim(n_rep,delta_t,species_list_status,dd_probs,qmatrix_dict_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True):
+def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
-    current_spec_list = species_list_status.species.values
-    current_status_list = species_list_status.current_status.values
     extinct_per_year_array = np.zeros([n_rep,delta_t+1])
-    te_array = np.zeros((len(species_list_status),n_rep+1)).astype(object)
-    te_array[:,0]=current_spec_list
+    te_array = np.zeros((len(species_list),n_rep+1)).astype(object)
+    te_array[:,0]=species_list
     status_through_time_dict = {}
     status_through_time = np.zeros([6,delta_t+1,n_rep])
     for n in range(n_rep):
         sys.stdout.write('\rRunning simulation rep %i/%i' %(n+1,n_rep))
-        if dynamic_qmatrix:
-            qmatrix_dict = qmatrix_dict_list[n]
-        else:
-            qmatrix_dict = qmatrix_dict_list
-    
-        # these are the simulator functions that need to be repeated
+        target_column = rate_index_list[n]
+            
         # new modeling of DD species every rep
-        current_status_list_new_dd = current_status_list.copy()
+        current_status_list_new_dd = input_status_list.copy()
         dd_indices = np.where([current_status_list_new_dd=='DD'])[1]    
-        dd_prob_vector = dd_probs.T[n]
+        dd_prob_vector = dd_probs.T[target_column]
         if all_lc:
 	        new_draws = np.array(['LC']*len(dd_indices))
         else:
             new_draws = np.random.choice(['LC','NT','VU','EN','CR'], size=len(dd_indices), replace=True, p=dd_prob_vector)
         current_status_list_new_dd[dd_indices] = new_draws
+        
         # new modeling of NE species every rep
-        status_count_dict = Counter(current_status_list)
+        status_count_dict = Counter(input_status_list)
         counts = np.array([status_count_dict[key] for key in status_count_dict.keys() if key not in ['DD','NE']])
         ne_probs = counts/sum(counts)
         status_array_count = [key for key in status_count_dict.keys() if key not in ['DD','NE']]        
@@ -266,8 +261,16 @@ def run_multi_sim(n_rep,delta_t,species_list_status,dd_probs,qmatrix_dict_list,o
         else:
             new_draws = np.random.choice(status_array_count, size=len(ne_indices), replace=True, p=ne_probs)
         current_status_list_new_dd[ne_indices] = new_draws
+
+        # sample a different q-matrix for each rep, according to the rate_index_list input
+        if dynamic_qmatrix:
+            q_matrix_list_rep = [qmatrix_dict[species][target_column] for species in species_list]
+            qmatrix_dict_rep = dict(zip(species_list,q_matrix_list_rep))
+        # the dynamic_qmatrix flag can be turned off to pass only a single q-matrix that will be used for all taxa and sim reps
+        else:
+            qmatrix_dict_rep = qmatrix_dict
     
-        future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,current_spec_list,outdir,qmatrix_dict,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+        future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,species_list,outdir,qmatrix_dict_rep,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
         # diversity_through time array
         for year in extinction_dict.keys():
             if not year == 'extant':

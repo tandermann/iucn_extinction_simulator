@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Calculate q-matrices and run simulations
+Run future simulations based on IUCN data and status transition rates
 
 Created on Wed Oct 30 20:59:28 2019
 @author: Tobias Andermann (tobias.andermann@bioenv.gu.se)
@@ -19,9 +19,9 @@ import iucn_sim.functions as cust_func
 
 def add_arguments(parser):
     parser.add_argument(
-        '--indir',
+        '--input_data',
         required=True,
-        help="Path to directory created by get_rates function."
+        help="Path to 'simulation_input_data.pkl' file created by esimate_rates function."
     )
     parser.add_argument(
         '--outdir',
@@ -35,8 +35,8 @@ def add_arguments(parser):
     )
     parser.add_argument(
         '--n_sim',
-        default=0,
-        help="How many simulation replicates to run. By default (value 0) as many simulation replicates are being produced as there are available rate estimates, resulting from the get_rates function (set by --n_rep flag in get_rates). If the number of simulation replicates exceeds the number of available transition rate estimates, these rates will be randomely resampled for the remaining simulations."
+        default=10000,
+        help="How many simulation replicates to run. If the number of simulation replicates exceeds the number of available transition rate estimates (produced by the 'estimate_rates' function), these rates will be randomely resampled for the remaining simulations."
     )
     parser.add_argument(
         '--status_change',
@@ -101,8 +101,29 @@ def add_arguments(parser):
     parser.add_argument(
         '--random_seed',
         default=None,
-        help="Set random seed for your analysis for reproducability (default None, i.e. it is randomely drawn)."
+        help="Set random seed for future simulations."
     )
+
+    import argparse
+    p = argparse.ArgumentParser()
+    args = p.parse_args()    
+    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/transition_rates_mode_1/simulation_input_data.pkl'
+    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/future_simulations/'
+    args.n_years = 100
+    args.n_sim = 100
+    args.status_change = 1
+    args.model_unknown_as_lc = 0
+    args.conservation_increase_factor = 1
+    args.threat_increase_factor = 1
+    args.extinction_rates = 0
+    args.n_gen = 100000
+    args.burnin = 1000
+    args.plot_diversity_trajectory = 1
+    args.plot_histograms = 0
+    args.plot_posterior = 0
+    args.plot_status_trajectories = 0
+    args.plot_status_piechart = 1
+    args.random_seed = 1234
 
 
 def p_e_year(years,p_e):
@@ -186,13 +207,16 @@ def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 
 #get_rate_estimate(ext_time_array,max_t)
 
 def main(args):
+    
+    # get user input___________________________________________________________
     random_seed = args.random_seed
     try:
         random_seed = int(random_seed)
         np.random.seed(random_seed)
+        print('Simulating with starting seed %i.'%random_seed)
     except:
-        pass
-    indir = args.indir
+        print('Simulating without starting seed.')
+    infile = args.input_data
     outdir = args.outdir
     n_years = int(args.n_years)
     n_sim = int(args.n_sim)
@@ -210,35 +234,24 @@ def main(args):
     plot_status_piechart = int(args.plot_status_piechart)
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    species_list_status_file = os.path.join(indir,'iucn_data/current_status_all_species.txt')
-    transition_rates_file = os.path.join(indir,'sampled_status_change_rates.txt')
-    en_ext_risk_file = os.path.join(indir,'en_extinction_risks_all_species.txt')
-    cr_ext_risk_file = os.path.join(indir,'cr_extinction_risks_all_species.txt')
-    species_list_status = pd.read_csv(species_list_status_file,sep='\t')
-    transition_rates = pd.read_csv(transition_rates_file,sep='\t',index_col='status_change')
-    species_list = pd.read_csv(en_ext_risk_file,sep='\t').iloc[:,0].values
-    en_ext_data = pd.read_csv(en_ext_risk_file,sep='\t').iloc[:,1:].values
-    cr_ext_data = pd.read_csv(cr_ext_risk_file,sep='\t').iloc[:,1:].values
-#    target_species=0
-#    target_species = 'Sarcogyps calvus'
-#    target_species = 'Cathartes aura'
-#    if target_species:
-#        species_list_status,species_list,en_ext_data,cr_ext_data = select_target_species(target_species,species_list_status,species_list,en_ext_data,cr_ext_data)   
-    # calculate all q-matrices (all species and sim replicates)________________
-    n_rates = transition_rates.shape[1]
-    print("\nCalculating species-specific q-matrices ...")
-    qmatrix_dict_list = []
-    for i in np.arange(n_rates):
-        rates = transition_rates.iloc[:,i]
-        sys.stdout.write('\rProgress: %i %%'%int(((i+1)/n_rates)*100))
-        en_risks_rep = en_ext_data.T[i]
-        cr_risks_rep = cr_ext_data.T[i]
-        q_matrix_dict = {}
-        for j,species in enumerate(species_list):
-            en_risk = en_risks_rep[j]
-            cr_risk = cr_risks_rep[j]
-            status_specific_p_e = np.array([0.000000155728,0.000041551152,0.001053050310,en_risk,cr_risk]) # These values are the category specific probabilities of extinction per year calculated from IUCN definition of each category
-            q_matrix = cust_func.qmatrix(rates, status_specific_p_e)
+        
+    input_data = cust_func.load_obj(infile)
+    species_input_data, dd_probs = input_data
+    species_list = np.array([i[0] for i in species_input_data])
+    current_status_list = np.array([i[1] for i in species_input_data])
+    q_matrix_list = [i[2] for i in species_input_data]
+    n_rates = dd_probs.shape[1]
+    #__________________________________________________________________________    
+
+
+
+
+    # modify q-matrices, if set by user________________________________________
+    final_qmatrix_list = []
+    q_matrix_list_copy = np.array(q_matrix_list).copy()
+    for q_matrix_list_i in q_matrix_list_copy:
+        q_matrix_list_temp = []
+        for q_matrix in q_matrix_list_i:
             if conservation_increase_factor != 1:
                 indeces_lower_triangle = np.tril_indices(q_matrix.shape[0],-1)
                 q_matrix[indeces_lower_triangle] = q_matrix[indeces_lower_triangle] * conservation_increase_factor
@@ -249,43 +262,35 @@ def main(args):
                 q_matrix[indeces_upper_triangle] = q_matrix[indeces_upper_triangle] * threat_increase_factor
                 np.fill_diagonal(q_matrix,0)
                 np.fill_diagonal(q_matrix, -np.sum(q_matrix,axis=1))                
-            q_matrix_dict[species] = q_matrix
-        qmatrix_dict_list.append(q_matrix_dict)
+            q_matrix_list_temp.append(q_matrix)
+        final_qmatrix_list.append(q_matrix_list_temp)
+    # turn into a dict with the n qmatrices for each species
+    final_qmatrix_dict = dict(zip(species_list,final_qmatrix_list))    
+    #__________________________________________________________________________    
+    
 
 
-    # get transition rates for DD______________________________________________
-    dd_changes = []
-    dd_rates = []
-    for row_id,change_type in enumerate(transition_rates.index.values):
-        states = change_type.split('->')
-        if states[0] == 'DD':
-            dd_changes.append('-'.join(states))
-            rates = transition_rates[transition_rates.index==change_type].values
-            dd_rates.append(rates[0])
-    dd_probs = dd_rates/sum(np.array(dd_rates))
 
-    if n_sim == 0:
-        n_rep = n_rates
+    # if more n_rep are set than there are q-matrices, resample________________
+    if n_sim <= n_rates:
+        sample_columns = np.random.choice(np.arange(n_rates),size=n_sim,replace=False)
+    # since there are only as many cr and en p(ex) estimates as there are provided GL values, we may have to resample some (but make sure all are present at least once)
     else:
-        n_rep = n_sim
+        sample_columns1 = np.random.choice(np.arange(n_rates),size=n_rates,replace=False)
+        sample_columns2 = np.random.choice(np.arange(n_rates),size=(n_sim-n_rates),replace=True)
+        sample_columns = np.concatenate([sample_columns1,sample_columns2])    
+    #__________________________________________________________________________    
 
-    # simulations______________________________________________________________    
-    # add dd frequencies for additional simulation replicates
-    if n_rep-n_rates >= 0:
-        resampling_rates_indexes = np.random.choice(np.arange(n_rates),(n_rep-n_rates))
-        append_this_dd = np.array([i[resampling_rates_indexes] for i in dd_probs])
-        final_dd_probs = np.concatenate([dd_probs,append_this_dd],axis=1)
-        # redraw n samples of transition rates to fill all simulation replicates
-        append_this = np.array(qmatrix_dict_list)[resampling_rates_indexes]
-        final_qmatrix_dict_list = list(qmatrix_dict_list) + list(append_this)
-    else:
-        resampling_rates_indexes = np.random.choice(np.arange(n_rates),n_rep)
-        final_dd_probs = np.array([i[resampling_rates_indexes] for i in dd_probs])
-        final_qmatrix_dict_list = np.array(qmatrix_dict_list)[resampling_rates_indexes]
 
-    #current_year = datetime.datetime.now().year 
-    #final_year = current_year+int(n_years)
+
+
+    # run simulations__________________________________________________________
     delta_t = n_years
+    model_ne_as_dd = False
+    dynamic_qmatrix = True
+
+    if model_ne_as_dd:
+        current_status_list[current_status_list=='NE'] = 'DD'    
     if model_unknown_as_lc:
         print('\nSetting all DD and NE species to LC.')
         all_lc=True
@@ -296,9 +301,9 @@ def main(args):
     else:
         print('\nNot simulating future status changes!')
         status_change=False
-    dynamic_qmatrix=True
+
     print('\nStarting simulations ...')
-    diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_rep,delta_t,species_list_status,final_dd_probs,final_qmatrix_dict_list,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+    diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
     # summarize simulation results
     sim_species_list = te_array[:,0].copy()
     ext_date_data = te_array[:,1:].copy()
@@ -312,13 +317,22 @@ def main(args):
     status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
     np.savetxt(os.path.join(outdir,'simulated_extinctions_array.txt'),status_through_time[-1],fmt='%i')
     pd.DataFrame(data=te_array).to_csv(os.path.join(outdir,'te_all_species.txt'),sep='\t',header=False,index=False)
-    
+    #__________________________________________________________________________   
+
+
+
+
+    #__________________________________________________________________________       
 #    if target_species:
 #        posterior = get_rate_estimate_posterior(ext_date_data[0],n_years,0,sim_species_list,n_gen=n_gen,burnin=burnin)
 #        np.savetxt('/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/posterior_samples/%s_gl_no_status_change.txt'%target_species.replace(' ','_'),posterior,fmt='%.8f')
 #        print('\nPrinted posterior')
-        
-        
+    #__________________________________________________________________________   
+
+
+
+
+    #__________________________________________________________________________           
     if plot_diversity_trajectory:
         # plot diversity trajectory of species list________________________________
         #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
@@ -346,7 +360,12 @@ def main(args):
         plt.ylabel('Lost species')
         plt.tight_layout()
         fig.savefig(os.path.join(outdir,'future_diversity_trajectory.pdf'),bbox_inches='tight', dpi = 500)
+    #__________________________________________________________________________   
 
+
+
+
+    #__________________________________________________________________________   
     if plot_status_trajectories:
         # color palette
         colors = ["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349"]
@@ -380,9 +399,14 @@ def main(args):
         #plt.xticks(modified_q_matrix.year[::10],modified_q_matrix.year[::10])
         plt.tight_layout()
         fig.savefig(os.path.join(outdir,'future_status_trajectory.pdf'),bbox_inches='tight', dpi = 500)
-    
+    #__________________________________________________________________________   
+
+
+
+
+    #__________________________________________________________________________       
     if plot_status_piechart:
-        statuses, counts = np.unique(species_list_status.current_status.values,return_counts=True)
+        statuses, counts = np.unique(current_status_list,return_counts=True)
         init_status_dict = dict(zip(statuses, counts))
         init_status_dict['EX'] = 0
         iucn_status_code = {0:'LC', 1:'NT', 2:'VU', 3:'EN', 4:'CR', 5:'EX', 6:'DD'}
@@ -420,11 +444,16 @@ def main(args):
         final_labels = list(labels[status_count_list[0] >0]) + ['EX']
         plt.legend(wedges+[ext], final_labels,title="IUCN status\n(N=%i sp.)"%status_count_list[2].sum(),loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
         fig.savefig(os.path.join(outdir,'status_pie_chart.pdf'),bbox_inches='tight', dpi = 500)
+    #__________________________________________________________________________   
 
+
+
+
+    #__________________________________________________________________________   
     if extinction_rates:
-        # calculate some extinction stats__________________________________________
+        # calculate some extinction stats
         # estimate extinction rates scaled by year
-        print('\nEstimating extinction rates from simulation output...')
+        print('\nRunning %i MCMCs to estimate species-specific extinction rates from simulation output...'%len(species_list))
         #ext_date_data = ext_date_data[:10,:]
         if plot_posterior:
             with PdfPages(os.path.join(outdir,'posterior_ext_rate_histograms.pdf')) as pdf:
@@ -440,7 +469,12 @@ def main(args):
     extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
     extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.5f')
     print('\n')
+    #__________________________________________________________________________   
 
+
+
+
+    #__________________________________________________________________________   
     if plot_histograms:
         # plot histograms of extinction times
         with PdfPages(os.path.join(outdir,'extinction_time_histograms.pdf')) as pdf:
@@ -450,7 +484,7 @@ def main(args):
                 species_te_array = te_array[:,1:][i]
                 not_na_values = species_te_array[~np.isnan(list(species_te_array))]
                 heights, bins = np.histogram(not_na_values,np.arange(0,delta_t+10,10))
-                percent = heights/n_rep
+                percent = heights/n_sim
                 plt.bar(bins[:-1],percent,width=10, align="edge")
                 plt.ylim(0,0.5)
                 #survival_prob = 1-sum(percent)
@@ -463,12 +497,14 @@ def main(args):
                 # annotate last bar            
                 if ax.patches[-1].get_height() > 0:
                     ax.text(ax.patches[-1].get_x()+3, np.round(ax.patches[-1].get_height()+0.001,4), '**', fontsize=12, color='black')
-                plt.title('%s - Extinct in %i years: %i/%i'%(species,delta_t,sum(heights),n_rep))
+                plt.title('%s - Extinct in %i years: %i/%i'%(species,delta_t,sum(heights),n_sim))
                 plt.xlabel('Years from present')
                 plt.ylabel('Fraction of simulations')
                 plt.tight_layout()
                 pdf.savefig()  # saves the current figure into a pdf page
                 plt.close()
     print('\n')
+    #__________________________________________________________________________   
+
 
         

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Download IUCN data and estimate status transition rates
+MCMC-estimation of status transition rates from IUCN record
 
 Created on Mon Oct 28 14:43:44 2019
 @author: Tobias Andermann (tobias.andermann@bioenv.gu.se)
@@ -10,14 +10,9 @@ Created on Mon Oct 28 14:43:44 2019
 import numpy as np
 np.set_printoptions(suppress=True)
 import pandas as pd
-#import matplotlib.pyplot as plt
-#np.random.seed(1234)
-import subprocess
-import os
+import os,sys
 import datetime
 import iucn_sim.functions as cust_func
-from urllib.request import urlopen
-from io import StringIO
 
 # get extinction probs_________________________________________________________
 def p_e_year(years,p_e):
@@ -50,16 +45,16 @@ def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 100
 
 def add_arguments(parser):
     parser.add_argument(
-        '--target_species_list',
+        '--species_data',
         required=True,
         metavar='<path>',
-        help="Path to file containing list of species to simulate future extinctions for, potentially including generation length (GL) data: first column taxon list, followed by n columns of GL values (e.g. 100 values per species sampled from uncertainty interval surrounding generation length)."
+        help="File containing species list and current IUCN status of species, as well as generation length (GL) data estimates if available. GL data is only used for '--extinction_probs_mode 0' ('species_data.txt' output from get_iucn_data function).",
     )
     parser.add_argument(
         '--iucn_history',
         required=True,
         metavar='<path>',
-        help="Path to .txt file containing IUCN history of the reference group for transition rate estimation (output of get_iucn_data function - *_iucn_history.txt)."
+        help="File containing IUCN history of the reference group for transition rate estimation ('*_iucn_history.txt' output of get_iucn_data function)."
     )
     parser.add_argument(
         '--outdir',
@@ -71,31 +66,19 @@ def add_arguments(parser):
         '--extinction_probs_mode',
         default=0,
         metavar='N',
-        help="Set to '0' to use IUCN defined extinction probabilities (e.g. Mooers et al, 2008 approach). Set to '1' to simulate extinctions based on recorded extinctions in IUCN history (e.g. Monroe et al, 2019 approach)"
+        help="Set to '0' to use IUCN defined extinction probabilities (e.g. Mooers et al, 2008 approach), also using available GL data to estimate species-specific extinction probabilities. Set to '1' to simulate extinctions based on recorded extinctions in IUCN history (e.g. Monroe et al, 2019 approach, no GL data is being used)."
     )
     parser.add_argument(
-        '--include_possibly_extinct',
-        action='store_true',
-        help='Model critically endangered taxa that are listed as probably extinct by IUCN (status CR(PE)) as extinct, starting at the first year of CR(PE) assessment of these species.',
-        default=False
-    )
-    parser.add_argument(
-        '--iucn_key',
-        default=0,
-        metavar='<IUCN-key>',
-        help="Provide your IUCN API key (see https://apiv3.iucnredlist.org/api/v3/token) for downloading IUCN history of your provided reference group. Not required if using precompiled reference group."
-    )
-    parser.add_argument(
-        '--status_list',
+        '--possibly_extinct_list',
         default=0,
         metavar='<path>',
-        help="Provide a text file containing a valid IUCN status (LC,NT,VU,EN,CR,DD) for each species, separated by newline (same order as species names provided under --gl_data)."
+        help="File containing list of taxa that are likely extinct, but that are listed as extant in IUCN, including the year of their assessment as possibly extinct ('possibly_extinct_reference_taxa.txt' output from get_iucn_data function). These species will then be modeled as extinct by the esimate_rates function, which will effect the estimated extinction probabilities when chosing `--extinction_probs_mode 1`",
     )
     parser.add_argument(
-        '--n_rep',
-        default=0,
+        '--rate_samples',
+        default=100,
         metavar='N',
-        help="How many different transition-rate and extinction risk estimates to produce for simulations (default == 0 -> assumes same as number of provided GL values for each species)."
+        help="How many rates to sample from the posterior transition rate estimates. These rates will be used to populate transition rate q-matrices for downstream simulations. Later on you can still chose to run more simulation replicates than the here specified number of produced transition rate q-matrices, in which case the `run_sim` function will randomely resample from the available q-matrices (default=100, this is ususally sufficient, larger numbers can lead to very high output file size volumes)."
     )
     parser.add_argument(
         '--n_gen',
@@ -109,61 +92,63 @@ def add_arguments(parser):
         metavar='N',
         help="Burn-in for MCMC for transition rate estimation (default=1000)."
     )
-
-    
-    import argparse
-    p = argparse.ArgumentParser()
-    args = p.parse_args()    
-    args.target_species_list = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/gl_data_all_birds.txt'
-    args.iucn_history = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/birds_output_test/iucn_data/TROCHILIDAE_iucn_history.txt'
-    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/example_data/birds_output_test/transition_rates'
-    args.extinction_probs_mode = 0
-    args.include_possibly_extinct = True
-    args.iucn_key = '01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba'
-    args.status_list = 0
-    args.n_rep = 0
-    args.n_gen = 100000
-    args.burnin = 1000
-  
-
+    parser.add_argument(
+        '--random_seed',
+        default=None,
+        help="Set random seed for the MCMC."
+    )
 
 
 def main(args):
-    # get user input
-    input_data = args.target_species_list
+
+    # get user input___________________________________________________________
+    input_data = args.species_data
     iucn_history = args.iucn_history
     outdir = args.outdir
-    extinction_probs_mode = args.extinction_probs_mode
-    iucn_key = args.iucn_key
-    status_list = args.status_list
-    n_rep = int(args.n_rep)
+    try:
+        extinction_probs_mode = int(args.extinction_probs_mode)
+    except:
+        print('Invlaid extinction_probs_mode provided. Please choose between the currenlty available options 0 or 1')
+        quit()
+    possibly_extinct_list = args.possibly_extinct_list
+    n_rep = int(args.rate_samples)
     n_gen = int(args.n_gen)
     burnin = int(args.burnin)
+    random_seed = args.random_seed
+    try:
+        random_seed = int(random_seed)
+        np.random.seed(random_seed)
+        print('Running MCMC with starting seed %i.'%random_seed)
+    except:
+        print('Running MCMC without starting seed.')
         
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    # get gl data to calculate en and cr extinction risk for all species
-    gl_data = pd.read_csv(input_data,sep='\t',header=None)
-    species_list = gl_data.iloc[:,0].values
+    # get input data
+    species_data_input = pd.read_csv(input_data,sep='\t',header=None)
+    # get the list of species
+    species_list = species_data_input.iloc[:,0].values.astype(str)
     # replace underscores in species name in case they are present
     species_list = np.array([i.replace('_',' ') for i in species_list])
     # Check if all species names are binomial
     for species in species_list:
         if len(species.split(' ')) != 2:
-            print('ERROR','*'*50,'\nABORTED: All provided species names provided under --input_data flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*55)
+            print('ERROR','*'*50,'\nABORTED: All provided species names provided under --species_data flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*50)
             quit()
-    gl_data_available = False
-    if gl_data.shape[1] > 1:
-        gl_matrix = gl_data.iloc[:,1:].values
-        gl_data_available = True
     
-    if status_list:
-        status_list_data = list(pd.read_csv(status_list,sep='\t',header=None).iloc[:,0].values)
-        if len(species_list) != len(status_list_data):
-            print('ERROR','*'*50,'\nLength of provided status list does not match length of species list provided as --input_data!','*'*55)
-            quit()
+    # get the current IUCN status of all species    
+    current_status = species_data_input.iloc[:,1].values.astype(str)        
 
+    # get GL data if provided
+    gl_data_available = False
+    if species_data_input.shape[1] > 2:
+        gl_matrix = species_data_input.iloc[:,2:].values
+        gl_data_available = True
+    #__________________________________________________________________________
+        
+    
+    
     
     # process the IUCN history data____________________________________________
     iucn_start_year = 2001
@@ -172,35 +157,51 @@ def main(args):
     statuses_through_time = pd.read_csv(iucn_history, delimiter = '\t')
     target_columns = [column for column in master_stat_time_df.columns if column in statuses_through_time.columns]
     master_stat_time_df[target_columns] = statuses_through_time[target_columns]
-
-    # check if we have sufficient number of species for rate estimation
-    if len(master_stat_time_df) < 1000:
-        print('\n\n','#'*50,'\nWarning: Only %i species in reference dataset. This may not be sufficient for proper estimation of status transition rates. It is recommended to choose a larger reference group encompassing >1000 species!'%len(master_stat_time_df),'#'*50,'\n\n')
     # treat EW as EX
     master_stat_time_df.replace('EW', 'EX',inplace=True)
+    # replace occurrences of NR (not recognized) with nan
+    master_stat_time_df.replace('NR', np.nan,inplace=True)
     
     # clean and sort df
     master_stat_time_df = master_stat_time_df.sort_values(by='species')
     master_stat_time_df = master_stat_time_df.drop_duplicates()
     master_stat_time_df.index = np.arange(len(master_stat_time_df))   
     
-    # get most current status of each species
+    # set the assessment at the current year to NE for species without any assessments
     na_row_indeces = np.where(master_stat_time_df.iloc[:,1:].T.isnull().all().values)
     for index in na_row_indeces:
         master_stat_time_df.iloc[index,-1] = 'NE'
     
+    # if possibly_extinct_list provided, read that list and set the status for those taxa to extinct, starting at provided year
+    if possibly_extinct_list:
+        pex_data = pd.read_csv(possibly_extinct_list,sep='\t')
+        pex_species_list = pex_data.iloc[:,0].values.astype(str)
+        pex_year = pex_data.iloc[:,1].values.astype(int)
+        column_names = master_stat_time_df.columns.values
+        row_names = master_stat_time_df.species.values
+        #df_selection = master_stat_time_df[master_stat_time_df.species.isin(pex_species_list)]
+        for i,species in enumerate(pex_species_list):
+            row_index = np.where(row_names==species)[0][0]
+            assessment_year = pex_year[i]
+            column_index = np.where(column_names==str(assessment_year))[0][0]
+            master_stat_time_df.iloc[row_index,column_index:] = 'EX'
+    
     # extract most recent valid status for each taxon
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
 
-    # remove all taxa that are currently extinct
-    ext_indices = np.array([num for num,i in enumerate(most_recent_status_dict.keys()) if most_recent_status_dict[i] == 'EX'])
-    master_stat_time_df = master_stat_time_df.drop(ext_indices)
-    master_stat_time_df.index = np.arange(len(master_stat_time_df))
-
-    if extinction_probs_mode == 0:        
+    # extinciton prob mode 0: remove all currently extinct taxa
+    if extinction_probs_mode == 0:
+        ext_indices = np.array([num for num,i in enumerate(most_recent_status_dict.keys()) if most_recent_status_dict[i] == 'EX'])
+        master_stat_time_df = master_stat_time_df.drop(ext_indices)
+        master_stat_time_df.index = np.arange(len(master_stat_time_df))
         # replace any occurrence of 'EX' as a past status with NaN to avoid problems with counting types of transitions (treating these assessments as invalid)
         master_stat_time_df.replace('EX', np.nan,inplace=True)
-
+    # extinciton prob mode 1: remove only taxa that have been extinct all along, keeping those that have recorded transition to extinct within time frame
+    elif extinction_probs_mode == 1:
+        ext_indices = np.array([num for num,i in enumerate(master_stat_time_df.iloc[:,1:].values.astype(str)) if 'EX' in np.unique(i) and len(np.unique(i))==2])
+        master_stat_time_df = master_stat_time_df.drop(ext_indices)
+        master_stat_time_df.index = np.arange(len(master_stat_time_df))
+        
     # write IUCN history df to file
     master_stat_time_df.to_csv(os.path.join(outdir,'formatted_iucn_history_reference_taxa.txt'),sep='\t')
 
@@ -208,7 +209,7 @@ def main(args):
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
     # count current status distribution
     unique, counts = np.unique(status_series, return_counts=True)
-    print('Current IUCN status distribution in specified reference group:',dict(zip(unique, counts)))
+    print('Current IUCN status distribution in reference group:',dict(zip(unique, counts)))
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
     print('Summing up years spend in each category...')
@@ -219,16 +220,12 @@ def main(args):
     np.savetxt(os.path.join(outdir,'years_spent_in_each_category.txt'),final_years_count_array,fmt='%s\t%s')
     change_type_dict_array = np.array([list(change_type_dict.keys()),list(change_type_dict.values())]).T
     np.savetxt(os.path.join(outdir,'change_type_dict.txt'),change_type_dict_array,fmt='%s\t%s')   
+    #__________________________________________________________________________
+    
 
-    # sample transition rates for all types of changes_________________________
-    if n_rep > 0:
-        sim_reps = n_rep
-    else:
-        if gl_data_available:
-            sim_reps = gl_matrix.shape[1]
-        else:
-            print('ERROR','*'*50,'\nUse --n_rep flag to set the number of simulation replicates.','*'*55)
-            quit()
+
+
+    # sample transition rates for all types of changes_________________________    
     if extinction_probs_mode == 0:
         status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
     elif extinction_probs_mode == 1:
@@ -243,100 +240,159 @@ def main(args):
     status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
     print('Counted the following transition occurrences in IUCN history of reference group:')
     print(status_change_coutn_df)
-    print('Estimating rates for %i simulation replicates'%sim_reps)
-    sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)])
+    print('\nRunning MCMC...')
+    sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)])
     for status_a in status_change_coutn_df.columns:
         row = status_change_coutn_df.loc[status_a]
         for status_b in row.index.values:
             if not status_a == status_b:
                 count = row[status_b]
                 total_time = years_in_each_category[status_a]
-                rates = sample_rate_mcmc(count, total_time, n_samples = sim_reps, n_gen = n_gen, burnin = burnin)
-                sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,sim_reps)]),ignore_index=True)
-    sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,sim_reps)]].apply(pd.to_numeric)
+                rates = sample_rate_mcmc(count, total_time, n_samples = n_rep, n_gen = n_gen, burnin = burnin)
+                sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)]),ignore_index=True)
+    sampled_rates_df[['rate_%i'%i for i in np.arange(0,n_rep)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,n_rep)]].apply(pd.to_numeric)
     sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')
-
+    print('Sampled %i rates from MCMC posterior for each transition type.'%n_rep)
+    #__________________________________________________________________________
     
-    # get current status for all species we want to simulate___________________
-    # get list of all species that we don't have IUCN data for already
-    if status_list:
-        current_status_list = status_list_data
-    else:
-        missing_species = np.array([species for species in species_list if not species in most_recent_status_dict.keys()])
-        if len(missing_species) > 0:
-            missing_species_file = os.path.join(outdir,'missing_species_list.txt')
-            np.savetxt(missing_species_file,missing_species,fmt='%s')
-            # extract the current status for those missing species
-            print('Extracting current status for species that were not found in reference group...')
-            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), missing_species_file, iucn_key, iucn_outdir]
-            #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-            #with open(iucn_error_file, 'w') as err:
-            if not iucn_key:
-                quit('***IUCN-KEY ERROR:*** Trying to download current status for species %s from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively provide the current IUCN status for all your input species using the --status_list flag.'%(str(list(missing_species))))
-            seqtk = subprocess.Popen(iucn_cmd)
-            seqtk.wait()
-            missing_species_status_file = os.path.join(iucn_outdir,'current_status_missing_species.txt')
-            if os.path.exists(missing_species_status_file):
-                missing_species_status_data = pd.read_csv(missing_species_status_file,sep='\t',header=None)
-            # clean up temporary files
-            if os.path.exists(missing_species_status_file):
-                os.remove(missing_species_status_file)
-            if os.path.exists(missing_species_file):
-                os.remove(missing_species_file)
-        current_status_list = []
-        for species in species_list:
-            if species in most_recent_status_dict.keys():
-                current_status = most_recent_status_dict[species]
-            else:
-                current_status = missing_species_status_data[missing_species_status_data[0]==species][1].values[0]
-                if current_status not in ['LC','NT','VU','EN','CR','DD']:
-                    print('Species %s was not found in IUCN database. Current status is therefore set to NE (Not Evaluated).'%species)
-                    current_status = 'NE'
-            current_status_list.append(current_status)
-    final_df_current_status = pd.DataFrame(np.array([species_list,current_status_list]).T,columns=['species','current_status'])
-    final_df_current_status.to_csv(os.path.join(iucn_outdir,'current_status_all_species.txt'),sep='\t',index=False)
+    
 
 
-    # calculate EN and CR extinction risk using GL information_________________
-    # calculate yearly extinction risks for categories EN and CR
-    if gl_data_available:
-        en_risks = []
-        for gl_array in gl_matrix:
-            #replace all nan values with the standard en extinction risk
-            en_risks_species = p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2)
-            n_nan = len(en_risks_species[en_risks_species!=en_risks_species])
-            en_risks_species[en_risks_species!=en_risks_species] = [p_e_year(20,0.2)]*n_nan
-            en_risks.append(en_risks_species)
-        en_risks = np.array(en_risks)
-    else:
-        print('Warning: No generation length (GL) data found. Extinction risks for status EN and CR are calculated without using GL data.')
-        en_risks = np.array([[p_e_year(20,0.2)]*sim_reps]*len(species_list))
-    if en_risks.shape[1] == 1:
-        en_risks = np.array([en_risks for i in range(sim_reps)])[:,:,0].T        
-    en_risks_df = pd.DataFrame(np.zeros((len(species_list),sim_reps+1)))
-    en_risks_df.columns = ['species']+ ['en_extinction_risk_yearly_%i'%i for i in np.arange(0,sim_reps)]
-    en_risks_df.species = species_list
-    en_risks_df.iloc[:,1:] = en_risks
-    en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+    # if mode 0, calculate extinction probabilities for EN and CR with GL data_________________________
+    if extinction_probs_mode == 0:
+        # calculate yearly extinction risks for categories EN and CR
+        if gl_data_available:
+            dims = gl_matrix.shape[1]
+            en_risks = []
+            for gl_array in gl_matrix:
+                if dims == 1:
+                    gl_array = np.array(gl_array)
+                #replace all nan values with the standard en extinction risk
+                en_risks_species = p_e_year(np.minimum(np.maximum([20]*len(gl_array),5*gl_array),100),0.2)
+                n_nan = len(en_risks_species[en_risks_species!=en_risks_species])
+                en_risks_species[en_risks_species!=en_risks_species] = [p_e_year(20,0.2)]*n_nan
+                en_risks.append(en_risks_species)
+            en_risks = np.array(en_risks)
+        else:
+            print('Warning: No generation length (GL) data found. Extinction risks for status EN and CR are calculated without using GL data.')
+            dims = 1
+            en_risks = np.array([[p_e_year(20,0.2)]]*len(species_list))
+        en_risks_df = pd.DataFrame(np.zeros((len(species_list),dims+1)))
+        en_risks_df.columns = ['species']+ ['EN_p_ext_%i'%i for i in np.arange(0,dims)]
+        en_risks_df.species = species_list
+        en_risks_df.iloc[:,1:] = en_risks
+        en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
 
-    if gl_data_available:
-        cr_risks = []
-        for gl_array in gl_matrix:
-            #replace all nan values with the standard en extinction risk
-            cr_risks_species = p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5)
-            n_nan = len(cr_risks_species[cr_risks_species!=cr_risks_species])
-            cr_risks_species[cr_risks_species!=cr_risks_species] = [p_e_year(10,0.5)]*n_nan
-            cr_risks.append(cr_risks_species)
-        cr_risks = np.array(cr_risks)
-    else:
-        cr_risks = np.array([[p_e_year(10,0.5)]*sim_reps]*len(species_list))
-    if cr_risks.shape[1] == 1:
-        cr_risks = np.array([cr_risks for i in range(sim_reps)])[:,:,0].T
-    cr_risks_df = pd.DataFrame(np.zeros((len(species_list),sim_reps+1)))
-    cr_risks_df.columns = ['species']+ ['cr_extinction_risk_yearly_%i'%i for i in np.arange(0,sim_reps)]
-    cr_risks_df.species = species_list
-    cr_risks_df.iloc[:,1:] = cr_risks
-    cr_risks_df.to_csv(os.path.join(outdir,'cr_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+        if gl_data_available:
+            dims = gl_matrix.shape[1]
+            cr_risks = []
+            for gl_array in gl_matrix:
+                if dims == 1:
+                    gl_array = np.array(gl_array)
+
+                #replace all nan values with the standard en extinction risk
+                cr_risks_species = p_e_year(np.minimum(np.maximum([10]*len(gl_array),3*gl_array),100),0.5)
+                n_nan = len(cr_risks_species[cr_risks_species!=cr_risks_species])
+                cr_risks_species[cr_risks_species!=cr_risks_species] = [p_e_year(10,0.5)]*n_nan
+                cr_risks.append(cr_risks_species)
+            cr_risks = np.array(cr_risks)
+        else:
+            dims = 1
+            cr_risks = np.array([[p_e_year(10,0.5)]]*len(species_list))
+        cr_risks_df = pd.DataFrame(np.zeros((len(species_list),dims+1)))
+        cr_risks_df.columns = ['species']+ ['CR_p_ext_%i'%i for i in np.arange(0,dims)]
+        cr_risks_df.species = species_list
+        cr_risks_df.iloc[:,1:] = cr_risks
+        cr_risks_df.to_csv(os.path.join(outdir,'cr_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+    #__________________________________________________________________________
+
+
+
+
+    # populate q-matrices______________________________________________________
+    print("\nPopulating species-specific q-matrices ...")
+    sampled_rates_df.index = sampled_rates_df.status_change.values
+    
+    if extinction_probs_mode == 0:
+        transition_rates = sampled_rates_df.iloc[:,1:]
+        
+        # randomely sample cr and en extinction probs to be used in q-matrices.
+        if n_rep <= dims:
+            sample_columns = np.random.choice(np.arange(dims),size=n_rep,replace=False)
+        # since there are only as many cr and en p(ex) estimates as there are provided GL values, we may have to resample some (but make sure all are present at least once)
+        else:
+            sample_columns1 = np.random.choice(np.arange(dims),size=dims,replace=False)
+            sample_columns2 = np.random.choice(np.arange(dims),size=(n_rep-dims),replace=True)
+            sample_columns = np.concatenate([sample_columns1,sample_columns2])
+        # get the corresponding en and cr ex-risk columns
+        en_risks_selection = en_risks[:,sample_columns]
+        cr_risks_selection = cr_risks[:,sample_columns]
+        
+    elif extinction_probs_mode == 1:
+        target_keys = [i for i in sampled_rates_df.status_change.values if i[-2:] == 'EX']
+        ex_probs = sampled_rates_df[sampled_rates_df.status_change.isin(target_keys)].iloc[:-1,1:].values.T
+        transition_rates = sampled_rates_df[~sampled_rates_df.status_change.isin(target_keys)].iloc[:30,1:]
+    
+    for i in np.arange(n_rep):
+        rates_i = transition_rates.iloc[:,i]
+        sys.stdout.write('\rProgress: %i %%'%int(((i+1)/n_rep)*100))
+
+        # for each rep (i), create list of q-matrices, 1 for each species
+        if extinction_probs_mode == 0:
+            en_risks_rep = en_risks_selection[:,i]
+            cr_risks_rep = cr_risks_selection[:,i]  
+            q_matrix_list_i = []
+            for j,__ in enumerate(species_list):
+                en_risk = en_risks_rep[j]
+                cr_risk = cr_risks_rep[j]
+                status_specific_p_e = np.array([0.000000155728,0.000041551152,0.001053050310,en_risk,cr_risk]) # These values are the category specific probabilities of extinction per year calculated from IUCN definition of each category    
+                q_matrix = cust_func.qmatrix(rates_i, status_specific_p_e)
+                q_matrix_list_i.append([q_matrix])
+        elif extinction_probs_mode == 1:
+            q_matrix_list_i = []
+            status_specific_p_e = ex_probs[i]
+            q_matrix = cust_func.qmatrix(rates_i, status_specific_p_e)
+            q_matrix_list_i = []
+            for spec in species_list:
+                q_matrix_list_i.append([q_matrix])
+        
+        q_matrix_list_i_copy = q_matrix_list_i.copy()
+        if i == 0:
+            qmatrix_list_dict = dict(zip(list(species_list),q_matrix_list_i_copy)).copy()
+        else:
+            update_dict = [qmatrix_list_dict[species].append(q_matrix_list_i_copy[i][0]) for i, species in enumerate(list(species_list))]
+    print('\n')
+    #__________________________________________________________________________
+    
+    
+
+
+    # get transition rates for DD______________________________________________
+    dd_changes = []
+    dd_rates = []
+    for row_id,change_type in enumerate(transition_rates.index.values):
+        states = change_type.split('->')
+        if states[0] == 'DD':
+            dd_changes.append('-'.join(states))
+            rates = transition_rates[transition_rates.index==change_type].values
+            dd_rates.append(rates[0])
+    dd_probs = dd_rates/sum(np.array(dd_rates))
+    #__________________________________________________________________________
+
+        
+
+
+    # Finally write all the compiled info to a pickle file_____________________
+    species_specific_data = [[species,current_status[i],qmatrix_list_dict[species]]for i,species in enumerate(species_list)]
+    final_output_data = [species_specific_data,dd_probs]
+    cust_func.save_obj(final_output_data,os.path.join(outdir,'simulation_input_data.pkl'))
+    #__________________________________________________________________________
+
+
+
+
+
+
 
 
 
