@@ -349,7 +349,7 @@ def write_r_scripts(output_folder):
     
     # load all IUCN data
     data = c()
-    for (i in seq(0, 10, 1)){
+    for (i in seq(0, 20, 1)){
       data = c(data,c(rl_sp(key=iucn_key,page = i)))
     }
     

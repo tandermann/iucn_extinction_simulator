@@ -1,0 +1,22 @@
+Scientific name	Year of Assessment
+Anodorhynchus glaucus	2019
+Callaeas cinereus	2016
+Campephilus imperialis	2013
+Charmosyna diadema	2019
+Eriocnemis godini	2012
+Eurostopodus exul	2014
+Glaucidium mooreorum	2019
+Hemignathus affinis	2016
+Hemignathus hanapepe	2016
+Loxops ochraceus	2016
+Myadestes lanaiensis	2013
+Numenius borealis	2012
+Paroreomyza maculata	2012
+Pomarea mira	2013
+Psittirostra psittacea	2012
+Pterodroma caribbaea	2013
+Pyrrhura subandina	2014
+Siphonorhis americana	2012
+Turnix novaecaledoniae	2014
+Vanellus macropterus	2019
+Vermivora bachmanii	2013

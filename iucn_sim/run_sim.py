@@ -36,7 +36,7 @@ def add_arguments(parser):
     parser.add_argument(
         '--n_sim',
         default=10000,
-        help="How many simulation replicates to run. If the number of simulation replicates exceeds the number of available transition rate estimates (produced by the 'estimate_rates' function), these rates will be randomely resampled for the remaining simulations."
+        help="How many simulation replicates to run. If the number of simulation replicates exceeds the number of available transition rate estimates (produced by the 'transition_rates' function), these rates will be randomely resampled for the remaining simulations."
     )
     parser.add_argument(
         '--status_change',
@@ -99,31 +99,10 @@ def add_arguments(parser):
         help="Plots pie charts of status distribution: 0=off, 1=on (default=1)."
     )
     parser.add_argument(
-        '--random_seed',
+        '--seed',
         default=None,
         help="Set random seed for future simulations."
     )
-
-    import argparse
-    p = argparse.ArgumentParser()
-    args = p.parse_args()    
-    args.input_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/transition_rates_mode_1/simulation_input_data.pkl'
-    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/future_simulations/'
-    args.n_years = 100
-    args.n_sim = 100
-    args.status_change = 1
-    args.model_unknown_as_lc = 0
-    args.conservation_increase_factor = 1
-    args.threat_increase_factor = 1
-    args.extinction_rates = 0
-    args.n_gen = 100000
-    args.burnin = 1000
-    args.plot_diversity_trajectory = 1
-    args.plot_histograms = 0
-    args.plot_posterior = 0
-    args.plot_status_trajectories = 0
-    args.plot_status_piechart = 1
-    args.random_seed = 1234
 
 
 def p_e_year(years,p_e):
@@ -209,7 +188,7 @@ def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 
 def main(args):
     
     # get user input___________________________________________________________
-    random_seed = args.random_seed
+    random_seed = args.seed
     try:
         random_seed = int(random_seed)
         np.random.seed(random_seed)
@@ -467,7 +446,7 @@ def main(args):
         column_names = ['species','simulated_p_e_in_%i_years'%delta_t]
         extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=column_names)        
     extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
-    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.5f')
+    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.8f')
     print('\n')
     #__________________________________________________________________________   
 

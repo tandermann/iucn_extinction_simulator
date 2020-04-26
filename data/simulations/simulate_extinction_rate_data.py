@@ -72,7 +72,7 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
 
 
 # ________________________________Simulating data______________________________
-n_sim = 100000
+n_sim = 100
 run_estimation = False
 
 n_species = 1000
@@ -108,7 +108,7 @@ simulated_delta_upper = simulated[:,3]-simulated_mean
 fig = plt.figure(figsize=[4,4])
 plt.errorbar(true_rates,simulated_mean, yerr=np.array([simulated_delta_lower,simulated_delta_upper]), fmt='.',ecolor='grey',elinewidth=0.1,capsize=0.)
 plt.plot(true_rates,true_rates,'-',color='red',zorder=10)
-plt.axhline(0.00009729,linestyle='--',color='black',alpha=0.5)
+plt.axhline(0.00001,linestyle='--',color='black',alpha=0.5)
 plt.xlim(min(true_rates)-0.4*min(true_rates),max(true_rates)+0.4*max(true_rates))
 plt.ylim(min(true_rates)-0.4*min(true_rates),max(true_rates)+0.4*max(true_rates))
 ax=plt.gca()

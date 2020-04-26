@@ -35,9 +35,9 @@ def add_arguments(parser):
     )
     parser.add_argument(
         '--target_species_list',
-        required=True,
+        default=1,
         metavar='<path>',
-        help="File containing the list of species that you want to simulate future extinctions for. In case you have generation length (GL) data available, provide the file containing the GL data for each species here, since this function will output one central data file for downstream processing that contains the current status information as well as the GL data (if available) for each species. You can provide multiple GL values for each species, e.g. several randomely sampled values from the GL uncertainty interval of a given species. Set this flag to 0 if you already have current IUCN status information compiled for your taxa and want to supress this functionality (may be necessary if you don't have a valid IUCN key). See https://github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/ for examples of the format of GL data input files and the resulting output file.",
+        help="File containing the list of species that you want to simulate future extinctions for. In case you have generation length (GL) data available, provide the file containing the GL data for each species here (including the species names). This function will output one central data file for downstream processing that contains the current status information as well as the GL data (if available) for each species. You can provide multiple GL values for each species, e.g. several randomely sampled values from the GL uncertainty interval of a given species. Set this flag to 0 if you want to supress downloading of current status information, e.g. if you already have current status information for your species (may be necessary if you don't have a valid IUCN key). Set to 1 if you want to use the same taxa that are present in the reference group. See https://github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/ for examples of the format of GL data input files and the format of the output file conataining current status information.",
     )
     parser.add_argument(
         '--outdir',
@@ -49,7 +49,7 @@ def add_arguments(parser):
         '--iucn_key',
         default=0,
         metavar='<IUCN-key>',
-        help="Provide your IUCN API key (see https://apiv3.iucnredlist.org/api/v3/token) for downloading IUCN history of your provided reference group. Not required if using precompiled reference group and a manually compiled current status list (to be used in the 'estimate_rates' function). Also not required if all species in your target_species_list are present in the precompiled reference_group)."
+        help="Provide your IUCN API key (see https://apiv3.iucnredlist.org/api/v3/token) for downloading IUCN history of your provided reference group. Not required if using precompiled reference group and a manually compiled current status list (to be used in the 'transition_rates' function). Also not required if all species in your target_species_list are present in the precompiled reference_group)."
     )
     parser.add_argument(
         '--no_online_sync',
@@ -170,67 +170,76 @@ def main(args):
         # extract most recent valid status for each taxon from reference group
         valid_status_dict_refgroup,most_recent_status_dict_refgroup,status_series_refgroup,taxon_series_refgroup = cust_func.extract_valid_statuses(master_stat_time_df)
 
-        # get list of species we want to simulate
-        species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
-        species_list_data = species_list_data.sort_values(0)
-        species_list_data.index = np.arange(len(species_list_data))
-        species_list = np.unique(species_list_data.iloc[:,0].values.astype(str))
-        species_list = np.array([i.replace('_',' ') for i in species_list])
-        # Check if all species names are binomial
-        for species in species_list:
-            if len(species.split(' ')) != 2:
-                print('ERROR','*'*50,'\nABORTED: All provided species names provided under --target_species_list flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*50)
-                quit()        
-        
+        # see if we want to only stick with the reference taxa
         try:
-            gl_data = species_list_data.iloc[:,1:].values
-        except:
+            species_list_file = int(species_list_file)
             gl_data = []
-        
-        # see which species are not in reference group and hence need current IUCN status extraction
-        remaining_species_wo_iucn_status = sorted(list(set(species_list)-set(taxon_series_refgroup)))
-        
-        fraction_overlap = np.round(1-(len(remaining_species_wo_iucn_status)/len(species_list)),3)        
-        if fraction_overlap <= 0.5:
-            print('\n\n%s'%('#'*50),'\nWarning: Only %.3f of target species found in reference group. Is this intended? You may want to reconsider chosing a reference group encompassing more of your target species.\n\nContinuing with downloading current status information for all remaining species...\n%s\n\n'%(fraction_overlap,'#'*50))
-        else:
-            print('\n\nA fraction of %.3f of the specified target species is present in reference group.\n\n'%fraction_overlap)
+            joined_df = pd.DataFrame([taxon_series_refgroup,status_series_refgroup]).T
+        except:
+            # get list of species we want to simulate
+            species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
+            species_list_data = species_list_data.sort_values(0)
+            species_list_data.index = np.arange(len(species_list_data))
+            species_list = np.unique(species_list_data.iloc[:,0].values.astype(str))
+            species_list = np.array([i.replace('_',' ') for i in species_list])
+            # Check if all species names are binomial
+            for species in species_list:
+                if len(species.split(' ')) != 2:
+                    print('ERROR','*'*50,'\nABORTED: All provided species names provided under --target_species_list flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*50)
+                    quit()        
             
-        tmp_outdir = os.path.join(outdir,'other_files')
-        if not os.path.exists(tmp_outdir):
-            os.makedirs(tmp_outdir)
-        species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
-        np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
-        
-        # extract the current status for those missing species
-        print('Extracting current status for target species...')
-        iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
-        #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-        #with open(iucn_error_file, 'w') as err:
-        if not iucn_key:
-            quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
-        print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
-        run_iucn_cmd = subprocess.Popen(iucn_cmd)
-        run_iucn_cmd.wait()
-        
-        # get the IUCN data and combine with recent status info from refgroup taxa
-        current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
-        current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
-        # print info which species were not found in IUCN
-        current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
-        nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
-        if len(nan_taxa) > 0:
-            print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
-        target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
-        status_series_refgroup = np.array(status_series_refgroup).astype(str)
-        taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
-        status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
-        current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
-        joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
+            try:
+                gl_data = species_list_data.iloc[:,1:].values
+            except:
+                gl_data = []
+            
+            # see which species are not in reference group and hence need current IUCN status extraction
+            remaining_species_wo_iucn_status = sorted(list(set(species_list)-set(taxon_series_refgroup)))
+            
+            fraction_overlap = np.round(1-(len(remaining_species_wo_iucn_status)/len(species_list)),3)        
+            if fraction_overlap <= 0.5:
+                print('\n\n%s'%('#'*50),'\nWarning: Only %.3f of target species found in reference group. Is this intended? You may want to reconsider chosing a reference group encompassing more of your target species.\n\nContinuing with downloading current status information for all remaining species...\n%s\n\n'%(fraction_overlap,'#'*50))
+            else:
+                print('\n\nA fraction of %.3f of the specified target species is present in reference group.\n\n'%fraction_overlap)
+                
+            tmp_outdir = os.path.join(outdir,'other_files')
+            if not os.path.exists(tmp_outdir):
+                os.makedirs(tmp_outdir)
+            species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
+            np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
+            
+            # extract the current status for those missing species
+            print('Extracting current status for target species...')
+            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
+            #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
+            #with open(iucn_error_file, 'w') as err:
+            if not iucn_key:
+                quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
+            print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
+            run_iucn_cmd = subprocess.Popen(iucn_cmd)
+            run_iucn_cmd.wait()
+            
+            # get the IUCN data and combine with recent status info from refgroup taxa
+            current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
+            current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
+            # print info which species were not found in IUCN
+            current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
+            nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
+            if len(nan_taxa) > 0:
+                print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
+            target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
+            status_series_refgroup = np.array(status_series_refgroup).astype(str)
+            taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
+            status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
+            current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
+            joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
+
+        # fix NE taxa and sort
         joined_df = joined_df.replace(np.nan,'NE')        
         joined_df.index = np.arange(len(joined_df))
         if len(gl_data) > 0:
             joined_df = pd.concat([joined_df,pd.DataFrame(np.round(gl_data,3))],axis=1)
+        
         # remove all extinct taxa from future steps
         ext_boolean = joined_df.iloc[:,1]=='EX'
         extinct_taxa = joined_df.iloc[ext_boolean.values,:]

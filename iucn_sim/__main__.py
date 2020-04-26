@@ -19,7 +19,7 @@ __author__ = "Tobias Andermann"
 
 COMMANDS = [
 		'get_iucn_data',
-		'estimate_rates',
+		'transition_rates',
 		'run_sim'
 ]
 

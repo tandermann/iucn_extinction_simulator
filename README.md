@@ -44,15 +44,15 @@ The -h command will show and explain all available flags for each specific `iucn
 
 #### Get IUCN data:
 
-`iucn_sim get_iucn_data --reference_group Mammalia --target_species_list data/precompiled/gl_data/carnivora_gl.txt --outdir data/iucn_sim_output/carnivora/iucn_data --iucn_key <IUCN-key>`
+`iucn_sim get_iucn_data --reference_group aves --reference_rank class --target_species_list data/precompiled/gl_data/aves_gl.txt --outdir data/iucn_sim_output/aves/iucn_data --iucn_key <IUCN-key>`
 
 #### Estimate status transition rates and extinction probabilities for all taxa
 
-`iucn_sim estimate_rates --species_data data/iucn_sim_output/carnivora/iucn_data/species_data.txt --iucn_history data/iucn_sim_output/carnivora/iucn_data/AVES_iucn_history.txt --extinction_probs_mode 0 --possibly_extinct_list data/iucn_sim_output/carnivora/iucn_data/possibly_extinct_reference_taxa.txt --rate_samples 100 --random_seed 1234 --outdir data/iucn_sim_output/carnivora/transition_rates`
+`iucn_sim transition_rates --species_data data/iucn_sim_output/aves/iucn_data/species_data.txt --iucn_history data/iucn_sim_output/aves/iucn_data/AVES_iucn_history.txt --extinction_probs_mode 0 --possibly_extinct_list data/iucn_sim_output/aves/iucn_data/possibly_extinct_reference_taxa.txt --rate_samples 100 --random_seed 1234 --outdir data/iucn_sim_output/aves/transition_rates_0`
 
 #### Run simulations for future
 
-`iucn_sim run_sim --indir data/example_data/carnivora_output/transition_rates/ --outdir data/example_data/carnivora_output/future_simulations/ --n_years 100`
+`iucn_sim run_sim --input_data data/iucn_sim_output/aves/transition_rates_0/simulation_input_data.pkl --outdir data/iucn_sim_output/aves/future_sim_0 --n_years 100 --n_sim 100 --extinction_rates 0`
 
 See below for further explanation of the required input.
 
