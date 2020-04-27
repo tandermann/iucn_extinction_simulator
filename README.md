@@ -1,6 +1,6 @@
 # IUCN Extinction Simulator
 
-A program for estimating extinction probabilities and dates for a given set of species, based on IUCN threat assessments.
+A program for simulating future extinctions and extinction rates for a given set of species, based on IUCN threat assessments.
 
 [![downloads](https://anaconda.org/bioconda/iucn_sim/badges/downloads.svg)](https://anaconda.org/bioconda/iucn_sim)
 [![updated](https://anaconda.org/bioconda/iucn_sim/badges/latest_release_date.svg)](https://anaconda.org/bioconda/iucn_sim)
@@ -10,30 +10,31 @@ A program for estimating extinction probabilities and dates for a given set of s
 
 ## Installation
 
-`iucn_sim` is available as a conda package, which helps installing all required Python and R dependencies, without you having to worry about taking care of this yourself.
+`iucn_sim` is available as a conda package, which helps installing all required Python and R dependencies, without you having to worry about taking care of this manually.
 The conda package manager creates an extremely light-weight virtual environment that enables anybody to run `iucn_sim` on their computer, independently of the operating system and independently of any previous installations of Python and R.
 
 1. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) for your operating system.
 
 2. Once miniconda is installed, open a command line terminal (e.g. `Terminal` on macOS). Windows users will need to open the freshly installed **Anaconda Powershell Prompt** instead of the regular Command Prompt for this purpose.
 
-3. Add the conda-forge and bioconda channels to conda, where some of the needed packages are hosted:
+3. Add the conda-forge and bioconda channels to conda, where some of the required packages are hosted:
 	- `conda config --add channels conda-forge`
 	- `conda config --add channels bioconda`
 
-4. Install `iucn_sim` and all it's dependencies by typing the following into the command line, but see the tip below before you do so!
+4. Install `iucn_sim` and all it's dependencies by typing the following into the command line, **but see the tip below before you do so!**
 	- `conda install iucn_sim`
 
-	> Tip: It is recommendable to create your own environment for `iucn_sim`. This will ensure that downloading the required R or Python version for `iucn_sim` will not affect any existing setup on your computer. In order to install `iucn_sim` into a new environment, simply type `conda create -n iucn_sim_env iucn_sim`.
-	Now, everytime you want to use the software, you first need to connect to the environment you just created, by typing `conda activate iucn_sim_env`. Now you can use `iucn_sim`, while connected to your specially created environment. Disconnect from the environment by typing `conda deactivate` while connected.
+	> Tip: Installing iucn_sim with the command above is the simplest solution. However, to be safe that you don't change the standard path on your computer to a different R or Python version than what you have been previously using, it is recommendable to create your own environment for `iucn_sim`. This is not any more complicated, except that everytime before you use iucn_sim, you will need to connect to the created environment (just a single command, see below).
+	> - In order to install `iucn_sim` into a new environment, simply type `conda create -n iucn_sim_env iucn_sim`.
+	> - Now, everytime you want to use `iucn_sim`, type `conda activate iucn_sim_env` to connect to the environment (in some cases this command doesn't work, but you need to type `source activate iucn_sim_env` instead). Once connected to the virtual environment you can repeatedly use `iucn_sim`. When you are done and want to disconnect from the environment, type `conda deactivate`.
 
-5. Test if installation worked by typing `iucn_sim -h`. This should show an overview of the available arguments of `iucn_sim`.
+5. Test if installation worked by typing `iucn_sim -h` (if you created a virtual environment, you need to be connected to it for any `iucn_sim` command to work). This should show an overview of the available arguments of `iucn_sim`.
 
-6. If step 4 caused an error something went wrong along the way. If you are a Linux or Mac user, you can instead install `iucn_sim` by [downloading this GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip) and building the software by typing `python setup.py install`. You will need to make sure yourself that Python3 and R are installed, including the R package `rredlist`.
+6. If step 4 caused an error something went wrong along the way. If you are a Linux or Mac user, you can instead install `iucn_sim` by [downloading this GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip) and building the software by typing `python setup.py install`. You will need to make sure yourself that Python3 and R are installed, including the R package `rredlist` and several Python packages, which can be installed with `pip install NAME_OF_PACHAGE` (the program will tell you which packages need to be installed).
 
 ## Running `iucn_sim`
 
-Once installed, `iucn_sim` will be installed in your standard path, so you can simply type `iucn_sim` in your command line (use **Anaconda Powershell Prompt** if you are a Windows user) to call the program.
+Once installed, `iucn_sim` will be installed in your standard path, so you can simply type `iucn_sim` in your command line (use **Anaconda Powershell Prompt** if you are a Windows user) to call the program. (Again: If you installed `iucn_sim` in a separate environment, first connect to the environment by typing `conda activate iucn_sim_env` to be able to use `iucn_sim`).
 
 - `iucn_sim -h` --> Open help page showing available functions
 
@@ -42,7 +43,13 @@ Once installed, `iucn_sim` will be installed in your standard path, so you can s
 The -h command will show and explain all available flags for each specific `iucn_sim` function. An example command could look like this:
 
 
+## Quick tutorial
+
+In the following tutorial we will predict future extinctions and extinction rates for all species of the order Carnivora. We will use the use
+
 #### Get IUCN data:
+
+`iucn_sim get_iucn_data --reference_group mammalia --target_species_list data/precompiled/gl_data/carnivora_gl.txt --outdir data/iucn_sim_output/carnivora/iucn_data/`
 
 `iucn_sim get_iucn_data --reference_group aves --reference_rank class --target_species_list data/precompiled/gl_data/aves_gl.txt --outdir data/iucn_sim_output/aves/iucn_data --iucn_key <IUCN-key>`
 

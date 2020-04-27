@@ -178,6 +178,7 @@ def main(args):
         except:
             # get list of species we want to simulate
             species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
+            species_list_data = species_list_data.drop_duplicates(0)
             species_list_data = species_list_data.sort_values(0)
             species_list_data.index = np.arange(len(species_list_data))
             species_list = np.unique(species_list_data.iloc[:,0].values.astype(str))
@@ -205,34 +206,47 @@ def main(args):
             tmp_outdir = os.path.join(outdir,'other_files')
             if not os.path.exists(tmp_outdir):
                 os.makedirs(tmp_outdir)
-            species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
-            np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
+
             
-            # extract the current status for those missing species
-            print('Extracting current status for target species...')
-            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
-            #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-            #with open(iucn_error_file, 'w') as err:
-            if not iucn_key:
-                quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
-            print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
-            run_iucn_cmd = subprocess.Popen(iucn_cmd)
-            run_iucn_cmd.wait()
+            if len(remaining_species_wo_iucn_status) > 0:
+                
+                # write the missinjg taxa to file for the r-script
+                species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
+                np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
+
+                # extract the current status for those missing species
+                print('Extracting current status for target species...')
+                iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
+                #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
+                #with open(iucn_error_file, 'w') as err:
+                if not iucn_key:
+                    quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
+                print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
+
+                run_iucn_cmd = subprocess.Popen(iucn_cmd)
+                run_iucn_cmd.wait()
             
-            # get the IUCN data and combine with recent status info from refgroup taxa
-            current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
-            current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
-            # print info which species were not found in IUCN
-            current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
-            nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
-            if len(nan_taxa) > 0:
-                print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
-            target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
-            status_series_refgroup = np.array(status_series_refgroup).astype(str)
-            taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
-            status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
-            current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
-            joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
+                # get the IUCN data and combine with recent status info from refgroup taxa
+                current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
+                current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
+                # print info which species were not found in IUCN
+                current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
+                nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
+                if len(nan_taxa) > 0:
+                    print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
+                target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
+                status_series_refgroup = np.array(status_series_refgroup).astype(str)
+                taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
+                status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
+                current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
+                joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
+            else:
+                target_reference_taxa = list(species_list)
+                status_series_refgroup = np.array(status_series_refgroup).astype(str)
+                taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
+                status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
+                joined_df = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
+
 
         # fix NE taxa and sort
         joined_df = joined_df.replace(np.nan,'NE')        

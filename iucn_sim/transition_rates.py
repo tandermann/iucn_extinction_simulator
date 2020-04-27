@@ -98,20 +98,6 @@ def add_arguments(parser):
         help="Set random seed for the MCMC."
     )
 
-
-    import argparse
-    p = argparse.ArgumentParser()
-    args = p.parse_args()    
-    args.species_data = '/Users/tobias/Desktop/test_carnivora/iucn_data/species_data.txt'
-    args.iucn_history = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/iucn_data/AVES_iucn_history.txt'
-    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/transition_rates'
-    args.extinction_probs_mode = 0
-    args.possibly_extinct_list = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/iucn_data/possibly_extinct_reference_taxa.txt'
-    args.rate_samples = 100
-    args.n_gen = 100000
-    args.burnin = 1000
-    args.seed = 1234
-
 def main(args):
     # get user input___________________________________________________________
     input_data = args.species_data
