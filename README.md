@@ -116,7 +116,7 @@ These are your options without an IUCN API key: You can e.g. run the tutorial ab
 
 ## References
 
-**Andermann et al. 2020**. iucn_sim - Improved Predictions of Future Extinctions Using IUCN Status Assessments. - biorxiv, doi: 10.1101/2019.12.16.878249.
+**Andermann et al. 2020**. iucn_sim - Improved Predictions of Future Extinctions Using IUCN Status Assessments. - biorxiv, doi: [10.1101/2019.12.16.878249](https://doi.org/10.1101/2019.12.16.878249).
 
 **Mooers, A. Ø. et al. 2008**. Converting endangered species categories to probabilities of extinction for phylogenetic conservation prioritization. - PLoS ONE 3: 1–5, doi: 10.1371/journal.pone.0003700.
 
