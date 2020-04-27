@@ -1,4 +1,4 @@
-<img src="https://github.com/dsilvestro/PyRate/blob/master/pyrate_lib/PyRate_logo1024.png" align="left" width="80">
+<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/logo.png" align="left" width="80">
 
 # IUCN Extinction Simulator
 
