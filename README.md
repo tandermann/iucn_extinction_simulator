@@ -1,3 +1,5 @@
+<img src="https://github.com/dsilvestro/PyRate/blob/master/pyrate_lib/PyRate_logo1024.png" align="left" width="80">
+
 # IUCN Extinction Simulator
 
 A program for simulating future extinctions and extinction rates for a given set of species, based on IUCN threat assessments.
@@ -99,6 +101,8 @@ Now we want to estimate the rates of how often any type of status change occurs 
 ### Simulate future extinctions and estimate species-specific extinction rates
 
 In this final step of `iucn_sim` we simulate future status changes and extinctions for the species in our target species list (all Carnivora in this case) over a specified time frame. From the simulated extinciton dates of individual species over several simulation replicates, `iucn_sim` estimates the extinction rates of each species. These rate estimates inherently contain the probabilities of a given species to change conservation status, as well as the GL data for this species (in case of EX mode 0). A minimum of 10,000 simulation replicates is recommended for accurate extinction rate estimates from the simulated data.
+
+You can turn off the rather time intensive estimation of species-specific extinction rates by setting `--extinction_rates 0`, in case you are only interested in the projected diversity. Otherwise turn it on by using `--extinction_rates 1` (default).
 
 ```
 iucn_sim run_sim --input_data data/iucn_sim_output/carnivora/transition_rates_1/simulation_input_data.pkl --outdir data/iucn_sim_output/carnivora/future_sim_1 --n_years 100 --n_sim 10000 --extinction_rates 1
