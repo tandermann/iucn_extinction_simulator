@@ -36,16 +36,24 @@ The conda package manager creates an extremely light-weight virtual environment 
 
 ## Running `iucn_sim`
 
-Once installed, `iucn_sim` will be installed in your standard path, so you can simply type `iucn_sim` in your command line (use **Anaconda Powershell Prompt** if you are a Windows user) to call the program. (Again: If you installed `iucn_sim` in a separate environment, first connect to the environment by typing `conda activate iucn_sim_env` to be able to use `iucn_sim`).
+Once set up, `iucn_sim` will be installed in your standard path, so you can simply type `iucn_sim` in your command line (use **Anaconda Powershell Prompt** if you are a Windows user) to call the program. (Again: If you installed `iucn_sim` in a separate environment, first connect to the environment by typing `conda activate iucn_sim_env` to be able to use `iucn_sim`).
 
 - `iucn_sim -h` --> Open help page showing available functions
 
 - `iucn_sim get_iucn_data -h` --> Open help page for specific function
 
-The -h command will show and explain all available flags for each specific `iucn_sim` function. An example command could look like this:
+The -h command will show and explain all available flags for each specific `iucn_sim` function.
 
 
-## Quick tutorial
+<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/workflow.png" align="left" width="400">
+
+## Workflow
+
+Here is a graphic overview of the basic workflow of `iucn_sim`. See the tutorial below for how to apply the main available functionalities.
+
+
+
+## `iucn_sim` tutorial
 
 To fully understand the methodology behind `iucn_sim` we recommend you to have a look at the published `iucn_sim` manuscript at [https://doi.org/10.1101/2019.12.16.878249](https://doi.org/10.1101/2019.12.16.878249) (Andermann et al., 2020).
 
