@@ -45,7 +45,7 @@ Once set up, `iucn_sim` will be installed in your standard path, so you can simp
 The -h command will show and explain all available flags for each specific `iucn_sim` function.
 
 
-<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/workflow.png" align="left" width="400">
+<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/workflow.png" align="right" width="600">
 
 ## Workflow
 
