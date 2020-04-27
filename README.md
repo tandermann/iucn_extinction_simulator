@@ -21,10 +21,10 @@ The conda package manager creates an extremely light-weight virtual environment 
 	- `conda config --add channels conda-forge`
 	- `conda config --add channels bioconda`
 
-4. Install `iucn_sim` and all it's dependencies by typing the following into the command line, **but see the tip below before you do so!**
+4. Install `iucn_sim` and all it's dependencies by typing the following into the command line, **but see the recommendation below before you do so!**
 	- `conda install iucn_sim`
 
-	> Tip: Installing iucn_sim with the command above is the simplest solution. However, to be safe that you don't change the standard path on your computer to a different R or Python version than what you have been previously using, it is recommendable to create your own environment for `iucn_sim`. This is not any more complicated, except that everytime before you use iucn_sim, you will need to connect to the created environment (just a single command, see below).
+	> Recommendation: Installing iucn_sim with the command above is the simplest solution. However, to be safe that you don't change the standard path on your computer to a different R or Python version than what you have been previously using, it is recommendable to create your own environment for `iucn_sim`. This is not any more complicated, except that everytime before you use iucn_sim, you will need to connect to the created environment (just a single command, see below).
 	> - In order to install `iucn_sim` into a new environment, simply type `conda create -n iucn_sim_env iucn_sim`.
 	> - Now, everytime you want to use `iucn_sim`, type `conda activate iucn_sim_env` to connect to the environment (in some cases this command doesn't work, but you need to type `source activate iucn_sim_env` instead). Once connected to the virtual environment you can repeatedly use `iucn_sim`. When you are done and want to disconnect from the environment, type `conda deactivate`.
 
@@ -58,6 +58,8 @@ This file contains a list of all Carnivora species (IUCN 2019-v2), including 100
 ### Get IUCN data:
 
 The first step is downloading available IUCN data, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group.
+
+(**Remember to activate your `iucn_sim` environment first**, in case you installed it in its own environment: `conda activate iucn_sim_env`)
 
 ```
 iucn_sim get_iucn_data \
