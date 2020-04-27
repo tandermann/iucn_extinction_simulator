@@ -33,7 +33,7 @@ The conda package manager creates an extremely light-weight virtual environment 
 	Once connected to the virtual environment you can use all functionalities of `iucn_sim`. When you are done and want to disconnect from the environment, type:
 	- `conda deactivate`
 
-	**The easy way**: If you are not worried about the standard path of any existing R or Python versions on your computer because you generally don't really use the command line much, you can skip the whole virtual environment stuff and simply install `iucn_sim` with: `conda install iucn_sim`. That's all, the software and all dependencies will be installed and there is no need to connecting to any environment before using `iucn_sim`.
+	**The easy way**: If you are not worried about the standard path of any existing R or Python versions on your computer because you generally don't really use the command line much, you can skip the whole virtual environment stuff and simply install the software with: `conda install iucn_sim`. That's all, the software and all dependencies will be installed and there is no need to connecting to any environment before using `iucn_sim`.
 
 5. Test if installation worked by typing `iucn_sim -h` (if you created a virtual environment, you need to be connected to it for any `iucn_sim` command to work). This should show an overview of the available arguments of `iucn_sim`.
 
