@@ -107,9 +107,21 @@ In this final step of `iucn_sim` we simulate future status changes and extinctio
 
 You can turn off the rather time intensive estimation of species-specific extinction rates by setting `--extinction_rates 0`, in case you are only interested in the projected diversity. Otherwise turn it on by using `--extinction_rates 1` (default).
 
+Let's run the simulations now using the EX mode 0 scenario:
+
+```
+iucn_sim run_sim --input_data data/iucn_sim_output/carnivora/transition_rates_0/simulation_input_data.pkl --outdir data/iucn_sim_output/carnivora/future_sim_0 --n_years 100 --n_sim 10000 --extinction_rates 1
+```
+
+Also run the simulations for the EX mode 1 scenario:
+
 ```
 iucn_sim run_sim --input_data data/iucn_sim_output/carnivora/transition_rates_1/simulation_input_data.pkl --outdir data/iucn_sim_output/carnivora/future_sim_1 --n_years 100 --n_sim 10000 --extinction_rates 1
 ```
+
+Compare the output fo the two different simulation scenarios. The pie plots (`status_pie_chart.pdf`) can give you a good overview of the predicted status distribution in 100 years and the number of expected extinctions. Further you can have a look at the status trajectories through time (`future_status_trajectory.pdf`). What difference do you see between the two scenarios?
+
+The species specific extinction rates are stored in the `extinction_prob_all_species.txt` files.
 
 ## Apply for IUCN API token
 

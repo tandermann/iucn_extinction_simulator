@@ -188,13 +188,16 @@ def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 
 def main(args):
     
     # get user input___________________________________________________________
-    random_seed = args.seed
+    seed = args.seed
     try:
-        random_seed = int(random_seed)
-        np.random.seed(random_seed)
-        print('Simulating with starting seed %i.'%random_seed)
+        random_seed = int(seed)
+        print('Simulating with user-set starting seed %i.'%random_seed)
+
     except:
-        print('Simulating without starting seed.')
+        random_seed = np.random.randint(999999999)
+        print('Simulating with randomely geenrated starting seed %i.'%random_seed)
+    np.random.seed(random_seed)
+    
     infile = args.input_data
     outdir = args.outdir
     n_years = int(args.n_years)
@@ -213,6 +216,7 @@ def main(args):
     plot_status_piechart = int(args.plot_status_piechart)
     if not os.path.exists(outdir):
         os.makedirs(outdir)
+    np.savetxt(os.path.join(outdir,'starting_seed.txt'),np.array([random_seed]),fmt='%i')
         
     input_data = cust_func.load_obj(infile)
     species_input_data, dd_probs = input_data

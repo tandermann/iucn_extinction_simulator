@@ -112,12 +112,16 @@ def main(args):
     n_rep = int(args.rate_samples)
     n_gen = int(args.n_gen)
     burnin = int(args.burnin)
-    random_seed = args.seed
+    seed = args.seed
     try:
-        random_seed = int(random_seed)
-        np.random.seed(random_seed)
+        random_seed = False
+        seed = int(seed)
+
     except:
-        random_seed = None
+        seed = np.random.randint(999999999)
+        random_seed = True
+    np.random.seed(seed)
+    np.savetxt(os.path.join(outdir,'starting_seed.txt'),np.array([seed]),fmt='%i')
         
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -237,10 +241,10 @@ def main(args):
     status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
     print('Counted the following transition occurrences in IUCN history of reference group:')
     print(status_change_coutn_df)
-    if random_seed:
-        print('Running MCMC with starting seed %i ...'%random_seed)
+    if not random_seed:
+        print('Running MCMC with user-set starting seed %i ...'%seed)
     else:
-        print('Running MCMC without starting seed ...')    
+        print('Running MCMC with randomely generated starting seed %i ...'%seed)    
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)])
     for status_a in status_change_coutn_df.columns:
         row = status_change_coutn_df.loc[status_a]
