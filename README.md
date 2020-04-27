@@ -22,7 +22,7 @@ The conda package manager creates an extremely light-weight virtual environment 
 	- `conda config --add channels conda-forge`
 	- `conda config --add channels bioconda`
 
-4. Install `iucn_sim` and all it's dependencies into a separate enviornment by typing the following into the command line (but see **The easy way** below):
+4. Install `iucn_sim` and all it's dependencies into a separate environment by typing the following into the command line (but see **The easy way** below):
 	- `conda create -n iucn_sim_env iucn_sim`
 	
 	This command creates a very light weight virtual environment for `iucn_sim`, containing all software dependencies. This makes sure that any existing Python or R version on your computer does not get overwritten or the standard-path changed.
@@ -33,7 +33,7 @@ The conda package manager creates an extremely light-weight virtual environment 
 	Once connected to the virtual environment you can use all functionalities of `iucn_sim`. When you are done and want to disconnect from the environment, type:
 	- `conda deactivate`.
 
-	> **The easy way**: If you are not worried about any existing R or Python versions on your computer and generally don't really use the command line much anyways, you can skip the whole virtual environment stuff and simply install `iucn_sim` with: `conda install iucn_sim`. The softwar and all dependencies will be installed and there is no need to connecting to any environment before using `iucn_sim`.
+	**The easy way**: If you are not worried about any existing R or Python versions on your computer and generally don't really use the command line much anyways, you can skip the whole virtual environment stuff and simply install `iucn_sim` with: `conda install iucn_sim`. The softwar and all dependencies will be installed and there is no need to connecting to any environment before using `iucn_sim`.
 
 5. Test if installation worked by typing `iucn_sim -h` (if you created a virtual environment, you need to be connected to it for any `iucn_sim` command to work). This should show an overview of the available arguments of `iucn_sim`.
 
