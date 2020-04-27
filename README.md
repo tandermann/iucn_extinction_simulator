@@ -1,6 +1,6 @@
 <img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/logo.png" align="left" width="80">
 
-# IUCN Extinction Simulator
+# IUCN Extinction Simulator - `iucn_sim`
 
 A program for simulating future extinctions and extinction rates for a given set of species, based on IUCN threat assessments.
 
