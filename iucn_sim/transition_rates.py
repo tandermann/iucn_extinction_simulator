@@ -99,6 +99,19 @@ def add_arguments(parser):
     )
 
 
+    import argparse
+    p = argparse.ArgumentParser()
+    args = p.parse_args()    
+    args.species_data = '/Users/tobias/Desktop/test_carnivora/iucn_data/species_data.txt'
+    args.iucn_history = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/iucn_data/AVES_iucn_history.txt'
+    args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/transition_rates'
+    args.extinction_probs_mode = 0
+    args.possibly_extinct_list = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/iucn_data/possibly_extinct_reference_taxa.txt'
+    args.rate_samples = 100
+    args.n_gen = 100000
+    args.burnin = 1000
+    args.seed = 1234
+
 def main(args):
     # get user input___________________________________________________________
     input_data = args.species_data
@@ -117,15 +130,14 @@ def main(args):
     try:
         random_seed = int(random_seed)
         np.random.seed(random_seed)
-        print('Running MCMC with starting seed %i.'%random_seed)
     except:
-        print('Running MCMC without starting seed.')
+        random_seed = None
         
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
     # get input data
-    species_data_input = pd.read_csv(input_data,sep='\t',header=None)
+    species_data_input = pd.read_csv(input_data,sep='\t',header=None).dropna()
     # get the list of species
     species_list = species_data_input.iloc[:,0].values.astype(str)
     # replace underscores in species name in case they are present
@@ -239,7 +251,10 @@ def main(args):
     status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
     print('Counted the following transition occurrences in IUCN history of reference group:')
     print(status_change_coutn_df)
-    print('\nRunning MCMC...')
+    if random_seed:
+        print('Running MCMC with starting seed %i ...'%random_seed)
+    else:
+        print('Running MCMC without starting seed ...')    
     sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)])
     for status_a in status_change_coutn_df.columns:
         row = status_change_coutn_df.loc[status_a]
