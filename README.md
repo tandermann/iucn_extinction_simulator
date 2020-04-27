@@ -45,6 +45,8 @@ The -h command will show and explain all available flags for each specific `iucn
 
 ## Quick tutorial
 
+To fully understand the methodology behind `iucn_sim` we recommend you to have a look at the published `iucn_sim` manuscript at [https://doi.org/10.1101/2019.12.16.878249](https://doi.org/10.1101/2019.12.16.878249) (Andermann et al., 2020).
+
 In the following tutorial we will predict future extinctions and extinction rates for all species of the order Carnivora (**target species list**). We will use the the whole class Mammalia as **reference group**. In `iucn_sim` the target species list contains a list of species names for which you want to simulate future extinctions. The reference group on the other hand is a group of species which are being used to estimate **status transition rates** (i.e. the rates of how often species change from one IUCN status to another) based on the IUCN history of the group. This reference group should be sufficiently large (>1,000 species) to increase the accuracy of the estimated transition rates.
 
 This tutorial uses pre-compiled IUCN data, without requiring an IUCN API key. If you plan on running `iucn_sim` on your own target species list and reference group, you will first need to apply for an IUCN key (see information below). However, `iucn_sim` has access to a range of pre-compiled reference groups, which enable processing without requiring an IUCN API key (see overview of precompiled groups [here](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history), but no need to download these).
@@ -59,7 +61,7 @@ This file contains a list of all Carnivora species (IUCN 2019-v2), including 100
 
 The first step is downloading available IUCN data, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group.
 
-(**Remember to activate your `iucn_sim` environment first**, in case you installed it in its own environment: `conda activate iucn_sim_env`)
+(**Remember to activate your `iucn_sim` environment first**, in case you installed it in its own environment: `conda activate iucn_sim_env` or `source activate iucn_sim_env`)
 
 ```
 iucn_sim get_iucn_data \
@@ -113,6 +115,9 @@ These are your options without an IUCN API key: You can e.g. run the tutorial ab
 
 
 ## References
-Mooers, A. Ø. et al. 2008. Converting endangered species categories to probabilities of extinction for phylogenetic conservation prioritization. - PLoS ONE 3: 1–5.
 
-Monroe, M. J. et al. 2019. The dynamics underlying avian extinction trajectories forecast a wave of extinctions. - Biology Letters 15: 20190633.
+**Andermann et al. 2020**. iucn_sim - Improved Predictions of Future Extinctions Using IUCN Status Assessments. - biorxiv, doi: 10.1101/2019.12.16.878249.
+
+**Mooers, A. Ø. et al. 2008**. Converting endangered species categories to probabilities of extinction for phylogenetic conservation prioritization. - PLoS ONE 3: 1–5, doi: 10.1371/journal.pone.0003700.
+
+**Monroe, M. J. et al. 2019**. The dynamics underlying avian extinction trajectories forecast a wave of extinctions. - Biology Letters 15: 20190633, doi: 10.1098/rsbl.2019.0633.
