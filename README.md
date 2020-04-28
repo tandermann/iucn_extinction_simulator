@@ -130,7 +130,7 @@ The species specific extinction rates are stored in the `extinction_prob_all_spe
 
 ## Apply for IUCN API token
 
-To use the full functionality of `iucn_sim` you will have to apply for an [IUCN API token](https://apiv3.iucnredlist.org/api/v3/token). This key is necessary to download data from IUCN, which is done internally in `iucn_sim`. It is easy o apply for an API key, just [follow this link](https://apiv3.iucnredlist.org/api/v3/token), it will then take up to a couple of days before you receive your API key. Once you have received your IUCN token, provide it when using the `get_rates` function with the `--iucn_key` flag.
+To use the full functionality of `iucn_sim` you will have to apply for an [IUCN API token](https://apiv3.iucnredlist.org/api/v3/token). This key is necessary to download data from IUCN, which is done internally in `iucn_sim`. It is easy o apply for an API key, just [follow this link](https://apiv3.iucnredlist.org/api/v3/token), it will then take up to a couple of days before you receive your API key. Once you have received your IUCN token, provide it when using the `get_iucn_data` function with the `--iucn_key` flag.
 
 ## Options without IUCN API token
 If for some reason you have problems obtaining an IUCN API key or don't want to wait until receiving it, there are several **options of avoiding IUCN API key usage**. However, the available taxon options are limited and we strongly recommend to apply for your own API key.
