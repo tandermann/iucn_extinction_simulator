@@ -14,7 +14,7 @@ A program for simulating future extinctions and extinction rates for a given set
 `iucn_sim` is available as a conda package, which helps installing all required Python and R dependencies, without you having to worry about taking care of this manually.
 The conda package manager creates an extremely light-weight virtual environment that enables anybody to run `iucn_sim` on their computer, independently of the operating system and independently of any previous installations of Python and R.
 
-1. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) for your operating system.
+1. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) for your operating system. If you already have `conda` installed on your computer, make sure to update it to the most recent version by running: `conda update -n base conda` in your command line.
 
 2. Once miniconda is installed, open a command line terminal (e.g. `Terminal` on macOS). Windows users will need to open the freshly installed **Anaconda Powershell Prompt** instead of the regular Command Prompt for this purpose.
 
@@ -35,7 +35,7 @@ The conda package manager creates an extremely light-weight virtual environment 
 
 	**The easy way**: If you are not worried about the standard path of any existing R or Python versions on your computer because you generally don't really use the command line much, you can skip the whole virtual environment stuff and simply install the software with: `conda install iucn_sim`. That's all, the software and all dependencies will be installed and there is no need to connecting to any environment before using `iucn_sim`.
 
-5. Test if installation worked by typing `iucn_sim -h` (if you created a virtual environment, you need to be connected to it for any `iucn_sim` command to work). This should show an overview of the available arguments of `iucn_sim`.
+5. Test if installation worked by typing `iucn_sim --version`, which should show a verison number >= 2.0 (if you created a virtual environment, you need to be connected to it for any `iucn_sim` command to work).
 
 6. If step 4 caused an error something went wrong along the way. If you are a Linux or Mac user, you can instead install `iucn_sim` by [downloading this GitHub repo](https://github.com/tobiashofmann88/iucn_extinction_simulator/archive/master.zip) and building the software by typing `python setup.py install`. You will need to make sure yourself that Python3 and R are installed, including the R package `rredlist` and several Python packages, which can be installed with `pip install NAME_OF_PACHAGE` (the program will tell you which packages need to be installed).
 
@@ -63,7 +63,7 @@ This tutorial uses pre-compiled IUCN data, without requiring an IUCN API key. If
 
 ### Required input data:
 
-The only file you need for running this tutorial is the [carnivora_gl.txt](https://drive.google.com/open?id=1lzsv6mo2Mif5iyLvxaXc5k0O9hImIGnh) file (click on file link to download). You can find other example input files in the `data/precompiled/gl_data` folder in this GitHub repo, which you can download by first 1) opening them on GitHub, 2) clicking on the 'Raw' button in the top right corner of the displayed file content, and 3) copying the whole content to your text-editor. Alternatively if you have `wget` installed, you can download e.g. the `carnivora_gl.txt` file by typing `wget https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/data/precompiled/gl_data/carnivora_gl.txt`.
+The only file you need for running this tutorial is the [carnivora_gl.txt](https://drive.google.com/open?id=1lzsv6mo2Mif5iyLvxaXc5k0O9hImIGnh) file (click on file link to download). You can find other example input files in the `data/precompiled/gl_data` folder in this GitHub repo, which you can download by first 1) opening them on GitHub, 2) clicking on the 'Raw' button in the top right corner of the displayed file content, and 3) copying the whole content to your text-editor. Alternatively if you have `wget` installed, you can download e.g. the `carnivora_gl.txt` file by typing `wget https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/gl_data/carnivora_gl.txt`.
 
 This `carnivora_gl.txt` file contains a list of all Carnivora species (IUCN 2019-v2), including 100 generation length (GL) estimates for each species (scaled in years). The purpose of having 100 estimates per species is to include the uncertainty of the GL value for those species where missing GL data was modeled based on phylogenetic imputation.
 
