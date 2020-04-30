@@ -63,9 +63,9 @@ This tutorial uses pre-compiled IUCN data, without requiring an IUCN API key. If
 
 ### Required input data:
 
-The only file you need for running this tutorial is the [carnivora_gl.txt](https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/data/precompiled/gl_data/carnivora_gl.txt) file stored in the `data/precompiled/gl_data` folder in this GitHub repo. You can download it by clicking on the file-link and copying the content to your text-editor or by executing `wget https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/data/precompiled/gl_data/carnivora_gl.txt` in your command line, in case you have `wget` installed.
+The only file you need for running this tutorial is the [carnivora_gl.txt](https://drive.google.com/open?id=1lzsv6mo2Mif5iyLvxaXc5k0O9hImIGnh) file (click on file link to download). You can find other example input files in the `data/precompiled/gl_data` folder in this GitHub repo, which you can download by first 1) opening them on GitHub, 2) clicking on the 'Raw' button in the top right corner of the displayed file content, and 3) copying the whole content to your text-editor. Alternatively if you have `wget` installed, you can download e.g. the `carnivora_gl.txt` file by typing `wget https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/data/precompiled/gl_data/carnivora_gl.txt`.
 
-This file contains a list of all Carnivora species (IUCN 2019-v2), including 100 generation length (GL) estimates for each species (scaled in years). The purpose of having 100 estimates per species is to include the uncertainty of the GL value for those species where missing GL data was modeled based on phylogenetic imputation.
+This `carnivora_gl.txt` file contains a list of all Carnivora species (IUCN 2019-v2), including 100 generation length (GL) estimates for each species (scaled in years). The purpose of having 100 estimates per species is to include the uncertainty of the GL value for those species where missing GL data was modeled based on phylogenetic imputation.
 
 ### Get IUCN data:
 
@@ -115,13 +115,23 @@ You can turn off the rather time intensive estimation of species-specific extinc
 Let's run the simulations now using the EX mode 0 scenario:
 
 ```
-iucn_sim run_sim --input_data data/iucn_sim_output/carnivora/transition_rates_0/simulation_input_data.pkl --outdir data/iucn_sim_output/carnivora/future_sim_0 --n_years 100 --n_sim 10000 --extinction_rates 1
+iucn_sim run_sim \
+  --input_data data/iucn_sim_output/carnivora/transition_rates_0/simulation_input_data.pkl \
+  --outdir data/iucn_sim_output/carnivora/future_sim_0 \
+  --n_years 100 \
+  --n_sim 10000 \
+  --extinction_rates 1
 ```
 
 Also run the simulations for the EX mode 1 scenario:
 
 ```
-iucn_sim run_sim --input_data data/iucn_sim_output/carnivora/transition_rates_1/simulation_input_data.pkl --outdir data/iucn_sim_output/carnivora/future_sim_1 --n_years 100 --n_sim 10000 --extinction_rates 1
+iucn_sim run_sim \
+  --input_data data/iucn_sim_output/carnivora/transition_rates_1/simulation_input_data.pkl \
+  --outdir data/iucn_sim_output/carnivora/future_sim_1 \
+  --n_years 100 \
+  --n_sim 10000 \
+  --extinction_rates 1
 ```
 
 Compare the output fo the two different simulation scenarios. The pie plots (`status_pie_chart.pdf`) can give you a good overview of the predicted status distribution in 100 years and the number of expected extinctions. Further you can have a look at the status trajectories through time (`future_status_trajectory.pdf`). What difference do you see between the two scenarios?
