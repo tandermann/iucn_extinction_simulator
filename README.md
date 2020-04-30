@@ -67,16 +67,20 @@ The only file you need for running this tutorial is the [carnivora_gl.txt](https
 
 This `carnivora_gl.txt` file contains a list of all Carnivora species (IUCN 2019-v2), including 100 generation length (GL) estimates for each species (scaled in years). The purpose of having 100 estimates per species is to include the uncertainty of the GL value for those species where missing GL data was modeled based on phylogenetic imputation.
 
+I recommend you create a folder on your Desktop and **enter that folder via the command line**, by typing `cd /PATH/TO/MY/DESKTOP/FOLDER` (replace `/PATH/TO/MY/DESKTOP/FOLDER` with the path to the folder you created on your Desktop). Store the downloaded `carnivora_gl.txt` file in this folder. now you are ready to start the tutorial.
+
 ### Get IUCN data:
 
-The first step is downloading available IUCN data, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group.
+All following commands in this tutorial assume that you are running them from the folder where you stored your `carnivora_gl.txt` input file. For this purpose make sure you first navigate to that folder with your command line by typing `cd /PATH/TO/MY/DESKTOP/FOLDER` (but replace `/PATH/TO/MY/DESKTOP/FOLDER` with real path, see above).
+
+The first step is downloading all available IUCN data with `iucn_sim`, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group.
 
 (**Remember to activate your `iucn_sim` environment first**, in case you installed it in its own environment: `conda activate iucn_sim_env` or `source activate iucn_sim_env`)
 
 ```
 iucn_sim get_iucn_data \
 	--reference_group mammalia \
-	--target_species_list data/precompiled/gl_data/carnivora_gl.txt \
+	--target_species_list ./carnivora_gl.txt \
 	--outdir data/iucn_sim_output/carnivora/iucn_data/
 ```
 
