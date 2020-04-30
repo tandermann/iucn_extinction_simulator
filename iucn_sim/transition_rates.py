@@ -106,25 +106,27 @@ def main(args):
     try:
         extinction_probs_mode = int(args.extinction_probs_mode)
     except:
-        print('Invlaid extinction_probs_mode provided. Please choose between the currenlty available options 0 or 1')
+        print('Invalid extinction_probs_mode provided. Please choose between the currenlty available options 0 or 1')
         quit()
     possibly_extinct_list = args.possibly_extinct_list
     n_rep = int(args.rate_samples)
     n_gen = int(args.n_gen)
     burnin = int(args.burnin)
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
     seed = args.seed
     try:
         random_seed = False
         seed = int(seed)
-
     except:
         seed = np.random.randint(999999999)
         random_seed = True
     np.random.seed(seed)
     np.savetxt(os.path.join(outdir,'starting_seed.txt'),np.array([seed]),fmt='%i')
         
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
+
 
     # get input data
     species_data_input = pd.read_csv(input_data,sep='\t',header=None).dropna()
