@@ -8,6 +8,7 @@ A program for simulating future extinctions and extinction rates for a given set
 [![updated](https://anaconda.org/bioconda/iucn_sim/badges/latest_release_date.svg)](https://anaconda.org/bioconda/iucn_sim)
 [![conda](https://anaconda.org/bioconda/iucn_sim/badges/installer/conda.svg)](https://anaconda.org/bioconda/iucn_sim)
 [![conda](https://anaconda.org/bioconda/iucn_sim/badges/license.svg)](https://anaconda.org/bioconda/iucn_sim)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/iucn_sim/badges/version.svg)](https://anaconda.org/bioconda/iucn_sim)
 
 ## Installation
 
