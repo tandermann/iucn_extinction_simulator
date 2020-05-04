@@ -85,6 +85,8 @@ iucn_sim get_iucn_data \
 	--outdir data/iucn_sim_output/carnivora/iucn_data/
 ```
 
+**NOTE for Windows users:** When you just copy paste the above command you will likely get an error because of the backslashes that are used as line breaks in macOS and linux command lines. These line breaks are not necessary and are only used in this tutorial for a better overview of the commands. If you want to run the command on a Windows system, simply remove the backslahes and line breaks at the end of each line and enter the command in one single line.
+
 ### Estimate status transition rates
 
 Now we want to estimate the rates of how often any type of status change occurs in the IUCN history of the reference group. This is done by sampling these rates from the counts of each type of status change, using a Markov chain Monte Carlo algorithm (MCMC). Additionally to the **status transition rates** we also estimate the rates at which species of any given status become extinct (**EX transition rates**). For estimating these rates `iucn_sim` offers two different methods.
