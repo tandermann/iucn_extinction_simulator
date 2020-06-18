@@ -74,7 +74,7 @@ I recommend you create a folder on your Desktop and **enter that folder via the 
 
 All following commands in this tutorial **assume that you are running them from the folder where you stored your `carnivora_gl.txt` input file!** For this purpose make sure you first navigate to that folder with your command line by typing `cd /PATH/TO/MY/DESKTOP/FOLDER` (but replace `/PATH/TO/MY/DESKTOP/FOLDER` with real path, see above).
 
-The first step is downloading all available IUCN data with `iucn_sim`, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group.
+The first step is downloading all available IUCN data with `iucn_sim`, which includes the IUCN history of the reference group, the current status information for all species in the target species list, and a list of possibly extinct species belonging to the reference group. Note that you normally need to provide an IUCN API key for this to work (`--iucn_key`), except if you use one of the precompiled reference groups as we do in this example (see available groups at `data/precompiled/gl_data`).
 
 (**Remember to activate your `iucn_sim` environment first**, in case you installed it in its own environment: `conda activate iucn_sim_env` or `source activate iucn_sim_env`)
 
