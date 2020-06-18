@@ -98,6 +98,19 @@ def add_arguments(parser):
         help="Set random seed for the MCMC."
     )
 
+# import argparse
+# p = argparse.ArgumentParser()
+# args = p.parse_args()    
+# args.species_data = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/carnivora/iucn_data_test/species_data.txt'
+# args.iucn_history = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/carnivora/iucn_data_test/MAMMALIA_iucn_history.txt'
+# args.outdir = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/carnivora/transition_rates_test_exmode_0'
+# args.extinction_probs_mode = 0
+# args.possibly_extinct_list = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/carnivora/iucn_data_test/possibly_extinct_reference_taxa.txt'
+# args.rate_samples = 100
+# args.n_gen = 100000
+# args.burnin = 1000
+# args.seed = 1234
+
 def main(args):
     # get user input___________________________________________________________
     input_data = args.species_data
@@ -106,7 +119,7 @@ def main(args):
     try:
         extinction_probs_mode = int(args.extinction_probs_mode)
     except:
-        print('Invalid extinction_probs_mode provided. Please choose between the currenlty available options 0 or 1')
+        print('\nInvalid extinction_probs_mode provided. Please choose between the currenlty available options 0 or 1')
         quit()
     possibly_extinct_list = args.possibly_extinct_list
     n_rep = int(args.rate_samples)
@@ -130,6 +143,16 @@ def main(args):
 
     # get input data
     species_data_input = pd.read_csv(input_data,sep='\t',header=None).dropna()
+    invalid_status_taxa = species_data_input[~species_data_input.iloc[:,1].isin(['LC','NT','VU','EN','CR','DD','NE'])]
+    if len(invalid_status_taxa)>0:
+        print('\nFound invalid IUCN statuses:',list(invalid_status_taxa[1].values),'\n\nMake sure that the second column of your --species_data input contains the current IUCN status of your target species, which must be one of the following valid extant statuses: LC, NT, VU, EN, CR, DD, NE')
+        # if this effects only a minority of taxa, continue after removing these
+        if len(invalid_status_taxa)/len(species_data_input) < 0.5:
+            print('\nAutomatically dropping the following taxa because of invalid IUCN status information:', list(invalid_status_taxa[0].values))
+            species_data_input = species_data_input[species_data_input.iloc[:,1].isin(['LC','NT','VU','EN','CR','DD','NE'])]
+        else:
+            quit('\nPlease fix your species_data input file. Check presence of current IUCN status information and column order.')
+        
     # get the list of species
     species_list = species_data_input.iloc[:,0].values.astype(str)
     # replace underscores in species name in case they are present
@@ -212,7 +235,7 @@ def main(args):
     valid_status_dict,most_recent_status_dict,status_series,taxon_series = cust_func.extract_valid_statuses(master_stat_time_df)
     # count current status distribution
     unique, counts = np.unique(status_series, return_counts=True)
-    print('Current IUCN status distribution in reference group:',dict(zip(unique, counts)))
+    print('\nCurrent IUCN status distribution in reference group:',dict(zip(unique, counts)))
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
     print('Summing up years spend in each category...')
