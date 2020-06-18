@@ -60,7 +60,7 @@ To fully understand the methodology behind `iucn_sim` we recommend you to have a
 
 In the following tutorial we will predict future extinctions and extinction rates for all species of the order Carnivora (**target species list**). We will use the the whole class Mammalia as **reference group**. In `iucn_sim` the target species list contains a list of species names for which you want to simulate future extinctions. The reference group on the other hand is a group of species which are being used to estimate **status transition rates** (i.e. the rates of how often species change from one IUCN status to another) based on the IUCN history of the group. This reference group should be sufficiently large (>1,000 species) to increase the accuracy of the estimated transition rates.
 
-This tutorial uses pre-compiled IUCN data, without requiring an IUCN API key. If you plan on running `iucn_sim` on your own target species list and reference group, you will first need to apply for an IUCN key (see information below). However, `iucn_sim` has access to a range of pre-compiled reference groups, which enable processing without requiring an IUCN API key (see overview of precompiled groups [here](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history), but no need to download these).
+This tutorial uses pre-compiled IUCN data, without requiring an IUCN API key. If you plan on running `iucn_sim` on your own target species list and reference group, you will first need to apply for an IUCN key (see information below). However, `iucn_sim` has access to a range of pre-compiled reference groups, which enable processing without requiring an IUCN API key (see overview of precompiled groups [here](https://github.com/tobiashofmann88/iucn_extinction_simulator/tree/master/data/precompiled/iucn_history), but no need to download these, the program will find them automatically).
 
 ### Required input data:
 
@@ -85,13 +85,26 @@ iucn_sim get_iucn_data \
 	--outdir data/iucn_sim_output/carnivora/iucn_data/
 ```
 
-**!NOTE for Windows users!:** When you just copy paste the above command you will likely get an error because of the backslashes that are used as line breaks in macOS and linux command lines. These line breaks are not necessary and are only used in this tutorial for a better overview of the commands. If you want to run the command on a Windows system, simply remove the backslahes and line breaks at the end of each line and enter the command in one single line as in the example below:
+**!NOTE for Windows users!:** When you just copy paste the above command you will likely get an error because of the backslashes that are used as line breaks in macOS and linux command lines. These line breaks are not necessary and are only used in this tutorial for a better overview of the commands. If you want to run the command on a Windows system, simply remove the backslashes and line breaks at the end of each line and enter the command in one single line as in the example below:
 
 ```
 iucn_sim get_iucn_data --reference_group mammalia --target_species_list ./carnivora_gl.txt --outdir data/iucn_sim_output/carnivora/iucn_data/
 ```
 
 ### Estimate status transition rates
+
+The previous `iucn_sim get_iucn_data` command creates the following output files:
+- `MAMMALIA_iucn_history.txt` - the whole IUCN status history for all mammal species
+- `species_data.txt` - your input species list (+ GL values, if provided) with an additional column showing the current IUCN status of each species
+- `possibly_extinct_reference_taxa.txt` - a list of possibly extinct species in your reference group (only relevant when choosing `--extinction_probs_mode 1`)
+
+
+<div class="alert alert-block alert-info">
+**Skipping the get_iucn_data step:**
+You may decide to enter the `iucn_sim` pipeline at this point, without running the previous `get_iucn_data` step, e.g. if you want to provide your own status data for your target species or you don't have an IUCN API key but have all necessary data already downloaded manually. In that case you need to make sure to provide these files yourself and store them in one folder. In that case make sure that the file names match those above and that the file content has the same format as those produced by `get_iucn_data` (for examples see the files in the `data/iucn_sim_output/carnivora/iucn_data/` folder). It can be a lot of work to manually recreate the IUCN history file in the correct format, and it is therefore recommended to use the most suitable precompiled IUCN history file found in the `data/precompiled/iucn_history/` folder of this repo. Note that you don't need the `possibly_extinct_reference_taxa.txt` file in case you are choosing `--extinction_probs_mode 0`.
+</div>
+
+
 
 Now we want to estimate the rates of how often any type of status change occurs in the IUCN history of the reference group. This is done by sampling these rates from the counts of each type of status change, using a Markov chain Monte Carlo algorithm (MCMC). Additionally to the **status transition rates** we also estimate the rates at which species of any given status become extinct (**EX transition rates**). For estimating these rates `iucn_sim` offers two different methods.
 
