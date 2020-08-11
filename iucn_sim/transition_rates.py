@@ -12,7 +12,10 @@ np.set_printoptions(suppress=True)
 import pandas as pd
 import os,sys
 import datetime
+from scipy.optimize import curve_fit
+import warnings
 import iucn_sim.functions as cust_func
+
 
 # get extinction probs_________________________________________________________
 def p_e_year(years,p_e):
@@ -43,6 +46,17 @@ def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 100
     sampled_rates = np.random.choice(post_samples,n_samples,replace=False)
     return sampled_rates
 
+def power_function(x,a,b):
+    # defining the power function
+    y = float(a)*x**float(b)
+    return y
+
+def make_empty_rate_df(species_list,rate_columns,status_label):
+    rate_df = pd.DataFrame(np.zeros((len(species_list),rate_columns+1)))
+    rate_df.columns = ['species']+ ['%s_p_ext_%i'%(status_label,i) for i in np.arange(0,rate_columns)]
+    rate_df.species = species_list
+    return rate_df
+
 def add_arguments(parser):
     parser.add_argument(
         '--species_data',
@@ -66,13 +80,19 @@ def add_arguments(parser):
         '--extinction_probs_mode',
         default=0,
         metavar='N',
-        help="Set to '0' to use IUCN defined extinction probabilities (e.g. Mooers et al, 2008 approach), also using available GL data to estimate species-specific extinction probabilities. Set to '1' to simulate extinctions based on recorded extinctions in IUCN history (e.g. Monroe et al, 2019 approach, no GL data is being used)."
+        help="Set to '0' to use the critE EX mode to determine extinction probabilities for each status (e.g. Mooers et al, 2008 approach). Set to '1' to use empirical EX mode, based on the recorded extinction in the IUCN history of the reference group (e.g. Monroe et al, 2019 approach). GL data can only be used in the critE EX mode ('0')."
     )
     parser.add_argument(
         '--possibly_extinct_list',
         default=0,
         metavar='<path>',
         help="File containing list of taxa that are likely extinct, but that are listed as extant in IUCN, including the year of their assessment as possibly extinct ('possibly_extinct_reference_taxa.txt' output from get_iucn_data function). These species will then be modeled as extinct by the esimate_rates function, which will effect the estimated extinction probabilities when chosing `--extinction_probs_mode 1`",
+    )
+    parser.add_argument(
+        '--species_specific_regression',
+        action='store_true',
+        help='Enables species-specific regression fitting to model LC, NT, and VU extinction probabilities. Only applicable with --extinction_probs_mode 0 (critE mode) and if GL is provided.',
+        default=False
     )
     parser.add_argument(
         '--rate_samples',
@@ -97,6 +117,7 @@ def add_arguments(parser):
         default=None,
         help="Set random seed for the MCMC."
     )
+
 
 def main(args):
     # get user input___________________________________________________________
@@ -164,7 +185,7 @@ def main(args):
     
     
     # process the IUCN history data____________________________________________
-    iucn_start_year = 2001
+    iucn_start_year = 2001 #start-year of the IUCN3.1 standard for categories
     current_year = datetime.datetime.now().year  
     master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
     statuses_through_time = pd.read_csv(iucn_history, delimiter = '\t')
@@ -225,7 +246,7 @@ def main(args):
     print('\nCurrent IUCN status distribution in reference group:',dict(zip(unique, counts)))
     # count how often each status change occurs
     change_type_dict = cust_func.count_status_changes(master_stat_time_df,valid_status_dict)
-    print('Summing up years spend in each category...')
+    print('Summing up years spend in each category ...')
     years_in_each_category = cust_func.get_years_spent_in_each_category(master_stat_time_df,valid_status_dict)
 
     # write the status change data to file
@@ -293,9 +314,7 @@ def main(args):
             print('Warning: No generation length (GL) data found. Extinction risks for status EN and CR are calculated without using GL data.')
             dims = 1
             en_risks = np.array([[p_e_year(20,0.2)]]*len(species_list))
-        en_risks_df = pd.DataFrame(np.zeros((len(species_list),dims+1)))
-        en_risks_df.columns = ['species']+ ['EN_p_ext_%i'%i for i in np.arange(0,dims)]
-        en_risks_df.species = species_list
+        en_risks_df = make_empty_rate_df(species_list,dims,'EN')
         en_risks_df.iloc[:,1:] = en_risks
         en_risks_df.to_csv(os.path.join(outdir,'en_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
 
@@ -315,11 +334,49 @@ def main(args):
         else:
             dims = 1
             cr_risks = np.array([[p_e_year(10,0.5)]]*len(species_list))
-        cr_risks_df = pd.DataFrame(np.zeros((len(species_list),dims+1)))
-        cr_risks_df.columns = ['species']+ ['CR_p_ext_%i'%i for i in np.arange(0,dims)]
-        cr_risks_df.species = species_list
+        cr_risks_df = make_empty_rate_df(species_list,dims,'CR')
         cr_risks_df.iloc[:,1:] = cr_risks
         cr_risks_df.to_csv(os.path.join(outdir,'cr_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+        
+
+    if args.species_specific_regression:
+        # make regression for all other categories based on EN and CR risks
+        print('Fitting species-specific regression function to determine LC, NT, and VU extinction probabilities ...')
+        vu_risks_df = make_empty_rate_df(species_list,dims,'VU')
+        nt_risks_df = make_empty_rate_df(species_list,dims,'NT')
+        lc_risks_df = make_empty_rate_df(species_list,dims,'LC')
+        for i,species in enumerate(cr_risks_df.species.values):
+            en_risks = en_risks_df.iloc[i,1:].values
+            cr_risks = cr_risks_df.iloc[i,1:].values
+            vu_risks = []
+            nt_risks = []
+            lc_risks = []
+            for j,_ in enumerate(en_risks):
+                en_prob = en_risks[j]
+                cr_prob = cr_risks[j]
+                x = [4.,5.]
+                y = [en_prob,cr_prob]
+                # fitting the power function to the 2 data points of each species (EN and CR risk)
+                with warnings.catch_warnings(): 
+                    # this is to avoid printing the warning from curve_fit when trying to fit function to only 2 points: "OptimizeWarning: Covariance of the parameters could not be estimated"
+                    warnings.filterwarnings("ignore")
+                    a_b = curve_fit(power_function,x,y);
+                # extracting the values for a and b from the curve fit function
+                a = a_b[0][0]
+                b = a_b[0][1]
+                # get values for LC, NT, and VU
+                p_year_LC = power_function(1,a,b)
+                p_year_NT = power_function(2,a,b)
+                p_year_VU = power_function(3,a,b)
+                vu_risks.append(p_year_VU)
+                nt_risks.append(p_year_NT)
+                lc_risks.append(p_year_LC)
+            vu_risks_df.iloc[vu_risks_df[vu_risks_df.species == species].index.values[0],1:] = np.array(vu_risks)
+            nt_risks_df.iloc[nt_risks_df[nt_risks_df.species == species].index.values[0],1:] = np.array(nt_risks)
+            lc_risks_df.iloc[lc_risks_df[lc_risks_df.species == species].index.values[0],1:] = np.array(lc_risks)
+        vu_risks_df.to_csv(os.path.join(outdir,'vu_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+        nt_risks_df.to_csv(os.path.join(outdir,'nt_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
+        lc_risks_df.to_csv(os.path.join(outdir,'lc_extinction_risks_all_species.txt'),sep='\t',index=False, float_format='%.12f')
     #__________________________________________________________________________
 
 
@@ -341,8 +398,13 @@ def main(args):
             sample_columns2 = np.random.choice(np.arange(dims),size=(n_rep-dims),replace=True)
             sample_columns = np.concatenate([sample_columns1,sample_columns2])
         # get the corresponding en and cr ex-risk columns
-        en_risks_selection = en_risks[:,sample_columns]
-        cr_risks_selection = cr_risks[:,sample_columns]
+        cr_risks_selection = cr_risks_df.iloc[:,1:].values[:,sample_columns]
+        en_risks_selection = en_risks_df.iloc[:,1:].values[:,sample_columns]
+        # smae for the vu, nt, and lc cats if species_specific_regression is activated
+        if args.species_specific_regression:
+            vu_risks_selection = vu_risks_df.iloc[:,1:].values[:,sample_columns]
+            nt_risks_selection = nt_risks_df.iloc[:,1:].values[:,sample_columns]
+            lc_risks_selection = lc_risks_df.iloc[:,1:].values[:,sample_columns]
         
     elif extinction_probs_mode == 1:
         target_keys = [i for i in sampled_rates_df.status_change.values if i[-2:] == 'EX']
@@ -355,13 +417,21 @@ def main(args):
 
         # for each rep (i), create list of q-matrices, 1 for each species
         if extinction_probs_mode == 0:
+            cr_risks_rep = cr_risks_selection[:,i]
             en_risks_rep = en_risks_selection[:,i]
-            cr_risks_rep = cr_risks_selection[:,i]  
+            if args.species_specific_regression:
+                vu_risks_rep = vu_risks_selection[:,i]
+                nt_risks_rep = nt_risks_selection[:,i]
+                lc_risks_rep = lc_risks_selection[:,i]                
             q_matrix_list_i = []
             for j,__ in enumerate(species_list):
                 en_risk = en_risks_rep[j]
                 cr_risk = cr_risks_rep[j]
-                status_specific_p_e = np.array([0.000000155728,0.000041551152,0.001053050310,en_risk,cr_risk]) # These values are the category specific probabilities of extinction per year calculated from IUCN definition of each category    
+                if args.species_specific_regression:
+                    lc_nt_vu = [lc_risks_rep[j],nt_risks_rep[j],vu_risks_rep[j]]
+                else:
+                    lc_nt_vu = [0.000000155728,0.000041551152,0.001053050310]
+                status_specific_p_e = np.array(lc_nt_vu+[en_risk,cr_risk]) # These values are the category specific probabilities of extinction per year calculated from IUCN definition of each category    
                 q_matrix = cust_func.qmatrix(rates_i, status_specific_p_e)
                 q_matrix_list_i.append([q_matrix])
         elif extinction_probs_mode == 1:

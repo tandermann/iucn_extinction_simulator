@@ -64,7 +64,7 @@ data_files = glob.glob('/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure
 data_array = [np.loadtxt(i) for i in data_files]
 order = [4,0,5,1,3,2]
 labels = np.array([os.path.basename(i).replace('.txt','').replace('_',' ').capitalize() for i in data_files])[order]
-labels = ['GL+SC','no GL+SC','GL+no SC','no GL+no SC','EX mode 1','EX mode 1(PEX)']
+labels = ['CritE EX\n(GL,SC)','CritE EX\n(no GL,SC)','CritE EX\n(GL,no SC)','CritE EX\n(no GL,no SC)','Emp. EX','Emp. EX\n(PEX)']
 plt.boxplot([data_array[i][-1] for i in order],labels=labels,showfliers=False,patch_artist=True);
 plt.ylabel('Extinct species')
 plt.title('Simulated bird extinctions in next 100 years')
@@ -145,8 +145,8 @@ cust_func.calcHPD(ext_species,0.95)
 # compare extinction rates:
 highlight_dd_ne = True
 plot_species = 'Strigops habroptila'
-ex_mode_1_file  = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves//future_sim_0/extinction_prob_all_species.txt'
-ex_mode_2_file  = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves//future_sim_1/extinction_prob_all_species.txt'
+ex_mode_1_file  = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/future_sim_0/extinction_prob_all_species.txt'
+ex_mode_2_file  = '/Users/tobias/GitHub/iucn_extinction_simulator/data/iucn_sim_output/aves/future_sim_1_pex/extinction_prob_all_species.txt'
 ex_mode_1 = pd.read_csv(ex_mode_1_file,sep='\t').rate_e_mean.values
 ex_mode_2 = pd.read_csv(ex_mode_2_file,sep='\t').rate_e_mean.values
 species_names = pd.read_csv(ex_mode_2_file,sep='\t').species.values
@@ -166,8 +166,8 @@ if highlight_dd_ne:
 else:
     filename = '/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_4/mode_1_vs_mode_2.pdf'
     plt.scatter(ex_mode_1,ex_mode_2,s=1)
-plt.xlabel('$\mu_i$ (EX mode 0)')
-plt.ylabel('$\mu_i$ (EX mode 1 + PEX taxa)')
+plt.xlabel('$\mu_i$ (CritE EX mode)')
+plt.ylabel('$\mu_i$ (Empirical EX mode + PEX taxa)')
 min_value = min(ex_mode_2)-5e-6
 max_value = max(ex_mode_1)+1e-2
 plt.xlim(min_value,max_value)
@@ -186,6 +186,47 @@ fig.savefig(filename,bbox_inches='tight', dpi = 500)
 
 
 # Figure 2
+# div trajectory
+
+indirs = ['/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/mode_0',
+          '/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/mode_1_no_pex',
+          '/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/mode_1'
+          ]
+
+colors = ["tomato",
+          "red",
+          "firebrick"
+          ]
+
+labels = ['CritE',
+          'Empirical',
+          'Empirical + PEX'
+          ]
+
+fig = plt.figure(figsize=(4,4))
+for i,indir in enumerate(indirs):
+    status_through_time_file = os.path.join(indir,'status_distribution_through_time.txt')
+    status_through_time_data = pd.read_csv(status_through_time_file,sep='\t')
+    #np.sum(status_through_time_data.iloc[:,1:].values,axis=1)
+    diversity_through_time_file = os.path.join(indir,'future_diversity_trajectory.txt')
+    diversity_through_time = np.loadtxt(diversity_through_time_file)
+    # define time axis
+    time_axis = status_through_time_data.year.values
+    y_values = diversity_through_time[0]
+    plt.plot(time_axis,y_values,color=colors[i])
+    # get upper and lower confidence interval boundaries
+    min_hpd, max_hpd = diversity_through_time[1],diversity_through_time[2]
+    plt.fill_between(time_axis, min_hpd, max_hpd,
+             color=colors[i], alpha=0.7,label=labels[i])
+plt.grid(which='major', alpha=0.5,axis='both')
+#plt.xlim(-5,120)
+plt.legend(title="Extinction risk mode:")
+plt.ylabel('Species diversity')
+plt.xlabel('Years from present')
+fig.savefig('/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/all_scenarios_div_plot.pdf',bbox_inches='tight', dpi = 500)
+
+
+# div trajectory for a single scenario
 indir = '/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/mode_0'
 #_________________separate_______________________
 status_through_time_file = os.path.join(indir,'status_distribution_through_time.txt')
@@ -215,6 +256,11 @@ plt.fill_between(time_axis, min_hpd, max_hpd,
 #plt.ylabel('Lost species')
 #plt.tight_layout()
 fig.savefig(os.path.join(indir,'div_plot.pdf'),bbox_inches='tight', dpi = 500)
+
+
+
+
+
 #
 colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#b80033"])
 labels = np.array(['LC', 'NT', 'VU', 'EN', 'CR', 'EX'])
@@ -257,7 +303,7 @@ axs[1].set_title('Status distribution present')
 # status distribution end
 wedges, texts, autotexts = axs[2].pie(end_status_distr[end_status_distr >0], colors= colors[end_status_distr >0], autopct=lambda pct: func(pct, end_status_distr[end_status_distr >0]), shadow=False,textprops=dict(color="w"))
 final_labels = list(labels[end_status_distr[0] >0])
-axs[2].legend(labels=final_labels[0],title="IUCN status\n(N=10965 sp.)",loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
+axs[2].legend(labels=final_labels[0],title="IUCN status\n(N=10961 sp.)",loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
 axs[2].set_title('Status distribution in 100 years')
 fig.savefig(os.path.join(indir,'all_joined.pdf'),bbox_inches='tight', dpi = 500)
 
@@ -283,9 +329,6 @@ plt.scatter(tobi_gl_data,bird_gl_data_sorted)
 
 bird_gl_data_output_df = pd.DataFrame(np.array([tobi_species_list,bird_gl_data_sorted]).T)
 bird_gl_data_output_df.to_csv('/Users/tobias/GitHub/iucn_extinction_simulator/data/precompiled/gl_data/aves_gl.txt',sep='\t',index=False,header=False)
-
-
-zip()
 
 
 
