@@ -390,7 +390,7 @@ def write_r_scripts(output_folder):
     final_sorted_taxon_list = selected_taxon_list
     #final_taxon_list = as.data.frame(cbind(selected_taxon_list,selected_ids))
     #final_sorted_taxon_list = final_taxon_list[order(final_taxon_list$selected_taxon_list),]
-    write.table(final_sorted_taxon_list,file=paste0(outdir,'/',taxon_group,"_species_list.txt"), quote=F,row.names=F,sep='	',col.names = FALSE)
+    write.table(sort(final_sorted_taxon_list),file=paste0(outdir,'/',taxon_group,"_species_list.txt"), quote=F,row.names=F,sep='	',col.names = FALSE)
     
     
     # get historic data __________________________
@@ -399,6 +399,7 @@ def write_r_scripts(output_folder):
     historic_assessments = as.data.frame(historic_assessments)
     colnames(historic_assessments) = c('species')
     # find historic assessments and fill into dataframe
+    log_frequency = 100
     counter = 1
     for (i in seq(1, length(selected_taxon_list), 1)){
       species = selected_taxon_list[i]
@@ -417,10 +418,12 @@ def write_r_scripts(output_folder):
           historic_assessments[row_id,year] <- hist_data$result$code[id]
         }
       }
+    if (counter %% log_frequency == 0){
+      write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
+    }
       counter = counter+1
     }
     write.table(historic_assessments,file=paste0(outdir,'/',taxon_group,"_iucn_history.txt"), quote=F,row.names=F,sep='	')
-
     #___________________________________    
     """
     
