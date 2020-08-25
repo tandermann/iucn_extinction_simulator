@@ -36,7 +36,7 @@ def add_arguments(parser):
     parser.add_argument(
         '--n_sim',
         default=10000,
-        help="How many simulation replicates to run. If the number of simulation replicates exceeds the number of available transition rate estimates (produced by the 'transition_rates' function), these rates will be randomely resampled for the remaining simulations."
+        help="How many simulation replicates to run. At least 10,000 simulations are recommended for accurate rate estimation (default). If the number of simulation replicates exceeds the number of available transition rate estimates (produced by the 'transition_rates' function), these rates will be randomely resampled for the remaining simulations."
     )
     parser.add_argument(
         '--status_change',
@@ -195,7 +195,7 @@ def main(args):
 
     except:
         random_seed = np.random.randint(999999999)
-        print('Simulating with randomely geenrated starting seed %i.'%random_seed)
+        print('Simulating with randomely generated starting seed %i.'%random_seed)
     np.random.seed(random_seed)
     
     infile = args.input_data
