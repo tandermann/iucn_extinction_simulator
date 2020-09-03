@@ -399,7 +399,7 @@ def write_r_scripts(output_folder):
     historic_assessments = as.data.frame(historic_assessments)
     colnames(historic_assessments) = c('species')
     # find historic assessments and fill into dataframe
-    log_frequency = 100
+    log_frequency = 1000
     counter = 1
     for (i in seq(1, length(selected_taxon_list), 1)){
       species = selected_taxon_list[i]
