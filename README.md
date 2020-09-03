@@ -52,7 +52,7 @@ The -h command will show and explain all available flags for each specific `iucn
 
 Here is a graphic overview of the main functions of `iucn_sim`. See the tutorial below for how to apply these function on example data.
 
-<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/workflow.png" width="800">
+<img src="https://github.com/tobiashofmann88/iucn_extinction_simulator/blob/master/img/workflow.png" width="900">
 
 ## `iucn_sim` tutorial
 
