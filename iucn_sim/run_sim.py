@@ -59,6 +59,11 @@ def add_arguments(parser):
         help="Model new status for all DD and NE species as LC (best case scenario). 0=off, 1=on (default=0)."
     )
     parser.add_argument(
+        '--n_extinct_taxa',
+        default=0,
+        help="Setting this value will stop the simulations when n taxa have gone extinct. This can be used to simulate the expected time until n extinctions. The value of the --n_years flag in this case will be interpreted as the maximum possible time frame, so set it large enough to cover a realistic time-frame for these extinctions to occur. Set to 0 to disable this function (default=0)."
+    )
+    parser.add_argument(
         '--extinction_rates',
         default=1,
         help="Estimation of extinction rates from simulation results: 0=off, 1=on (default=1)."
@@ -202,6 +207,7 @@ def main(args):
     outdir = args.outdir
     n_years = int(args.n_years)
     n_sim = int(args.n_sim)
+    n_extinct_taxa = int(args.n_extinct_taxa)
     allow_status_change = int(args.status_change)
     conservation_increase_factor = int(args.conservation_increase_factor)
     threat_increase_factor = int(args.threat_increase_factor)
@@ -286,7 +292,7 @@ def main(args):
         status_change=False
 
     print('\nStarting simulations ...')
-    diversity_through_time,te_array,status_through_time = cust_func.run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+    diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list = cust_func.run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa)
     # summarize simulation results
     sim_species_list = te_array[:,0].copy()
     ext_date_data = te_array[:,1:].copy()
@@ -311,9 +317,15 @@ def main(args):
 #        np.savetxt('/Users/tobias/GitHub/iucn_predictions/doc/figures/Figure_2/figure_data/posterior_samples/%s_gl_no_status_change.txt'%target_species.replace(' ','_'),posterior,fmt='%.8f')
 #        print('\nPrinted posterior')
     #__________________________________________________________________________   
-
-
-
+    
+    if n_extinct_taxa:        
+        np.savetxt(os.path.join(outdir,'time_until_%i_extinctions.txt'%n_extinct_taxa),time_until_n_extinctions_list,fmt='%.2f')
+        fig = plt.figure()
+        plt.hist(time_until_n_extinctions_list)
+        plt.xlabel('Time in years')
+        plt.ylabel('N')
+        plt.title('Simulated years until %i extinctions (%i simulations)'%(n_extinct_taxa,n_sim))
+        fig.savefig(os.path.join(outdir,'time_until_%i_extinctions.pdf'%n_extinct_taxa),bbox_inches='tight', dpi = 500)
 
     #__________________________________________________________________________           
     if plot_diversity_trajectory:
@@ -488,6 +500,8 @@ def main(args):
                 plt.close()
     print('\n')
     #__________________________________________________________________________   
+
+
 
 
         

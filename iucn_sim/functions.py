@@ -158,7 +158,7 @@ def round_up(value):
     except ValueError:
         return value
 
-def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_statuses,species_list,outdir,qmatrix_dict,status_change=False,dynamic_qmatrix=True):
+def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_statuses,species_list,outdir,qmatrix_dict,status_change=False,dynamic_qmatrix=True,n_extinct_taxa=0):
 	# write the species name and the index to a separate txt file
     # this is necessary because two years get lost when summarizing the simulated data into year bins
     #final_year = final_year+2
@@ -216,12 +216,22 @@ def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_st
         extinction_time_list.append(extinction)
     a = np.array(species_list)
     b = np.array(extinction_time_list)
+    time_until_n_extinctions = None
+    if n_extinct_taxa:
+        ext_taxa = b[b!='extant'].astype(float)
+        if len(ext_taxa) < n_extinct_taxa:
+            print('\n\nWARNING: The --n_extinct_taxa flag is being ignored in this analysis.\n\nCan not find %i extinct taxa in this simulation replicate. You may have to increase the simulated time frame by adjusting the --n_years value.'%n_extinct_taxa)
+        else:
+            # select the n smallest values from the extinction times
+            sorted_times = np.sort(ext_taxa)
+            time_until_n_extinctions = np.max(sorted_times[:n_extinct_taxa])
     extinction_array = np.stack((a, b))
     list_ex = list(map(round_up, extinction_array[1]))
     extinctions_per_year = Counter(list_ex)
     extinctions_per_year = dict(extinctions_per_year)
-    return status_array, extinction_array, extinctions_per_year
+    return status_array, extinction_array, extinctions_per_year, time_until_n_extinctions
     
+
 def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_year,final_year):
     year_bins = np.arange(current_year,final_year+1)
     ext_count= [extinction_dict_sim_out[i] if i in extinction_dict_sim_out.keys() else 0 for i in year_bins]
@@ -229,13 +239,15 @@ def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_
     diversity_through_time
     return diversity_through_time
 
-def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True):
+
+def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True,n_extinct_taxa=0):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
     extinct_per_year_array = np.zeros([n_rep,delta_t+1])
     te_array = np.zeros((len(species_list),n_rep+1)).astype(object)
     te_array[:,0]=species_list
     status_through_time_dict = {}
     status_through_time = np.zeros([6,delta_t+1,n_rep])
+    time_until_n_extinctions_list = []
     for n in range(n_rep):
         sys.stdout.write('\rRunning simulation rep %i/%i' %(n+1,n_rep))
         target_column = rate_index_list[n]
@@ -270,7 +282,8 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
         else:
             qmatrix_dict_rep = qmatrix_dict
     
-        future_status_array, extinction_array, extinction_dict = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,species_list,outdir,qmatrix_dict_rep,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix)
+        future_status_array, extinction_array, extinction_dict, time_until_n_extinctions = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,species_list,outdir,qmatrix_dict_rep,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa)
+        time_until_n_extinctions_list.append(time_until_n_extinctions)
         # diversity_through time array
         for year in extinction_dict.keys():
             if not year == 'extant':
@@ -314,7 +327,8 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
     #    pickle.dump(te_array, f, pickle.HIGHEST_PROTOCOL)
     #with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
     #    pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
-    return diversity_through_time,te_array,status_through_time
+    return diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list
+
 
 def calcHPD(data, level):
     assert (0 < level < 1)
