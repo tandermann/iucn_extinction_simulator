@@ -14,7 +14,7 @@ def add_arguments(parser):
     parser.add_argument(
         '--input_data',
         required=True,
-        help="Path to 'simulation_input_data.pkl' file created by esimate_rates function."
+        help="Path to 'simulation_input_data.pkl' file created by transition_rates function."
     )
     parser.add_argument(
         '--outdir',

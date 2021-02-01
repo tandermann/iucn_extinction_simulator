@@ -294,7 +294,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --input_data INPUT_DATA
                         Path to 'simulation_input_data.pkl' file created by
-                        esimate_rates function.
+                        transition_rates function.
   --outdir OUTDIR       Provide path to outdir where results will be saved.
   --n_years N_YEARS     How many years to simulate into the future.
   --n_sim N_SIM         How many simulation replicates to run. If the number
