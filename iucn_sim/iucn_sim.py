@@ -160,7 +160,7 @@ class get_iucn_data():
             joined_df = pd.DataFrame([taxon_series_refgroup,status_series_refgroup]).T
         except:
             if not load_from_file:
-                species_list_data = species_list_file
+                species_list_data = pd.DataFrame(species_list_file)
                 species_list_data.columns = np.arange(len(species_list_data.columns)) # make sure column naming is integers, as in header=None scenario
             else:
                 # get list of species we want to simulate
