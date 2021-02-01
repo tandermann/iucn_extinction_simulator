@@ -30,7 +30,8 @@ class get_iucn_data():
                  reference_group,
                  reference_rank = None,
                  iucn_key = None,
-                 no_online_sync = False):
+                 no_online_sync = False,
+                 from_file = True):
         
         self._reference_group = reference_group
         self._reference_rank = reference_rank
@@ -38,6 +39,7 @@ class get_iucn_data():
         self._outdir = outdir
         self._iucn_key = iucn_key
         self._no_online_sync = no_online_sync
+        self._from_file = from_file
         self.run()
 
     def run(self):
@@ -45,6 +47,7 @@ class get_iucn_data():
         taxon_reference_group = self._reference_group
         reference_rank = self._reference_rank
         species_list_file = self._target_species_list
+        load_from_file = self._from_file
         outdir = self._outdir
         iucn_key = self._iucn_key
         no_precompiled_iucn_data = self._no_online_sync
@@ -157,8 +160,11 @@ class get_iucn_data():
                 gl_data = []
                 joined_df = pd.DataFrame([taxon_series_refgroup,status_series_refgroup]).T
             except:
-                # get list of species we want to simulate
-                species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
+                if not load_from_file:
+                    species_list_data = species_list_file
+                else:
+                    # get list of species we want to simulate
+                    species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
                 species_list_data = species_list_data.drop_duplicates(0)
                 species_list_data = species_list_data.sort_values(0)
                 species_list_data.index = np.arange(len(species_list_data))

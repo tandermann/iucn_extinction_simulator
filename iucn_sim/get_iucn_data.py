@@ -56,7 +56,8 @@ def main(args):
         reference_group = args.reference_group,
         reference_rank = args.reference_rank,
         iucn_key = args.iucn_key,
-        no_online_sync = args.no_online_sync
+        no_online_sync = args.no_online_sync,
+        from_file = True
         )
 
 
