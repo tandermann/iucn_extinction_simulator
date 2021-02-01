@@ -165,6 +165,8 @@ class get_iucn_data():
             else:
                 # get list of species we want to simulate
                 species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
+            print(species_list_data)
+            quit()
             species_list_data = species_list_data.drop_duplicates(0)
             species_list_data = species_list_data.sort_values(0)
             species_list_data.index = np.arange(len(species_list_data))
