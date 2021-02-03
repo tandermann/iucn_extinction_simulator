@@ -74,8 +74,8 @@ def add_arguments(parser):
 
 def main(args):
     tr_rates = iucn_sim.transition_rates(
-        species_data = args.species_data,
-        iucn_history = args.iucn_history,
+        species_iucn_status = args.species_data,
+        iucn_history_file = args.iucn_history,
         outdir = args.outdir,
         extinction_probs_mode = args.extinction_probs_mode,
         possibly_extinct_list = args.possibly_extinct_list,

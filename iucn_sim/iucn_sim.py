@@ -46,234 +46,41 @@ class get_iucn_data():
         # get user input
         taxon_reference_group = self._reference_group
         reference_rank = self._reference_rank
-        species_list_file = self._target_species_list
+        species_list = self._target_species_list
         load_from_file = self._from_file
         outdir = self._outdir
         iucn_key = self._iucn_key
-        no_precompiled_iucn_data = self._no_online_sync
+        avoid_precompiled_iucn_data = self._no_online_sync
         
-        # create the r-scripts to be used later on:
-        write_r_scripts(outdir)
-        
-        if taxon_reference_group:
-            taxon_reference_groups = taxon_reference_group.split(',')
-        else:
-            print('No reference group provided. Use the --reference_group to provide the name of a taxonomic group, e.g. Mammalia')
-            quit()
-        if reference_rank:
-            reference_ranks = reference_rank.split(',')
-        
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
-    
-    
-        # get IUCN history_________________________________________________________  
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
-        precompiled_taxon_groups = []
-        precompiled_taxon_group_files = []
-        if not no_precompiled_iucn_data:
-            for taxon_group in taxon_reference_groups:         
-                try:
-                    # look for precompiled files online    
-                    url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/iucn_history/%s_iucn_history.txt'%taxon_group.upper()
-                    urlpath =urlopen(url)
-                    string = urlpath.read().decode('utf-8')        
-                    string_input = StringIO(string)
-                    ref_group_data = pd.read_csv(string_input, sep="\t")
-                    hist_outfile = os.path.join(outdir,os.path.basename(url))
-                    ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
-                    precompiled_taxon_groups.append(str.lower(taxon_group))
-                    precompiled_taxon_group_files.append(hist_outfile)
-                except:
-                    pass
-    
-        iucn_history_files = []
-        for i,taxon_group in enumerate(taxon_reference_groups):
-            if str.lower(taxon_group) in precompiled_taxon_groups and not no_precompiled_iucn_data:
-                print('Using precompiled IUCN history data for %s.'%taxon_group)                    
-                iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).startswith(str.upper(taxon_group))][0])
-            else:
-                print('Fetching IUCN history using rredlist')
-                rank = reference_ranks[i]
-                iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.upper(taxon_group), str.lower(rank), iucn_key, outdir]
-                if not iucn_key:
-                    print('ERROR','*'*50,'\nIUCN-KEY ERROR: Need to download IUCN history for specified reference group: %s. Please provide a valid IUCN key (using the --iucn_key flag). Alternatively choose a precompiled reference group (see available groups at github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/iucn_history/)'%(taxon_group),'*'*55)
-                    quit()
-                #iucn_error_file = os.path.join(outdir,'get_iucn_status_data_and_species_list_error_file.txt')
-                #with open(iucn_error_file, 'w') as err:
-                run_iucn_cmd = subprocess.Popen(iucn_cmd)
-                run_iucn_cmd.wait()
-                iucn_history_files.append(os.path.join(outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
-                
-        if len(iucn_history_files) > 1:
-            df_previous = pd.DataFrame()
-            outfile_stem = ''
-            for i in iucn_history_files:
-                outfile_stem += os.path.basename(i).split('_')[0]+'_'
-                df_new = pd.read_csv(i,sep='\t')
-                if len(df_previous) > 0:
-                    df_previous = pd.concat([df_previous,df_new],sort=False,ignore_index=True)
-                else:
-                    df_previous = df_new
-                os.remove(i)
-            df_previous.to_csv(os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem)),sep='\t',index=False)
-        else:
-            outfile_stem = os.path.basename(iucn_history_files[0]).split('_')[0]+'_'
-        
-        # save the file name of the output file for further actions that need to read this file
-        iucn_history_file = os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem))
+        # get iucn history of reference group
+        iucn_history_file = get_iucn_history(reference_group=taxon_reference_group,
+                                                reference_rank=reference_rank,
+                                                iucn_key=iucn_key,
+                                                avoid_precompiled_iucn_data=avoid_precompiled_iucn_data,
+                                                outdir=outdir)
         self._iucn_history_file = iucn_history_file
-    
-        # get current IUCN status all target species_______________________________
-        # process the IUCN history data
-        iucn_start_year = 2001
-        current_year = datetime.datetime.now().year  
-        master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
-        statuses_through_time = pd.read_csv(iucn_history_file, delimiter = '\t')
-        target_columns = [column for column in master_stat_time_df.columns if column in statuses_through_time.columns]
-        master_stat_time_df[target_columns] = statuses_through_time[target_columns]
-    
-        # check if we have sufficient number of species for rate estimation
-        if len(master_stat_time_df) < 1000:
-            print('\n\n%s'%('#'*50),'\nWarning: Only %i species in reference dataset. This may not be sufficient for proper estimation of status transition rates. It is recommended to choose a larger reference group encompassing >1000 species at the least!\n\nContinuing processing IUCN history data of reference group ...\n%s\n\n'%(len(master_stat_time_df),'#'*50))
-        # treat EW as EX
-        master_stat_time_df.replace('EW', 'EX',inplace=True)
-        
-        # clean and sort df
-        master_stat_time_df = master_stat_time_df.sort_values(by='species')
-        master_stat_time_df = master_stat_time_df.drop_duplicates()
-        master_stat_time_df.index = np.arange(len(master_stat_time_df))   
-        
-        # set most recent status to NE for species without any IUCN status information
-        na_row_indeces = np.where(master_stat_time_df.iloc[:,1:].T.isnull().all().values)
-        for index in na_row_indeces:
-            master_stat_time_df.iloc[index,-1] = 'NE'
-        
-        # extract most recent valid status for each taxon from reference group
-        valid_status_dict_refgroup,most_recent_status_dict_refgroup,status_series_refgroup,taxon_series_refgroup = extract_valid_statuses(master_stat_time_df)
 
-        # see if we want to only stick with the reference taxa
-        try:
-            species_list_file = int(species_list_file)
-            gl_data = []
-            joined_df = pd.DataFrame([taxon_series_refgroup,status_series_refgroup]).T
-        except:
-            if not load_from_file:
-                species_list_data = pd.DataFrame(species_list_file)
-                species_list_data.columns = np.arange(len(species_list_data.columns)) # make sure column naming is integers, as in header=None scenario
-            else:
-                # get list of species we want to simulate
-                species_list_data = pd.read_csv(species_list_file,sep='\t',header=None)
-            species_list_data = species_list_data.drop_duplicates(0)
-            species_list_data = species_list_data.sort_values(0)
-            species_list_data.index = np.arange(len(species_list_data))
-            species_list = np.unique(species_list_data.iloc[:,0].values.astype(str))
-            species_list = np.array([i.replace('_',' ') for i in species_list])
-            # Check if all species names are binomial
-            for species in species_list:
-                if len(species.split(' ')) != 2:
-                    print('ERROR','*'*50,'\nABORTED: All provided species names provided under --target_species_list flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*50)
-                    quit()        
-            
-            try:
-                gl_data = species_list_data.iloc[:,1:].values
-            except:
-                gl_data = []
-            
-            # see which species are not in reference group and hence need current IUCN status extraction
-            remaining_species_wo_iucn_status = sorted(list(set(species_list)-set(taxon_series_refgroup)))
-            
-            fraction_overlap = np.round(1-(len(remaining_species_wo_iucn_status)/len(species_list)),3)        
-            if fraction_overlap <= 0.5:
-                print('\n\n%s'%('#'*50),'\nWarning: Only %.3f of target species found in reference group. Is this intended? You may want to reconsider chosing a reference group encompassing more of your target species.\n\nContinuing with downloading current status information for all remaining species...\n%s\n\n'%(fraction_overlap,'#'*50))
-            else:
-                print('\n\nA fraction of %.3f of the specified target species is present in reference group.\n\n'%fraction_overlap)
-                
-            tmp_outdir = os.path.join(outdir,'other_files')
-            if not os.path.exists(tmp_outdir):
-                os.makedirs(tmp_outdir)
+        # get most recent status for each taxon in target species list
+        extant_taxa_current_status = get_most_recent_status_target_species(species_list=species_list,
+                                                                            iucn_history_file=iucn_history_file,
+                                                                            iucn_key=iucn_key,
+                                                                            load_from_file = load_from_file,
+                                                                            outdir=outdir)
+        self._species_data = extant_taxa_current_status
 
-            
-            if len(remaining_species_wo_iucn_status) > 0:
-                
-                # write the missinjg taxa to file for the r-script
-                species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
-                np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
-
-                # extract the current status for those missing species
-                print('Extracting current status for target species...')
-                iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
-                #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
-                #with open(iucn_error_file, 'w') as err:
-                if not iucn_key:
-                    quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
-                print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
-
-                run_iucn_cmd = subprocess.Popen(iucn_cmd)
-                run_iucn_cmd.wait()
-            
-                # get the IUCN data and combine with recent status info from refgroup taxa
-                current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
-                current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
-                # print info which species were not found in IUCN
-                current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
-                nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
-                if len(nan_taxa) > 0:
-                    print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
-                target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
-                status_series_refgroup = np.array(status_series_refgroup).astype(str)
-                taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
-                status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
-                current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
-                joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
-            else:
-                target_reference_taxa = list(species_list)
-                status_series_refgroup = np.array(status_series_refgroup).astype(str)
-                taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
-                status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
-                joined_df = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
-
-
-        # fix NE taxa and sort
-        joined_df = joined_df.replace(np.nan,'NE')        
-        joined_df.index = np.arange(len(joined_df))
-        if len(gl_data) > 0:
-            joined_df = pd.concat([joined_df,pd.DataFrame(np.round(gl_data,3))],axis=1)
-        
-        # remove all extinct taxa from future steps
-        ext_boolean = joined_df.iloc[:,1]=='EX'
-        extinct_taxa = joined_df.iloc[ext_boolean.values,:]
-        print('The following taxa listed in your target species list are extinct according to IUCN:\n')
-        print(extinct_taxa.iloc[:,0].values)
-        print('\nThese taxa will be removed from the list for downstream processing.')
-        extant_taxa = joined_df.iloc[~ext_boolean.values,:]
-        extant_taxa.to_csv(os.path.join(outdir,'species_data.txt'),sep='\t',index=False,header=False)
-        self._species_data = extant_taxa
-    
-        
-        # get info about possibly extinct taxa_____________________________________
-        url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/pex_taxa/2020_1_RL_Stats_Table_9.txt'
-        urlpath =urlopen(url)
-        string = urlpath.read().decode('utf-8')        
-        string_input = StringIO(string)
-        pe_data = pd.read_csv(string_input, sep="\t")
-        # which species are we looking for?
-        reference_taxa = pd.read_csv(iucn_history_file,sep='\t').species.values.astype(str)    
-        # extract all these species and write to file
-        reference_taxa_listed_as_pe = pe_data[pe_data['Scientific name'].isin(reference_taxa)]
-        reference_taxa_listed_as_pe = reference_taxa_listed_as_pe.iloc[:,[0,3]]
-        pe_data_outfile = os.path.join(outdir,'possibly_extinct_reference_taxa.txt')
-        reference_taxa_listed_as_pe.to_csv(pe_data_outfile,sep='\t',index=False)
+        # get info about possibly extinct taxa
+        possibly_extinct_taxa = get_possibly_extinct_iucn_info(iucn_history_file,
+                                                                outdir=outdir)
+        self._possibly_extinct_taxa = possibly_extinct_taxa
 
 
 class transition_rates():
     def __init__(self,
-                 species_data,
-                 iucn_history,
+                 species_iucn_status,
+                 iucn_history_file,
                  outdir,
                  extinction_probs_mode=0,
-                 possibly_extinct_list=0,
+                 possibly_extinct_list=[],
                  species_specific_regression=False,
                  rate_samples=100,
                  n_gen=100000,
@@ -281,8 +88,8 @@ class transition_rates():
                  seed=None,
                  load_from_file=True):
         
-        self._species_data = species_data
-        self._iucn_history = iucn_history
+        self._species_data = species_iucn_status
+        self._iucn_history = iucn_history_file
         self._outdir = outdir
         self._extinction_probs_mode = extinction_probs_mode
         self._possibly_extinct_list = possibly_extinct_list
@@ -325,9 +132,11 @@ class transition_rates():
     
         # get input data (either from file or from memory)
         if self._load_from_file:            
-            species_data_input = pd.read_csv(self._species_data,sep='\t',header=None).dropna()
+            species_data_input = pd.read_csv(self._species_data,sep='\t',header=None)
         else:
-            species_data_input = self._species_data.dropna()
+            species_data_input = self._species_data
+            
+        species_data_input = species_data_input.dropna()
         invalid_status_taxa = species_data_input[~species_data_input.iloc[:,1].isin(['LC','NT','VU','EN','CR','DD','NE'])]
         if len(invalid_status_taxa)>0:
             print('\nFound invalid IUCN statuses:',list(invalid_status_taxa[1].values),'\n\nMake sure that the second column of your --species_data input contains the current IUCN status of your target species, which must be one of the following valid extant statuses: LC, NT, VU, EN, CR, DD, NE')
@@ -358,49 +167,19 @@ class transition_rates():
             gl_data_available = True
         #__________________________________________________________________________
             
-        
-        
-        
         # process the IUCN history data____________________________________________
-        iucn_start_year = 2001 #start-year of the IUCN3.1 standard for categories
-        current_year = datetime.datetime.now().year  
-        master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
-        statuses_through_time = pd.read_csv(iucn_history, delimiter = '\t')
-        target_columns = [column for column in master_stat_time_df.columns if column in statuses_through_time.columns]
-        master_stat_time_df[target_columns] = statuses_through_time[target_columns]
-        # treat EW as EX
-        master_stat_time_df.replace('EW', 'EX',inplace=True)
-        # replace occurrences of NR (not recognized) with nan
-        master_stat_time_df.replace('NR', np.nan,inplace=True)
-        
-        # clean and sort df
-        master_stat_time_df = master_stat_time_df.sort_values(by='species')
-        master_stat_time_df = master_stat_time_df.drop_duplicates()
-        master_stat_time_df.index = np.arange(len(master_stat_time_df))   
-        
-        # set the assessment at the current year to NE for species without any assessments
-        na_row_indeces = np.where(master_stat_time_df.iloc[:,1:].T.isnull().all().values)
-        for index in na_row_indeces:
-            master_stat_time_df.iloc[index,-1] = 'NE'
-        
+        stat_time_df = process_iucn_history(self._iucn_history)
+
         # if possibly_extinct_list provided, read that list and set the status for those taxa to extinct, starting at provided year
-        if possibly_extinct_list:
-            pex_data = pd.read_csv(possibly_extinct_list,sep='\t')
-            pex_species_list = pex_data.iloc[:,0].values.astype(str)
-            pex_year = pex_data.iloc[:,1].values.astype(int)
-            column_names = master_stat_time_df.columns.values
-            row_names = master_stat_time_df.species.values
-            #df_selection = master_stat_time_df[master_stat_time_df.species.isin(pex_species_list)]
-            for i,species in enumerate(pex_species_list):
-                row_index = np.where(row_names==species)[0][0]
-                assessment_year = pex_year[i]
-                column_index = np.where(column_names==str(assessment_year))[0][0]
-                master_stat_time_df.iloc[row_index,column_index:] = 'EX'
-        
+        if len(possibly_extinct_list) > 0:
+            master_stat_time_df = set_taxa_as_extinct(stat_time_df,possibly_extinct_list,from_file=self._load_from_file)
+        else:
+            master_stat_time_df = stat_time_df.copy()
+
         # extract most recent valid status for each taxon
         valid_status_dict,most_recent_status_dict,status_series,taxon_series = extract_valid_statuses(master_stat_time_df)
     
-        # extinciton prob mode 0: remove all currently extinct taxa
+        # extinction prob mode 0: remove all currently extinct taxa
         if extinction_probs_mode == 0:
             ext_indices = np.array([num for num,i in enumerate(most_recent_status_dict.keys()) if most_recent_status_dict[i] == 'EX'])
             master_stat_time_df = master_stat_time_df.drop(ext_indices)
@@ -627,8 +406,10 @@ class transition_rates():
         # Finally write all the compiled info to a pickle file_____________________
         species_specific_data = [[species,current_status[i],qmatrix_list_dict[species]]for i,species in enumerate(species_list)]
         final_output_data = [species_specific_data,dd_probs]
-        save_obj(final_output_data,os.path.join(outdir,'simulation_input_data.pkl'))
+        simdata_outfile = os.path.join(outdir,'simulation_input_data.pkl')
+        save_obj(final_output_data,simdata_outfile)
         self._simulation_input_data = final_output_data
+        self._simdata_outfile = simdata_outfile
 
 
 class run_sim():
@@ -783,9 +564,12 @@ class run_sim():
         year = np.arange(delta_t+1).astype(int)
         status_df_data = np.round(np.vstack([year,mean_status_through_time])).astype(int)
         status_df = pd.DataFrame(data = status_df_data.T,columns=['year','LC','NT','VU','EN','CR','EX'])
+        self._status_through_time_mean = status_df
+        #self._status_through_time = status_through_time
         status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
-        self._status_through_time = status_df
+        self._simulated_extinctions_through_time = status_through_time[-1]
         np.savetxt(os.path.join(outdir,'simulated_extinctions_array.txt'),status_through_time[-1],fmt='%i')
+        self._extinction_times = te_array
         pd.DataFrame(data=te_array).to_csv(os.path.join(outdir,'te_all_species.txt'),sep='\t',header=False,index=False)
         #__________________________________________________________________________   
     
@@ -798,6 +582,7 @@ class run_sim():
         
         if n_extinct_taxa:        
             np.savetxt(os.path.join(outdir,'time_until_%i_extinctions.txt'%n_extinct_taxa),time_until_n_extinctions_list,fmt='%.2f')
+            self._time_until_n_extinctions = time_until_n_extinctions_list
             fig = plt.figure()
             plt.hist(time_until_n_extinctions_list)
             plt.xlabel('Time in years')
@@ -817,6 +602,7 @@ class run_sim():
             # get upper and lower confidence interval boundaries
             min_hpd, max_hpd = np.array([calcHPD(i,0.95) for i in diversity_through_time.T]).T
             mean_min_max = np.vstack([y_values,min_hpd,max_hpd])
+            self._future_div_mean_min_max = mean_min_max
             np.savetxt(os.path.join(outdir,'future_diversity_trajectory.txt'),mean_min_max,fmt='%.2f')
             plt.fill_between(time_axis, min_hpd, max_hpd,
                      color="#b80033", alpha=0.2)
@@ -968,6 +754,254 @@ class run_sim():
                     plt.close()
         print('\n')
 
+
+def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoid_precompiled_iucn_data=False,outdir=''):
+    # create the r-scripts to be used later on:
+    write_r_scripts(outdir,script_id = 'history')
+
+    if reference_group:
+        taxon_reference_groups = reference_group.split(',')
+    else:
+        print('No reference group provided. Provide the name of a taxonomic group as reference_group, e.g. Mammalia')
+        quit()
+    if reference_rank:
+        reference_ranks = reference_rank.split(',')
+    
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+
+    # get IUCN history_________________________________________________________  
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    precompiled_taxon_groups = []
+    precompiled_taxon_group_files = []
+    if not avoid_precompiled_iucn_data:
+        for taxon_group in taxon_reference_groups:         
+            try:
+                # look for precompiled files online    
+                url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/iucn_history/%s_iucn_history.txt'%taxon_group.upper()
+                urlpath =urlopen(url)
+                string = urlpath.read().decode('utf-8')        
+                string_input = StringIO(string)
+                ref_group_data = pd.read_csv(string_input, sep="\t")
+                hist_outfile = os.path.join(outdir,os.path.basename(url))
+                ref_group_data.to_csv(hist_outfile,sep='\t',index=False)
+                precompiled_taxon_groups.append(str.lower(taxon_group))
+                precompiled_taxon_group_files.append(hist_outfile)
+            except:
+                pass
+
+    iucn_history_files = []
+    for i,taxon_group in enumerate(taxon_reference_groups):
+        if str.lower(taxon_group) in precompiled_taxon_groups and not avoid_precompiled_iucn_data:
+            print('Using precompiled IUCN history data for %s.'%taxon_group)                    
+            iucn_history_files.append([file for file in precompiled_taxon_group_files if os.path.basename(file).startswith(str.upper(taxon_group))][0])
+        else:
+            print('Fetching IUCN history using rredlist')
+            rank = reference_ranks[i]
+            if rank == 'genus':
+                iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.capitalize(taxon_group), str.lower(rank), iucn_key, outdir]
+            else:
+                iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_iucn_status_data_and_species_list.r'), str.upper(taxon_group), str.lower(rank), iucn_key, outdir]
+                
+            if not iucn_key:
+                print('ERROR','*'*50,'\nIUCN-KEY ERROR: Need to download IUCN history for specified reference group: %s. Please provide a valid IUCN key (using the --iucn_key flag). Alternatively choose a precompiled reference group (see available groups at github.com/tobiashofmann88/iucn_extinction_simulator/data/precompiled/iucn_history/)'%(taxon_group),'*'*55)
+                quit()
+            #iucn_error_file = os.path.join(outdir,'get_iucn_status_data_and_species_list_error_file.txt')
+            #with open(iucn_error_file, 'w') as err:
+            run_iucn_cmd = subprocess.Popen(iucn_cmd)
+            run_iucn_cmd.wait()
+            iucn_history_files.append(os.path.join(outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
+            
+    if len(iucn_history_files) > 1:
+        df_previous = pd.DataFrame()
+        outfile_stem = ''
+        for i in iucn_history_files:
+            outfile_stem += os.path.basename(i).split('_')[0]+'_'
+            df_new = pd.read_csv(i,sep='\t')
+            if len(df_previous) > 0:
+                df_previous = pd.concat([df_previous,df_new],sort=False,ignore_index=True)
+            else:
+                df_previous = df_new
+            os.remove(i)
+        df_previous.to_csv(os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem)),sep='\t',index=False)
+    else:
+        outfile_stem = os.path.basename(iucn_history_files[0]).split('_')[0]+'_'
+
+    # save the file name of the output file for further actions that need to read this file
+    iucn_history_file = os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem))
+    return(iucn_history_file)
+
+
+def process_iucn_history(iucn_history_file,iucn_start_year=2001,final_year=None):
+    # get current IUCN status all target species_______________________________
+    # process the IUCN history data
+    if not final_year:
+        current_year = datetime.datetime.now().year  
+    else:
+        current_year = final_year
+    master_stat_time_df = pd.DataFrame(columns=['species']+list(np.arange(iucn_start_year,current_year+1).astype(str)))
+    statuses_through_time = pd.read_csv(iucn_history_file, delimiter = '\t')
+    target_columns = [column for column in master_stat_time_df.columns if column in statuses_through_time.columns]
+    master_stat_time_df[target_columns] = statuses_through_time[target_columns]
+
+    # check if we have sufficient number of species for rate estimation
+    if len(master_stat_time_df) < 1000:
+        print('\n\n%s'%('#'*50),'\nWarning: Only %i species in reference dataset. This may not be sufficient for proper estimation of status transition rates. It is recommended to choose a larger reference group encompassing >1000 species at the least!\n\nContinuing processing IUCN history data of reference group ...\n%s\n\n'%(len(master_stat_time_df),'#'*50))
+    # treat EW as EX
+    master_stat_time_df.replace('EW', 'EX',inplace=True)
+    # replace occurrences of NR (not recognized) with nan
+    master_stat_time_df.replace('NR', np.nan,inplace=True)
+    
+    # clean and sort df
+    master_stat_time_df = master_stat_time_df.sort_values(by='species')
+    master_stat_time_df = master_stat_time_df.drop_duplicates()
+    master_stat_time_df.index = np.arange(len(master_stat_time_df))   
+    
+    # set most recent status to NE for species without any IUCN status information
+    na_row_indeces = np.where(master_stat_time_df.iloc[:,1:].T.isnull().all().values)
+    for index in na_row_indeces:
+        master_stat_time_df.iloc[index,-1] = 'NE'
+    return(master_stat_time_df)
+
+def set_taxa_as_extinct(stat_time_df,possibly_extinct_list,from_file=True): # provide 2-column df as possibly_extinct_list with species names and supposed year of extinction
+    master_stat_time_df = stat_time_df.copy()
+    if from_file:
+        pex_data = pd.read_csv(possibly_extinct_list,sep='\t')
+    else:
+        pex_data = pd.DataFrame(possibly_extinct_list)
+    pex_species_list = pex_data.iloc[:,0].values.astype(str)
+    pex_year = pex_data.iloc[:,1].values.astype(int)
+    column_names = master_stat_time_df.columns.values
+    row_names = master_stat_time_df.species.values
+    #df_selection = master_stat_time_df[master_stat_time_df.species.isin(pex_species_list)]
+    for i,species in enumerate(pex_species_list):
+        row_index = np.where(row_names==species)[0][0]
+        assessment_year = pex_year[i]
+        column_index = np.where(column_names==str(assessment_year))[0][0]
+        master_stat_time_df.iloc[row_index,column_index:] = 'EX'
+    return(master_stat_time_df)
+
+def get_most_recent_status_target_species(species_list=[],iucn_history_file=None,iucn_key=None,load_from_file=True,outdir=''):
+    if iucn_history_file:
+        # process IUCN history file
+        master_stat_time_df = process_iucn_history(iucn_history_file)
+        valid_status_dict_refgroup,most_recent_status_dict_refgroup,status_series_refgroup,taxon_series_refgroup = extract_valid_statuses(master_stat_time_df)
+        provided_history_file = True
+    else:
+        provided_history_file = False
+    # see if we want to only stick with the reference taxa
+    if len(species_list) == 0:
+        gl_data = []
+        if provided_history_file:
+            joined_df = pd.DataFrame([taxon_series_refgroup,status_series_refgroup]).T
+        else:
+            print('ERROR','*'*50,'\nABORTED: You need to provide either a target species list or a IUCN history file (or both). Found neither.')
+    else:
+        if not load_from_file:
+            species_list_data = pd.DataFrame(species_list)
+            species_list_data.columns = np.arange(len(species_list_data.columns)) # make sure column naming is integers, as in header=None scenario
+        else:
+            # get list of species we want to simulate
+            species_list_data = pd.read_csv(species_list,sep='\t',header=None)
+        species_list_data = species_list_data.drop_duplicates(0)
+        species_list_data = species_list_data.sort_values(0)
+        species_list_data.index = np.arange(len(species_list_data))
+        species_list = np.unique(species_list_data.iloc[:,0].values.astype(str))
+        species_list = np.array([i.replace('_',' ') for i in species_list])
+        # Check if all species names are binomial
+        for species in species_list:
+            if len(species.split(' ')) != 2:
+                print('ERROR','*'*50,'\nABORTED: All provided species names provided under --target_species_list flag must be binomial! Found non binomial name:\n%s\n'%species,'*'*50)
+                quit()        
+        try:
+            gl_data = species_list_data.iloc[:,1:].values
+            print('Found generation length data, which will be written to output file for downstream processing.')
+        except:
+            gl_data = []
+        # see which species are not in reference group and hence need current IUCN status extraction
+        if provided_history_file:
+            remaining_species_wo_iucn_status = sorted(list(set(species_list)-set(taxon_series_refgroup)))
+            fraction_overlap = np.round(1-(len(remaining_species_wo_iucn_status)/len(species_list)),3)      
+            if fraction_overlap <= 0.5:
+                print('\n\n%s'%('#'*50),'\nWarning: Only %.3f of target species found in reference group. Is this intended? You may want to reconsider chosing a reference group encompassing more of your target species.\n\nContinuing with downloading current status information for all remaining species...\n%s\n\n'%(fraction_overlap,'#'*50))
+            else:
+                print('\n\nA fraction of %.3f of the specified target species is present in reference group.\n\n'%fraction_overlap)
+        else:
+            remaining_species_wo_iucn_status = sorted(list(species_list))
+        tmp_outdir = os.path.join(outdir,'other_files')
+        if not os.path.exists(tmp_outdir):
+            os.makedirs(tmp_outdir)
+        if len(remaining_species_wo_iucn_status) > 0:
+            # write r-script for downloading missing taxa
+            write_r_scripts(outdir,script_id = 'current')
+            # write the missing taxa to file for the r-script
+            species_list_out_file = os.path.join(tmp_outdir,'target_species_not_in_reference_group.txt')
+            np.savetxt(species_list_out_file,remaining_species_wo_iucn_status,fmt='%s')
+            # extract the current status for those missing species
+            print('Extracting current status for target species...')
+            iucn_cmd = ['Rscript',os.path.join(outdir,'rscripts/get_current_iucn_status_missing_species.r'), species_list_out_file, iucn_key, tmp_outdir]
+            #iucn_error_file = os.path.join(iucn_outdir,'get_current_iucn_status_missing_species_error_file.txt')
+            #with open(iucn_error_file, 'w') as err:
+            if not iucn_key:
+                quit('***IUCN-KEY ERROR:*** Trying to download current status for target species from IUCN. Please provide a valid IUCN key (using the --iucn_key flag) to access IUCN data. Alternatively you can turn off this functionality by setting "--target_species_list 0". In that case you need to compile your own current IUCN status list manually. In that case store the status data in a tab-separated format with the header "species current_status".')
+            print('Downloading current IUCN status information for %i target species that are not present in reference group:'%len(remaining_species_wo_iucn_status))
+            run_iucn_cmd = subprocess.Popen(iucn_cmd)
+            run_iucn_cmd.wait()
+            # get the IUCN data and combine with recent status info from refgroup taxa
+            current_status_target_species_file = os.path.join(tmp_outdir,'current_status_missing_species.txt')
+            current_status_missing_taxa = pd.read_csv(current_status_target_species_file,sep='\t',header=None)
+            # print info which species were not found in IUCN
+            current_status_missing_list = current_status_missing_taxa[1].values.astype(str)
+            nan_taxa = current_status_missing_taxa[0].values[current_status_missing_list=='nan']
+            if len(nan_taxa) > 0:
+                print('\n\nNo IUCN information found for the following %i species. This could be due to taxonomic issues. Make sure that all species names match with the most recent IUCN taxonomy.\n\nFor now, these species will be coded as Not Evaluated (NE)...\n\n%s\n\n'%(len(nan_taxa),str(nan_taxa)))        
+            if provided_history_file:
+                target_reference_taxa = list(set(species_list)-set(current_status_missing_taxa[0].values))
+                status_series_refgroup = np.array(status_series_refgroup).astype(str)
+                taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
+                status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
+                current_status_reference_taxa = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
+                joined_df = pd.concat([current_status_missing_taxa,current_status_reference_taxa],ignore_index=True).sort_values(by=[0])
+            else:
+                joined_df = current_status_missing_taxa.sort_values(by=[0])
+        else:
+            target_reference_taxa = list(species_list)
+            status_series_refgroup = np.array(status_series_refgroup).astype(str)
+            taxon_series_refgroup = np.array(taxon_series_refgroup).astype(str)
+            status_reference_taxa = [status_series_refgroup[taxon_series_refgroup == i][0] for i in target_reference_taxa]
+            joined_df = pd.DataFrame(data = np.array([target_reference_taxa,status_reference_taxa]).T)
+    # fix NE taxa and sort
+    joined_df = joined_df.replace(np.nan,'NE')        
+    joined_df.index = np.arange(len(joined_df))
+    if len(gl_data) > 0:
+        joined_df = pd.concat([joined_df,pd.DataFrame(np.round(gl_data,3))],axis=1)
+    # remove all extinct taxa from future steps
+    ext_boolean = joined_df.iloc[:,1]=='EX'
+    extinct_taxa = joined_df.iloc[ext_boolean.values,:]
+    print('The following taxa listed in your target species list are extinct according to IUCN:\n')
+    print(extinct_taxa.iloc[:,0].values)
+    print('\nThese taxa will be removed from the list for downstream processing.')
+    extant_taxa = joined_df.iloc[~ext_boolean.values,:]
+    extant_taxa.to_csv(os.path.join(outdir,'species_data.txt'),sep='\t',index=False,header=False)
+    return(extant_taxa)
+
+def get_possibly_extinct_iucn_info(iucn_history_file,outdir=''):
+    # get info about possibly extinct taxa_____________________________________
+    url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/pex_taxa/2020_1_RL_Stats_Table_9.txt'
+    urlpath =urlopen(url)
+    string = urlpath.read().decode('utf-8')        
+    string_input = StringIO(string)
+    pe_data = pd.read_csv(string_input, sep="\t")
+    # which species are we looking for?
+    reference_taxa = pd.read_csv(iucn_history_file,sep='\t').species.values.astype(str)    
+    # extract all these species and write to file
+    reference_taxa_listed_as_pe = pe_data[pe_data['Scientific name'].isin(reference_taxa)]
+    reference_taxa_listed_as_pe = reference_taxa_listed_as_pe.iloc[:,[0,3]]
+    pe_data_outfile = os.path.join(outdir,'possibly_extinct_reference_taxa.txt')
+    reference_taxa_listed_as_pe.to_csv(pe_data_outfile,sep='\t',index=False)
+    return(reference_taxa_listed_as_pe)
 
 def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,pdf=0,n_gen = 100000,burnin = 1000):
     sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
@@ -1406,7 +1440,7 @@ def calcHPD(data, level):
     return (d[i], d[i+nIn-1])
 
 
-def write_r_scripts(output_folder):
+def write_r_scripts(output_folder,script_id = 'both'):
 	
     script_1_content = """
     library(rredlist)
@@ -1528,9 +1562,18 @@ def write_r_scripts(output_folder):
     if not os.path.exists(rscript_out):
         os.makedirs(rscript_out)
 
-    with open(os.path.join(rscript_out,'get_iucn_status_data_and_species_list.r'),'w') as file:
-        file.write(script_1_content)
-        file.close()
-    with open(os.path.join(rscript_out,'get_current_iucn_status_missing_species.r'),'w') as file:
-        file.write(script_2_content)
-        file.close()
+    if script_id == 'both':
+        with open(os.path.join(rscript_out,'get_iucn_status_data_and_species_list.r'),'w') as file:
+            file.write(script_1_content)
+            file.close()
+        with open(os.path.join(rscript_out,'get_current_iucn_status_missing_species.r'),'w') as file:
+            file.write(script_2_content)
+            file.close()
+    elif script_id == 'history':
+        with open(os.path.join(rscript_out,'get_iucn_status_data_and_species_list.r'),'w') as file:
+            file.write(script_1_content)
+            file.close()
+    elif script_id == 'current':    
+        with open(os.path.join(rscript_out,'get_current_iucn_status_missing_species.r'),'w') as file:
+            file.write(script_2_content)
+            file.close()
