@@ -114,14 +114,24 @@ def main(args):
         threat_increase_factor = args.threat_increase_factor,
         model_unknown_as_lc = args.model_unknown_as_lc,
         until_n_taxa_extinct = args.until_n_taxa_extinct,
-        extinction_rates = args.extinction_rates,
-        n_gen = args.n_gen,
-        burnin = args.burnin,
         plot_diversity_trajectory = args.plot_diversity_trajectory,
         plot_status_trajectories = args.plot_status_trajectories,
         plot_histograms = args.plot_histograms,
-        plot_posterior = args.plot_posterior,
         plot_status_piechart = args.plot_status_piechart,
         seed = args.seed,
         load_from_file = True
         )
+
+    if args.extinction_rates:
+        ext_rates = iucn_sim.estimate_extinction_rates(
+            simulation_output._extinction_times,
+            args.n_years,
+            args.outdir,
+            n_gen = args.n_gen,
+            burnin = args.burnin,
+            plot_posterior = args.plot_posterior,
+            seed = simulation_output._seed,
+            load_from_file=False # since in this case the input is parsed as an object
+            )
+
+

@@ -423,16 +423,12 @@ class run_sim():
                  threat_increase_factor=1,
                  model_unknown_as_lc=0,
                  until_n_taxa_extinct=0,
-                 extinction_rates=1,
-                 n_gen=100000,
-                 burnin=1000,
                  plot_diversity_trajectory=1,
                  plot_status_trajectories=1,
                  plot_histograms=0,
-                 plot_posterior=0,
                  plot_status_piechart=1,
                  seed=None,
-                 load_from_file = True):
+                 load_from_file=True):
         
         self._input_data = input_data
         self._outdir = outdir
@@ -443,12 +439,8 @@ class run_sim():
         self._threat_increase_factor = threat_increase_factor
         self._model_unknown_as_lc = model_unknown_as_lc
         self._until_n_taxa_extinct = until_n_taxa_extinct
-        self._extinction_rates = extinction_rates
-        self._n_gen = n_gen
-        self._burnin = burnin
         self._plot_diversity_trajectory = plot_diversity_trajectory
         self._plot_histograms = plot_histograms
-        self._plot_posterior = plot_posterior
         self._plot_status_trajectories = plot_status_trajectories
         self._plot_status_piechart = plot_status_piechart
         self._seed = seed
@@ -476,12 +468,8 @@ class run_sim():
         allow_status_change = int(self._status_change)
         conservation_increase_factor = int(self._conservation_increase_factor)
         threat_increase_factor = int(self._threat_increase_factor)
-        extinction_rates = int(self._extinction_rates)
-        n_gen = int(self._n_gen)
-        burnin = int(self._burnin)
         plot_diversity_trajectory = int(self._plot_diversity_trajectory)
         plot_histograms = int(self._plot_histograms)
-        plot_posterior = int(self._plot_posterior)
         model_unknown_as_lc = int(self._model_unknown_as_lc)
         plot_status_trajectories = int(self._plot_status_trajectories)
         plot_status_piechart = int(self._plot_status_piechart)
@@ -557,8 +545,10 @@ class run_sim():
         # summarize simulation results
         sim_species_list = te_array[:,0].copy()
         ext_date_data = te_array[:,1:].copy()
+        self._ext_date_data = ext_date_data
         extinction_occs = np.array([len(row[~np.isnan(list(row))]) for row in ext_date_data])
         extinction_prob = extinction_occs/ext_date_data.shape[1]
+        self._extinction_prob = extinction_prob
         # produce output file for status distribution through time
         mean_status_through_time = np.mean(status_through_time,axis=2)
         year = np.arange(delta_t+1).astype(int)
@@ -569,10 +559,17 @@ class run_sim():
         status_df.to_csv(os.path.join(outdir,'status_distribution_through_time.txt'),sep='\t',index=False)
         self._simulated_extinctions_through_time = status_through_time[-1]
         np.savetxt(os.path.join(outdir,'simulated_extinctions_array.txt'),status_through_time[-1],fmt='%i')
-        self._extinction_times = te_array
-        pd.DataFrame(data=te_array).to_csv(os.path.join(outdir,'te_all_species.txt'),sep='\t',header=False,index=False)
+        extinction_times = pd.DataFrame(data=ext_date_data,index=sim_species_list)
+        self._extinction_times = extinction_times
+        extinction_times.to_csv(os.path.join(outdir,'te_all_species.txt'),sep='\t',header=False,index=True)
         #__________________________________________________________________________   
     
+        # print extinction probabilities over simulated time frame for each species
+        column_names = ['species','simulated_ext_prob_in_%i_years'%delta_t]
+        extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=column_names)        
+        extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
+        extinction_prob_df.to_csv(os.path.join(outdir,'extinction_probs_over_next_%i_years.txt'%delta_t),sep='\t',index=False,float_format='%.8f')
+
         #__________________________________________________________________________       
     #    if target_species:
     #        posterior = get_rate_estimate_posterior(ext_date_data[0],n_years,0,sim_species_list,n_gen=n_gen,burnin=burnin)
@@ -698,30 +695,6 @@ class run_sim():
             plt.legend(wedges+[ext], final_labels,title="IUCN status\n(N=%i sp.)"%status_count_list[2].sum(),loc="center left",bbox_to_anchor=(1, 0, 0.5, 1))
             fig.savefig(os.path.join(outdir,'status_pie_chart.pdf'),bbox_inches='tight', dpi = 500)
         #__________________________________________________________________________   
-
-        #__________________________________________________________________________   
-        if extinction_rates:
-            # calculate some extinction stats
-            # estimate extinction rates scaled by year
-            print('\nRunning %i MCMCs to estimate species-specific extinction rates from simulation output...'%len(species_list))
-            #ext_date_data = ext_date_data[:10,:]
-            if plot_posterior:
-                with PdfPages(os.path.join(outdir,'posterior_ext_rate_histograms.pdf')) as pdf:
-                    sampled_rates = np.array([get_rate_estimate(species_values,n_years,i,sim_species_list,plot_posterior=plot_posterior,pdf=pdf,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
-            else:
-                sampled_rates = np.array([get_rate_estimate(species_values,n_years,i,sim_species_list,plot_posterior=plot_posterior,pdf=0,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
-            # export extinction stats to file
-            column_names = ['species','rate_e_mean','rate_e_lower','rate_e_upper','simulated_p_e_in_%i_years'%delta_t]
-            extinction_prob_df = pd.DataFrame(np.array([sim_species_list,sampled_rates[:,0],sampled_rates[:,1],sampled_rates[:,2],extinction_prob]).T,columns=column_names)
-        else:
-            column_names = ['species','simulated_p_e_in_%i_years'%delta_t]
-            extinction_prob_df = pd.DataFrame(np.array([sim_species_list,extinction_prob]).T,columns=column_names)        
-        extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
-        extinction_prob_df.to_csv(os.path.join(outdir,'extinction_prob_all_species.txt'),sep='\t',index=False,float_format='%.8f')
-        self._extinction_probs = extinction_prob_df
-        
-        print('\n')
-        #__________________________________________________________________________   
     
         #__________________________________________________________________________   
         if plot_histograms:
@@ -755,6 +728,47 @@ class run_sim():
         print('\n')
 
 
+def estimate_extinction_rates(extinction_dates,
+                                max_t,
+                                outdir,
+                                n_gen=100000,
+                                burnin=1000,
+                                plot_posterior=False,
+                                seed=None,
+                                load_from_file=False):
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    if load_from_file:
+        te_df = pd.read_csv(extinction_dates,sep='\t',header=None,index_col=0)
+    else:
+        te_df = pd.DataFrame(extinction_dates)
+    sim_species_list = list(te_df.index.values)
+    ext_date_data = te_df.values.copy()
+    # estimate extinction rates scaled by year
+    print('\nRunning %i MCMCs to estimate species-specific extinction rates from simulation output...'%len(sim_species_list),flush=True)
+    #ext_date_data = ext_date_data[:10,:]
+    if plot_posterior:
+        with PdfPages(os.path.join(outdir,'posterior_ext_rate_histograms.pdf')) as pdf:
+            sampled_rates = np.array([get_rate_estimate(species_values,max_t,i,sim_species_list,plot_posterior=plot_posterior,pdf=pdf,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
+    else:
+        sampled_rates = np.array([get_rate_estimate(species_values,max_t,i,sim_species_list,plot_posterior=plot_posterior,pdf=0,n_gen=n_gen,burnin=burnin) for i,species_values in enumerate(ext_date_data)])
+    # get overall extincion rate for whole group
+    all_species_values = np.reshape(ext_date_data,[ext_date_data.shape[0]*ext_date_data.shape[1],])
+    overall_average_list_item = ['All taxa combined']
+    i = 0
+    overall_rate_estimates = get_rate_estimate(all_species_values,max_t,i,sim_species_list,plot_posterior=False,pdf=0,n_gen=n_gen,burnin=burnin,suppress_info=True)
+    # add the average to the species specific values
+    sim_species_list = overall_average_list_item+sim_species_list
+    sampled_rates = np.vstack([overall_rate_estimates,sampled_rates])
+    # export extinction stats to file
+    column_names = ['species','rate_e_mean','rate_e_lower','rate_e_upper']
+    extinction_prob_df = pd.DataFrame(np.array([sim_species_list,sampled_rates[:,0],sampled_rates[:,1],sampled_rates[:,2]]).T,columns=column_names)
+    extinction_prob_df[column_names[1:]] = extinction_prob_df[column_names[1:]].astype(float)
+    extinction_prob_df.to_csv(os.path.join(outdir,'extinction_rates.txt'),sep='\t',index=False,float_format='%.8f')
+    print('\n')
+    return(extinction_prob_df)
+
+
 def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoid_precompiled_iucn_data=False,outdir=''):
     # create the r-scripts to be used later on:
     write_r_scripts(outdir,script_id = 'history')
@@ -772,8 +786,6 @@ def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoi
 
 
     # get IUCN history_________________________________________________________  
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
     precompiled_taxon_groups = []
     precompiled_taxon_group_files = []
     if not avoid_precompiled_iucn_data:
@@ -1003,8 +1015,10 @@ def get_possibly_extinct_iucn_info(iucn_history_file,outdir=''):
     reference_taxa_listed_as_pe.to_csv(pe_data_outfile,sep='\t',index=False)
     return(reference_taxa_listed_as_pe)
 
-def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,pdf=0,n_gen = 100000,burnin = 1000):
-    sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
+def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,pdf=0,n_gen = 100000,burnin = 1000,suppress_info=False):
+    if not suppress_info:
+        sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
+        sys.stdout.flush()
     ext_time_array_new = ext_time_array.copy()
     ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
     ext_time_array_new = ext_time_array_new.astype(float)
@@ -1046,6 +1060,7 @@ def select_target_species(species,species_list_status,species_list,en_ext_data,c
 
 def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 100000,burnin = 1000):
     sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
+    sys.stdout.flush()
     ext_time_array_new = ext_time_array.copy()
     ext_time_array_new[ext_time_array_new!=ext_time_array_new] = max_t
     ext_time_array_new = ext_time_array_new.astype(float)
