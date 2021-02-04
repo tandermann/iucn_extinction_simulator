@@ -31,7 +31,7 @@ class get_iucn_data():
                  reference_rank = None,
                  iucn_key = None,
                  no_online_sync = False,
-                 from_file = True):
+                 from_file = False):
         
         self._reference_group = reference_group
         self._reference_rank = reference_rank
@@ -86,7 +86,7 @@ class transition_rates():
                  n_gen=100000,
                  burnin=1000,
                  seed=None,
-                 load_from_file=True):
+                 load_from_file=False):
         
         self._species_data = species_iucn_status
         self._iucn_history = iucn_history_file
@@ -428,7 +428,7 @@ class run_sim():
                  plot_histograms=0,
                  plot_status_piechart=1,
                  seed=None,
-                 load_from_file=True):
+                 load_from_file=False):
         
         self._input_data = input_data
         self._outdir = outdir
@@ -448,7 +448,6 @@ class run_sim():
         self.run()
 
     def run(self):
-    
         # get user input___________________________________________________________
         seed = self._seed
         try:
@@ -895,7 +894,7 @@ def set_taxa_as_extinct(stat_time_df,possibly_extinct_list,from_file=True): # pr
         master_stat_time_df.iloc[row_index,column_index:] = 'EX'
     return(master_stat_time_df)
 
-def get_most_recent_status_target_species(species_list=[],iucn_history_file=None,iucn_key=None,load_from_file=True,outdir=''):
+def get_most_recent_status_target_species(species_list=[],iucn_history_file=None,iucn_key=None,load_from_file=False,outdir=''):
     if iucn_history_file:
         # process IUCN history file
         master_stat_time_df = process_iucn_history(iucn_history_file)
