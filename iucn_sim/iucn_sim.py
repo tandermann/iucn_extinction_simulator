@@ -175,10 +175,10 @@ class transition_rates():
         # process the IUCN history data____________________________________________
         # extinction prob mode 0: remove all currently extinct taxa
         if extinction_probs_mode == 0:
-            status_change_coutn_df = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=True,outdir=self._outdir)
+            status_change_coutn_df,years_in_each_category = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=True,outdir=self._outdir)
         # extinciton prob mode 1: remove only taxa that have been extinct all along, keeping those that have recorded transition to extinct within time frame
         elif extinction_probs_mode == 1:
-            status_change_coutn_df = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=False,outdir=self._outdir)
+            status_change_coutn_df,years_in_each_category = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=False,outdir=self._outdir)
         #__________________________________________________________________________
 
         # run MCMCs to sample transition rates_____________________________________
@@ -734,7 +734,7 @@ def evaluate_iucn_history(iucn_history_file,possibly_extinct_list=[],exclude_ext
         status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
     print('Counted the following transition occurrences in IUCN history of reference group:')
     print(status_change_coutn_df)
-    return(status_change_coutn_df)
+    return(status_change_coutn_df,years_in_each_category)
 
 
 def estimate_extinction_rates(extinction_dates,
