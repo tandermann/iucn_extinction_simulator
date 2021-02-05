@@ -165,67 +165,23 @@ class transition_rates():
         if species_data_input.shape[1] > 2:
             gl_matrix = species_data_input.iloc[:,2:].values
             gl_data_available = True
+
+        if self._load_from_file:
+            possibly_extinct_list = pd.read_csv(possibly_extinct_list,sep='\t')
+        else:
+            possibly_extinct_list = pd.DataFrame(possibly_extinct_list)
         #__________________________________________________________________________
             
         # process the IUCN history data____________________________________________
-        stat_time_df = process_iucn_history(self._iucn_history)
-
-        # if possibly_extinct_list provided, read that list and set the status for those taxa to extinct, starting at provided year
-        if len(possibly_extinct_list) > 0:
-            master_stat_time_df = set_taxa_as_extinct(stat_time_df,possibly_extinct_list,from_file=self._load_from_file)
-        else:
-            master_stat_time_df = stat_time_df.copy()
-
-        # extract most recent valid status for each taxon
-        valid_status_dict,most_recent_status_dict,status_series,taxon_series = extract_valid_statuses(master_stat_time_df)
-    
         # extinction prob mode 0: remove all currently extinct taxa
         if extinction_probs_mode == 0:
-            ext_indices = np.array([num for num,i in enumerate(most_recent_status_dict.keys()) if most_recent_status_dict[i] == 'EX'])
-            master_stat_time_df = master_stat_time_df.drop(ext_indices)
-            master_stat_time_df.index = np.arange(len(master_stat_time_df))
-            # replace any occurrence of 'EX' as a past status with NaN to avoid problems with counting types of transitions (treating these assessments as invalid)
-            master_stat_time_df.replace('EX', np.nan,inplace=True)
+            status_change_coutn_df = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=True,outdir=self._outdir)
         # extinciton prob mode 1: remove only taxa that have been extinct all along, keeping those that have recorded transition to extinct within time frame
         elif extinction_probs_mode == 1:
-            ext_indices = np.array([num for num,i in enumerate(master_stat_time_df.iloc[:,1:].values.astype(str)) if 'EX' in np.unique(i) and len(np.unique(i))==2])
-            master_stat_time_df = master_stat_time_df.drop(ext_indices)
-            master_stat_time_df.index = np.arange(len(master_stat_time_df))
-            
-        # write IUCN history df to file
-        master_stat_time_df.to_csv(os.path.join(outdir,'formatted_iucn_history_reference_taxa.txt'),sep='\t')
-    
-        # extract most recent valid status for each taxon
-        valid_status_dict,most_recent_status_dict,status_series,taxon_series = extract_valid_statuses(master_stat_time_df)
-        # count current status distribution
-        unique, counts = np.unique(status_series, return_counts=True)
-        print('\nCurrent IUCN status distribution in reference group:',dict(zip(unique, counts)))
-        # count how often each status change occurs
-        change_type_dict = count_status_changes(master_stat_time_df,valid_status_dict)
-        print('Summing up years spend in each category ...')
-        years_in_each_category = get_years_spent_in_each_category(master_stat_time_df,valid_status_dict)
-    
-        # write the status change data to file
-        final_years_count_array = np.array([list(years_in_each_category.keys()),list(years_in_each_category.values())]).T
-        np.savetxt(os.path.join(outdir,'years_spent_in_each_category.txt'),final_years_count_array,fmt='%s\t%s')
-        change_type_dict_array = np.array([list(change_type_dict.keys()),list(change_type_dict.values())]).T
-        np.savetxt(os.path.join(outdir,'change_type_dict.txt'),change_type_dict_array,fmt='%s\t%s')   
+            status_change_coutn_df = evaluate_iucn_history(self._iucn_history,possibly_extinct_list=possibly_extinct_list,exclude_extinct=False,outdir=self._outdir)
         #__________________________________________________________________________
-        # sample transition rates for all types of changes_________________________    
-        if extinction_probs_mode == 0:
-            status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
-        elif extinction_probs_mode == 1:
-            status_change_coutn_df = pd.DataFrame(data=np.zeros([7,7]).astype(int),index = ['LC','NT','VU','EN','CR','DD','EX'],columns=['LC','NT','VU','EN','CR','DD','EX'])
-            
-        for status_change in change_type_dict.keys():
-            states = status_change.split('->')
-            original_state = states[0]
-            new_state = states[1]
-            count = change_type_dict[status_change]
-            status_change_coutn_df.loc[original_state,new_state] = count
-        status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
-        print('Counted the following transition occurrences in IUCN history of reference group:')
-        print(status_change_coutn_df)
+
+        # run MCMCs to sample transition rates_____________________________________
         if not self._random_seed:
             print('Running MCMC with user-set starting seed %i ...'%seed)
         else:
@@ -726,6 +682,60 @@ class run_sim():
                     plt.close()
         print('\n')
 
+def evaluate_iucn_history(iucn_history_file,possibly_extinct_list=[],exclude_extinct=False,outdir=False):
+    # process the IUCN history data
+    stat_time_df = process_iucn_history(iucn_history_file)
+    # if possibly_extinct_list provided, read that list and set the status for those taxa to extinct, starting at provided year
+    if len(possibly_extinct_list) > 0:
+        master_stat_time_df = set_taxa_as_extinct(stat_time_df,possibly_extinct_list)
+    else:
+        master_stat_time_df = stat_time_df.copy()
+    # extract most recent valid status for each taxon
+    valid_status_dict,most_recent_status_dict,status_series,taxon_series = extract_valid_statuses(master_stat_time_df)
+    # if exclude_extinct remove all currently extinct taxa
+    if exclude_extinct:
+        ext_indices = np.array([num for num,i in enumerate(most_recent_status_dict.keys()) if most_recent_status_dict[i] == 'EX'])
+        master_stat_time_df = master_stat_time_df.drop(ext_indices)
+        master_stat_time_df.index = np.arange(len(master_stat_time_df))
+        # replace any occurrence of 'EX' as a past status with NaN to avoid problems with counting types of transitions (treating these assessments as invalid)
+        master_stat_time_df.replace('EX', np.nan,inplace=True)
+    # else remove only taxa that have been extinct all along, keeping those that have recorded transition to extinct within time frame
+    else:
+        ext_indices = np.array([num for num,i in enumerate(master_stat_time_df.iloc[:,1:].values.astype(str)) if 'EX' in np.unique(i) and len(np.unique(i))==2])
+        master_stat_time_df = master_stat_time_df.drop(ext_indices)
+        master_stat_time_df.index = np.arange(len(master_stat_time_df))
+    # extract most recent valid status for each taxon
+    valid_status_dict,most_recent_status_dict,status_series,taxon_series = extract_valid_statuses(master_stat_time_df)
+    # count current status distribution
+    unique, counts = np.unique(status_series, return_counts=True)
+    print('\nCurrent IUCN status distribution in reference group:',dict(zip(unique, counts)))
+    # count how often each status change occurs
+    change_type_dict = count_status_changes(master_stat_time_df,valid_status_dict)
+    #print('Summing up years spend in each category ...')
+    years_in_each_category = get_years_spent_in_each_category(master_stat_time_df,valid_status_dict)
+    if exclude_extinct:
+        status_change_coutn_df = pd.DataFrame(data=np.zeros([6,6]).astype(int),index = ['LC','NT','VU','EN','CR','DD'],columns=['LC','NT','VU','EN','CR','DD'])
+    else:
+        status_change_coutn_df = pd.DataFrame(data=np.zeros([7,7]).astype(int),index = ['LC','NT','VU','EN','CR','DD','EX'],columns=['LC','NT','VU','EN','CR','DD','EX']) 
+    for status_change in change_type_dict.keys():
+        states = status_change.split('->')
+        original_state = states[0]
+        new_state = states[1]
+        count = change_type_dict[status_change]
+        status_change_coutn_df.loc[original_state,new_state] = count
+    if outdir:
+        # write IUCN history df to file
+        master_stat_time_df.to_csv(os.path.join(outdir,'formatted_iucn_history_reference_taxa.txt'),sep='\t')
+        # write the status change data to file
+        final_years_count_array = np.array([list(years_in_each_category.keys()),list(years_in_each_category.values())]).T
+        np.savetxt(os.path.join(outdir,'years_spent_in_each_category.txt'),final_years_count_array,fmt='%s\t%s')
+        change_type_dict_array = np.array([list(change_type_dict.keys()),list(change_type_dict.values())]).T
+        np.savetxt(os.path.join(outdir,'change_type_dict.txt'),change_type_dict_array,fmt='%s\t%s')   
+        status_change_coutn_df.to_csv(os.path.join(outdir,'status_change_counts.txt'),sep='\t',index=True)
+    print('Counted the following transition occurrences in IUCN history of reference group:')
+    print(status_change_coutn_df)
+    return(status_change_coutn_df)
+
 
 def estimate_extinction_rates(extinction_dates,
                                 max_t,
@@ -876,12 +886,8 @@ def process_iucn_history(iucn_history_file,iucn_start_year=2001,final_year=None)
         master_stat_time_df.iloc[index,-1] = 'NE'
     return(master_stat_time_df)
 
-def set_taxa_as_extinct(stat_time_df,possibly_extinct_list,from_file=True): # provide 2-column df as possibly_extinct_list with species names and supposed year of extinction
+def set_taxa_as_extinct(stat_time_df,pex_data): # provide 2-column df as possibly_extinct_list with species names and supposed year of extinction
     master_stat_time_df = stat_time_df.copy()
-    if from_file:
-        pex_data = pd.read_csv(possibly_extinct_list,sep='\t')
-    else:
-        pex_data = pd.DataFrame(possibly_extinct_list)
     pex_species_list = pex_data.iloc[:,0].values.astype(str)
     pex_year = pex_data.iloc[:,1].values.astype(int)
     column_names = master_stat_time_df.columns.values
