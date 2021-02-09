@@ -128,7 +128,7 @@ class transition_rates():
             self._random_seed = True
         self._seed = seed
         np.random.seed(seed)
-        np.savetxt(os.path.join(outdir,'starting_seed.txt'),np.array([seed]),fmt='%i')
+        np.savetxt(os.path.join(outdir,'starting_seed_transition_rates.txt'),np.array([seed]),fmt='%i')
     
         # get input data (either from file or from memory)
         if self._load_from_file:            
@@ -414,6 +414,7 @@ class run_sim():
             print('Simulating with randomely generated starting seed %i.'%random_seed)
         np.random.seed(random_seed)
         self._seed = random_seed
+        colors = {'LC':'#60C659','NT':'#CCE226','VU':'#F9E814','EN':'#FC7F3F','CR':'#D81E05','EX':'#000000','DD':'#D1D1C6'}
         
 
         outdir = self._outdir
@@ -431,7 +432,7 @@ class run_sim():
         
         if not os.path.exists(outdir):
             os.makedirs(outdir)
-        np.savetxt(os.path.join(outdir,'starting_seed.txt'),np.array([random_seed]),fmt='%i')
+        np.savetxt(os.path.join(outdir,'starting_seed_future_sim.txt'),np.array([random_seed]),fmt='%i')
             
         if self._load_from_file:
             infile = self._input_data
@@ -543,18 +544,18 @@ class run_sim():
             fig.savefig(os.path.join(outdir,'time_until_%i_extinctions.pdf'%n_extinct_taxa),bbox_inches='tight', dpi = 500)
     
         #__________________________________________________________________________           
+        # plot diversity trajectory of species list________________________________
+        #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
+        # define time axis
+        time_axis = np.array(range(len(diversity_through_time[0])))
+        fig = plt.figure()
+        y_values = np.mean(diversity_through_time, axis =0)
+        plt.plot(time_axis,y_values,color="#b80033", label='accounting for GL')
+        # get upper and lower confidence interval boundaries
+        min_hpd, max_hpd = np.array([calcHPD(i,0.95) for i in diversity_through_time.T]).T
+        mean_min_max = np.vstack([y_values,min_hpd,max_hpd])
+        self._future_div_mean_min_max = mean_min_max
         if plot_diversity_trajectory:
-            # plot diversity trajectory of species list________________________________
-            #colors = ["#9a002e","#df4a3d","#fecd5f","#5cd368","#916200"]
-            # define time axis
-            time_axis = np.array(range(len(diversity_through_time[0])))
-            fig = plt.figure()
-            y_values = np.mean(diversity_through_time, axis =0)
-            plt.plot(time_axis,y_values,color="#b80033", label='accounting for GL')
-            # get upper and lower confidence interval boundaries
-            min_hpd, max_hpd = np.array([calcHPD(i,0.95) for i in diversity_through_time.T]).T
-            mean_min_max = np.vstack([y_values,min_hpd,max_hpd])
-            self._future_div_mean_min_max = mean_min_max
             np.savetxt(os.path.join(outdir,'future_diversity_trajectory.txt'),mean_min_max,fmt='%.2f')
             plt.fill_between(time_axis, min_hpd, max_hpd,
                      color="#b80033", alpha=0.2)
@@ -576,7 +577,7 @@ class run_sim():
         #__________________________________________________________________________   
         if plot_status_trajectories:
             # color palette
-            colors = ["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349"]
+            #colors = ["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#e34349"]
             # define time axis
             time_axis = np.array(range(len(diversity_through_time[0])))
             # plot results
@@ -586,12 +587,12 @@ class run_sim():
                 plt.fill_between(time_axis, min_hpd, max_hpd, color=color, alpha=0.2);
                 return fig
             fig = plt.figure(figsize=(10,10))
-            plot_mean_and_interval(status_through_time[0,:,:].T,colors[0],'LC',fig)
-            plot_mean_and_interval(status_through_time[1,:,:].T,colors[1],'NT',fig)
-            plot_mean_and_interval(status_through_time[2,:,:].T,colors[2],'VU',fig)
-            plot_mean_and_interval(status_through_time[3,:,:].T,colors[3],'EN',fig)
-            plot_mean_and_interval(status_through_time[4,:,:].T,colors[4],'CR',fig)
-            plot_mean_and_interval(status_through_time[5,:,:].T,colors[5],'EX',fig)
+            plot_mean_and_interval(status_through_time[0,:,:].T,colors['LC'],'LC',fig)
+            plot_mean_and_interval(status_through_time[1,:,:].T,colors['NT'],'NT',fig)
+            plot_mean_and_interval(status_through_time[2,:,:].T,colors['VU'],'VU',fig)
+            plot_mean_and_interval(status_through_time[3,:,:].T,colors['EN'],'EN',fig)
+            plot_mean_and_interval(status_through_time[4,:,:].T,colors['CR'],'CR',fig)
+            plot_mean_and_interval(status_through_time[5,:,:].T,colors['EX'],'EX',fig)
             # add title, legend and axis-labels
             plt.legend(loc='best',fancybox=True)
             plt.title('Diversity trajectory IUCN categories - status change') #10x higher conservation
@@ -616,6 +617,7 @@ class run_sim():
             init_status_dict['EX'] = 0
             iucn_status_code = {0:'LC', 1:'NT', 2:'VU', 3:'EN', 4:'CR', 5:'EX', 6:'DD'}
             status_count_list = []
+            status_order = []
             for status_id in np.arange(status_through_time.shape[0]+1):
                 status = iucn_status_code[status_id]
                 if status in init_status_dict.keys():
@@ -629,20 +631,22 @@ class run_sim():
                     present_status_count = 0
                     final_status_count = 0
                 status_count_list.append([pre_dd_modeling_count,present_status_count,final_status_count])
+                status_order.append(status)
             status_count_list = np.array(status_count_list).T
-            colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#b80033",'black'])
+            pie_colors = np.array([colors[i] for i in status_order])
+            #colors = np.array(["#227a00","#a5c279","#f3d248","#6956cb","#79262a","#b80033",'black'])
             labels = np.array(['LC', 'NT', 'VU', 'EN', 'CR', 'EX', 'DD'])
             def func(pct, allvals):
                 absolute = int(np.round((pct/100.*np.sum(allvals))))
                 return "{:d}".format(absolute)
             fig, axs = plt.subplots(1, 3,figsize=(12,10))
             # status distribution beginning
-            wedges, texts, autotexts =axs[1].pie(status_count_list[1][status_count_list[1] >0], colors= colors[status_count_list[1] >0], autopct=lambda pct: func(pct, status_count_list[1][status_count_list[1] >0]), shadow=False,textprops=dict(color="w"))
+            wedges, texts, autotexts =axs[1].pie(status_count_list[1][status_count_list[1] >0], colors= pie_colors[status_count_list[1] >0], autopct=lambda pct: func(pct, status_count_list[1][status_count_list[1] >0]), shadow=False,textprops=dict(color="w"))
             # status distribution end
-            wedges, texts, autotexts =axs[2].pie(status_count_list[2][status_count_list[2] >0], colors= colors[status_count_list[2] >0], autopct=lambda pct: func(pct, status_count_list[2][status_count_list[2] >0]), shadow=False,textprops=dict(color="w"))
+            wedges, texts, autotexts =axs[2].pie(status_count_list[2][status_count_list[2] >0], colors= pie_colors[status_count_list[2] >0], autopct=lambda pct: func(pct, status_count_list[2][status_count_list[2] >0]), shadow=False,textprops=dict(color="w"))
             ext = wedges[-1]
             # status distribution pre-dd
-            wedges, texts, autotexts =axs[0].pie(status_count_list[0][status_count_list[0] >0], colors= colors[status_count_list[0] >0], autopct=lambda pct: func(pct, status_count_list[0][status_count_list[0] >0]), shadow=False,textprops=dict(color="w"))
+            wedges, texts, autotexts =axs[0].pie(status_count_list[0][status_count_list[0] >0], colors= pie_colors[status_count_list[0] >0], autopct=lambda pct: func(pct, status_count_list[0][status_count_list[0] >0]), shadow=False,textprops=dict(color="w"))
             axs[0].set_title('Current (including DD)')
             axs[1].set_title('Current (DD corrected)')
             axs[2].set_title('Final (%i years)'%delta_t)

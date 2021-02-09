@@ -10,6 +10,10 @@ A program for simulating future extinctions and extinction rates for a given set
 [![conda](https://anaconda.org/bioconda/iucn_sim/badges/license.svg)](https://anaconda.org/bioconda/iucn_sim)
 [![Anaconda-Server Badge](https://anaconda.org/bioconda/iucn_sim/badges/version.svg)](https://anaconda.org/bioconda/iucn_sim)
 
+## Are you an R-user?
+
+Check out our [`iucnsim` R-package](https://github.com/tobiashofmann88/iucnsim) (fully functional beta-version, currently in development) for a more interactive implementation of this program and additional functionalities. Otherwise follow the instructions below to install and run `iucn_sim` as a command line program on any operating system.
+
 ## Installation
 
 `iucn_sim` is available as a conda package, which helps installing all required Python and R dependencies, without you having to worry about taking care of this manually.
