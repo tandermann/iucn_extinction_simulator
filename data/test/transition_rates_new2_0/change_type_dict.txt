@@ -1,3 +1,0 @@
-VU->EN	1
-LC->NT	1
-NT->LC	1
