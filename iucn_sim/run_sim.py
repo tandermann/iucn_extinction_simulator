@@ -125,7 +125,7 @@ def main(args):
     if args.extinction_rates:
         ext_rates = iucn_sim.estimate_extinction_rates(
             simulation_output._extinction_times,
-            args.n_years,
+            int(args.n_years),
             args.outdir,
             n_gen = args.n_gen,
             burnin = args.burnin,

@@ -1,0 +1,9 @@
+iucn_sim get_iucn_data --reference_group aves --target_species_list data/precompiled/gl_data/aves_gl.txt --outdir data/iucn_sim_output/aves/iucn_data --iucn_key 01524b67f4972521acd1ded2d8b3858e7fedc7da5fd75b8bb2c5456ea18b01ba
+
+iucn_sim transition_rates --species_data data/iucn_sim_output/aves/iucn_data/species_data.txt --iucn_history data/iucn_sim_output/aves/iucn_data/AVES_iucn_history.txt --outdir data/iucn_sim_output/aves/transition_rates_mode_0 --extinction_probs_mode 0 --possibly_extinct_list data/iucn_sim_output/aves/iucn_data/possibly_extinct_reference_taxa.txt
+
+iucn_sim transition_rates --species_data data/iucn_sim_output/aves/iucn_data/species_data.txt --iucn_history data/iucn_sim_output/aves/iucn_data/AVES_iucn_history.txt --outdir data/iucn_sim_output/aves/transition_rates_mode_1 --extinction_probs_mode 1 --possibly_extinct_list data/iucn_sim_output/aves/iucn_data/possibly_extinct_reference_taxa.txt
+
+iucn_sim run_sim --input_data data/iucn_sim_output/aves/transition_rates_mode_0/simulation_input_data.pkl --outdir data/iucn_sim_output/aves/future_sim_mode_0 --n_years 100 --n_sim 10000
+
+iucn_sim run_sim --input_data data/iucn_sim_output/aves/transition_rates_mode_1/simulation_input_data.pkl --outdir data/iucn_sim_output/aves/future_sim_mode_1 --n_years 100 --n_sim 10000
