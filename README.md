@@ -12,7 +12,7 @@ A program for simulating future extinctions and extinction rates for a given set
 
 ## Are you an R-user?
 
-Check out our [`iucnsim` R-package](https://github.com/tobiashofmann88/iucnsim) (fully functional beta-version, currently in development) for a more interactive implementation of this program and additional functionalities. Otherwise follow the instructions below to install and run `iucn_sim` as a command line program on any operating system.
+Check out our [`iucnsim` R-package](https://github.com/tobiashofmann88/iucnsim) (fully functional beta-version) for a more interactive implementation of this program and additional functionalities. Otherwise follow the instructions below to install and run `iucn_sim` as a command line program on any operating system.
 
 ## Installation
 
