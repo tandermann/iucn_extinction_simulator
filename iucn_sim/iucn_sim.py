@@ -384,7 +384,8 @@ class run_sim():
                  plot_histograms=0,
                  plot_status_piechart=1,
                  seed=None,
-                 load_from_file=False):
+                 load_from_file=False,
+                 save_future_status_array = False):
         
         self._input_data = input_data
         self._outdir = outdir
@@ -401,6 +402,7 @@ class run_sim():
         self._plot_status_piechart = plot_status_piechart
         self._seed = seed
         self._load_from_file = load_from_file
+        self._save_future_status_array = save_future_status_array
         self.run()
 
     def run(self):
@@ -497,7 +499,7 @@ class run_sim():
             status_change=False
     
         print('\nStarting simulations ...')
-        diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list = run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa)
+        diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list = run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa,save_future_status_array=self._save_future_status_array)
         # summarize simulation results
         sim_species_list = te_array[:,0].copy()
         ext_date_data = te_array[:,1:].copy()
@@ -686,6 +688,7 @@ class run_sim():
                     plt.close()
         print('\n')
 
+
 def evaluate_iucn_history(iucn_history_file,possibly_extinct_list=[],exclude_extinct=False,outdir=False):
     # process the IUCN history data
     stat_time_df = process_iucn_history(iucn_history_file)
@@ -741,14 +744,7 @@ def evaluate_iucn_history(iucn_history_file,possibly_extinct_list=[],exclude_ext
     return(status_change_coutn_df,years_in_each_category)
 
 
-def estimate_extinction_rates(extinction_dates,
-                                max_t,
-                                outdir,
-                                n_gen=100000,
-                                burnin=1000,
-                                plot_posterior=False,
-                                seed=None,
-                                load_from_file=False):
+def estimate_extinction_rates(extinction_dates,max_t,outdir,n_gen=100000,burnin=1000,plot_posterior=False,seed=None,load_from_file=False):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
     if load_from_file:
@@ -785,7 +781,6 @@ def estimate_extinction_rates(extinction_dates,
 def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoid_precompiled_iucn_data=False,outdir=''):
     # create the r-scripts to be used later on:
     write_r_scripts(outdir,script_id = 'history')
-
     if reference_group:
         taxon_reference_groups = reference_group.split(',')
     else:
@@ -793,11 +788,8 @@ def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoi
         quit()
     if reference_rank:
         reference_ranks = reference_rank.split(',')
-    
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-
-
     # get IUCN history_________________________________________________________  
     precompiled_taxon_groups = []
     precompiled_taxon_group_files = []
@@ -816,7 +808,6 @@ def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoi
                 precompiled_taxon_group_files.append(hist_outfile)
             except:
                 pass
-
     iucn_history_files = []
     for i,taxon_group in enumerate(taxon_reference_groups):
         if str.lower(taxon_group) in precompiled_taxon_groups and not avoid_precompiled_iucn_data:
@@ -838,7 +829,6 @@ def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoi
             run_iucn_cmd = subprocess.Popen(iucn_cmd)
             run_iucn_cmd.wait()
             iucn_history_files.append(os.path.join(outdir,'%s_iucn_history.txt'%str.upper(taxon_group)))
-            
     if len(iucn_history_files) > 1:
         df_previous = pd.DataFrame()
         outfile_stem = ''
@@ -853,7 +843,6 @@ def get_iucn_history(reference_group=None,reference_rank=None,iucn_key=None,avoi
         df_previous.to_csv(os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem)),sep='\t',index=False)
     else:
         outfile_stem = os.path.basename(iucn_history_files[0]).split('_')[0]+'_'
-
     # save the file name of the output file for further actions that need to read this file
     iucn_history_file = os.path.join(outdir,'%siucn_history.txt'%str.upper(outfile_stem))
     return(iucn_history_file)
@@ -890,6 +879,7 @@ def process_iucn_history(iucn_history_file,iucn_start_year=2001,final_year=None)
         master_stat_time_df.iloc[index,-1] = 'NE'
     return(master_stat_time_df)
 
+
 def set_taxa_as_extinct(stat_time_df,pex_data): # provide 2-column df as possibly_extinct_list with species names and supposed year of extinction
     master_stat_time_df = stat_time_df.copy()
     pex_species_list = pex_data.iloc[:,0].values.astype(str)
@@ -903,6 +893,7 @@ def set_taxa_as_extinct(stat_time_df,pex_data): # provide 2-column df as possibl
         column_index = np.where(column_names==str(assessment_year))[0][0]
         master_stat_time_df.iloc[row_index,column_index:] = 'EX'
     return(master_stat_time_df)
+
 
 def get_most_recent_status_target_species(species_list=[],iucn_history_file=None,iucn_key=None,load_from_file=False,outdir=''):
     if iucn_history_file:
@@ -1008,6 +999,7 @@ def get_most_recent_status_target_species(species_list=[],iucn_history_file=None
     extant_taxa.to_csv(os.path.join(outdir,'species_data.txt'),sep='\t',index=False,header=False)
     return(extant_taxa)
 
+
 def get_possibly_extinct_iucn_info(iucn_history_file,outdir=''):
     # get info about possibly extinct taxa_____________________________________
     url = 'https://raw.githubusercontent.com/tobiashofmann88/iucn_extinction_simulator/master/data/precompiled/pex_taxa/2020_1_RL_Stats_Table_9.txt'
@@ -1023,6 +1015,7 @@ def get_possibly_extinct_iucn_info(iucn_history_file,outdir=''):
     pe_data_outfile = os.path.join(outdir,'possibly_extinct_reference_taxa.txt')
     reference_taxa_listed_as_pe.to_csv(pe_data_outfile,sep='\t',index=False)
     return(reference_taxa_listed_as_pe)
+
 
 def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,pdf=0,n_gen = 100000,burnin = 1000,suppress_info=False):
     if not suppress_info:
@@ -1058,6 +1051,7 @@ def get_rate_estimate(ext_time_array,max_t,index,species_list,plot_posterior=0,p
         #fig.savefig(os.path.join(posterior_plot_dir,'%s.pdf'%species_list[index]),bbox_inches='tight', dpi = 500)
     return [mean_value,lower,upper]
 
+
 def select_target_species(species,species_list_status,species_list,en_ext_data,cr_ext_data):
     target_species = species
     target_index = species_list_status[species_list_status.species==target_species].index.values[0]
@@ -1066,6 +1060,7 @@ def select_target_species(species,species_list_status,species_list,en_ext_data,c
     en_ext_data = np.array([en_ext_data[target_index]])
     cr_ext_data = np.array([cr_ext_data[target_index]])
     return pd.DataFrame(species_list_status).T,species_list,en_ext_data,cr_ext_data
+
 
 def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 100000,burnin = 1000):
     sys.stdout.write('\rProcessing species: %i/%i '%(index+1,len(species_list)))
@@ -1088,9 +1083,11 @@ def get_rate_estimate_posterior(ext_time_array,max_t,index,species_list,n_gen = 
             post_samples.append(q)
     return post_samples
 
+
 def p_e_year(years,p_e):
     pe_year = 1-(1-float(p_e))**(1/years)
     return pe_year
+
 
 def update_multiplier(q,d=1.1):
     u = np.random.uniform(0,1)
@@ -1098,6 +1095,7 @@ def update_multiplier(q,d=1.1):
     m = np.exp(l*(u-.5))
     new_q = q * m
     return new_q, np.log(m)
+
 
 def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 1000):
     def get_loglik(count, dT, rate):
@@ -1116,16 +1114,19 @@ def sample_rate_mcmc(count, tot_time, n_samples = 1, n_gen = 100000,burnin = 100
     sampled_rates = np.random.choice(post_samples,n_samples,replace=False)
     return sampled_rates
 
+
 def power_function(x,a,b):
     # defining the power function
     y = float(a)*x**float(b)
     return y
+
 
 def make_empty_rate_df(species_list,rate_columns,status_label):
     rate_df = pd.DataFrame(np.zeros((len(species_list),rate_columns+1)))
     rate_df.columns = ['species']+ ['%s_p_ext_%i'%(status_label,i) for i in np.arange(0,rate_columns)]
     rate_df.species = species_list
     return rate_df
+
 
 def format_iucn_df(statuses_through_time_file,start_year,current_year):
     new_df = pd.DataFrame()
@@ -1141,6 +1142,7 @@ def format_iucn_df(statuses_through_time_file,start_year,current_year):
     print('Completed: Adding missing columns and selecting target years.')
     return new_df
 
+
 def exclude_extinct(iucn_dataframe, status_column_name):
     new_df = iucn_dataframe.copy()
     new_df = new_df[(new_df[status_column_name] != 'EW') & (new_df[status_column_name] != 'EX')]
@@ -1148,6 +1150,7 @@ def exclude_extinct(iucn_dataframe, status_column_name):
     new_df.replace({'EX': 'NaN'},inplace=True)
     new_df.drop(new_df.columns[[-2, -1]], axis=1, inplace=True)
     return new_df
+
 
 def count_status_changes(iucn_dataframe,valid_status_dict):
     change_types = {}
@@ -1172,6 +1175,7 @@ def count_status_changes(iucn_dataframe,valid_status_dict):
         change_types[category] = sum(change_types[category])
     return change_types
 
+
 def get_years_spent_in_each_category(extant_iucn_df,valid_status_dict):
     species_list = extant_iucn_df.species.values
     only_year_columns = extant_iucn_df.iloc[:,1:].copy()
@@ -1183,6 +1187,7 @@ def get_years_spent_in_each_category(extant_iucn_df,valid_status_dict):
     years_in_each_category = dict(zip(statuses, counts))
     years_in_each_category.pop('NA')
     return years_in_each_category
+
 
 def replace_iucn_status_with_int(change_types,sum_years):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
@@ -1205,9 +1210,11 @@ def save_obj(obj, file_name):
     with open(file_name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
+
 def load_obj(file_name):
     with open(file_name, 'rb') as f:
         return pickle.load(f)
+
 
 def qmatrix(rates, status_specific_p_e):   
     Q_matrix = np.zeros((5,6))
@@ -1224,6 +1231,7 @@ def qmatrix(rates, status_specific_p_e):
     np.fill_diagonal(Q_matrix, -np.sum(Q_matrix,axis=1))
     np.set_printoptions(precision=8)
     return Q_matrix
+
 
 def treat_dd_species(iucn_dataframe,change_type_dict,all_lc = False):
     new_df = iucn_dataframe.copy()
@@ -1249,6 +1257,7 @@ def treat_dd_species(iucn_dataframe,change_type_dict,all_lc = False):
     new_df.columns = np.array(list(iucn_dataframe.columns))
     return new_df
 
+
 def extract_valid_statuses(formatted_status_through_time_file):
     taxon_list = list(formatted_status_through_time_file.species.values)
     #valid_status_matrix = [list(line[line.isin(['NE','EX','EW','DD','CR','EN','VU','NT','LC'])].values) for it,line in formatted_status_through_time_file.iterrows()]
@@ -1261,17 +1270,20 @@ def extract_valid_statuses(formatted_status_through_time_file):
     most_recent_status_dict = dict(zip(taxon_list, current_status_list))
     return valid_status_dict,most_recent_status_dict,current_status_list,taxon_list
 
+
 def random_choice_P(vector): # randomly sample an element of 'vector' based on their values, input needs to be float
     probDeath=vector/sum(vector) # (larger values have higher prob of being sampled)
     r=np.random.choice(probDeath, p=probDeath)
     ind=np.where(probDeath==r)[0][0]
     return [vector[ind], ind]
 
+
 def round_up(value):
     try:
         return math.ceil(float(value))
     except ValueError:
         return value
+
 
 def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_statuses,species_list,outdir,qmatrix_dict,status_change=False,dynamic_qmatrix=True,n_extinct_taxa=0):
 	# write the species name and the index to a separate txt file
@@ -1345,7 +1357,7 @@ def simulate_extinction_and_status_change(delta_t,list_of_all_current_species_st
     extinctions_per_year = Counter(list_ex)
     extinctions_per_year = dict(extinctions_per_year)
     return status_array, extinction_array, extinctions_per_year, time_until_n_extinctions
-    
+
 
 def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_year,final_year):
     year_bins = np.arange(current_year,final_year+1)
@@ -1355,7 +1367,7 @@ def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_
     return diversity_through_time
 
 
-def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True,n_extinct_taxa=0):
+def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True,n_extinct_taxa=0,save_future_status_array=False):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
     extinct_per_year_array = np.zeros([n_rep,delta_t+1])
     te_array = np.zeros((len(species_list),n_rep+1)).astype(object)
@@ -1363,6 +1375,7 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
     status_through_time_dict = {}
     status_through_time = np.zeros([6,delta_t+1,n_rep])
     time_until_n_extinctions_list = []
+    all_future_status_arrays = []
     for n in range(n_rep):
         sys.stdout.write('\rRunning simulation rep %i/%i' %(n+1,n_rep))
         target_column = rate_index_list[n]
@@ -1372,7 +1385,7 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
         dd_indices = np.where([current_status_list_new_dd=='DD'])[1]    
         dd_prob_vector = dd_probs.T[target_column]
         if all_lc:
-	        new_draws = np.array(['LC']*len(dd_indices))
+            new_draws = np.array(['LC']*len(dd_indices))
         else:
             new_draws = np.random.choice(['LC','NT','VU','EN','CR'], size=len(dd_indices), replace=True, p=dd_prob_vector)
         current_status_list_new_dd[dd_indices] = new_draws
@@ -1384,7 +1397,7 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
         status_array_count = [key for key in status_count_dict.keys() if key not in ['DD','NE']]        
         ne_indices = np.where([current_status_list_new_dd=='NE'])[1]
         if all_lc:
-	        new_draws = np.array(['LC']*len(ne_indices))
+            new_draws = np.array(['LC']*len(ne_indices))
         else:
             new_draws = np.random.choice(status_array_count, size=len(ne_indices), replace=True, p=ne_probs)
         current_status_list_new_dd[ne_indices] = new_draws
@@ -1398,6 +1411,8 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
             qmatrix_dict_rep = qmatrix_dict
     
         future_status_array, extinction_array, extinction_dict, time_until_n_extinctions = simulate_extinction_and_status_change(delta_t,current_status_list_new_dd,species_list,outdir,qmatrix_dict_rep,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa)
+        if save_future_status_array: # this might become a pretty big object cluddering up the memory
+            all_future_status_arrays.append(future_status_array)
         time_until_n_extinctions_list.append(time_until_n_extinctions)
         # diversity_through time array
         for year in extinction_dict.keys():
@@ -1442,7 +1457,18 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
     #    pickle.dump(te_array, f, pickle.HIGHEST_PROTOCOL)
     #with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
     #    pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
+    if save_future_status_array:
+        with open(os.path.join(outdir,'future_status_array_list.pkl'), 'wb') as f:
+            pickle.dump(all_future_status_arrays, f, pickle.HIGHEST_PROTOCOL)
     return diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list
+
+
+def summarize_future_status_array(future_status_file):
+    future_status_list = load_obj(future_status_file)
+    future_status_list = np.array(future_status_list)
+    status_probs = np.array([np.count_nonzero(future_status_list==i,axis=0)/future_status_list.shape[0] for i in np.arange(future_status_list.max()+1)])
+    most_probable_status_per_year = np.argmax(status_probs,axis=0)
+    return(status_probs,most_probable_status_per_year)
 
 
 def calcHPD(data, level):
