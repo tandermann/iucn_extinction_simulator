@@ -385,7 +385,8 @@ class run_sim():
                  plot_status_piechart=1,
                  seed=None,
                  load_from_file=False,
-                 save_future_status_array = False):
+                 save_future_status_array = False,
+                 save_status_through_time = False):
         
         self._input_data = input_data
         self._outdir = outdir
@@ -403,6 +404,7 @@ class run_sim():
         self._seed = seed
         self._load_from_file = load_from_file
         self._save_future_status_array = save_future_status_array
+        self._save_status_through_time = save_status_through_time
         self.run()
 
     def run(self):
@@ -499,7 +501,20 @@ class run_sim():
             status_change=False
     
         print('\nStarting simulations ...')
-        diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list = run_multi_sim(n_sim,delta_t,species_list,current_status_list,dd_probs,final_qmatrix_dict,sample_columns,outdir,all_lc=all_lc,status_change=status_change,dynamic_qmatrix=dynamic_qmatrix,n_extinct_taxa=n_extinct_taxa,save_future_status_array=self._save_future_status_array)
+        diversity_through_time,te_array,status_through_time,time_until_n_extinctions_list = run_multi_sim(n_sim,
+                                                                                                          delta_t,
+                                                                                                          species_list,
+                                                                                                          current_status_list,
+                                                                                                          dd_probs,
+                                                                                                          final_qmatrix_dict,
+                                                                                                          sample_columns,
+                                                                                                          outdir,
+                                                                                                          all_lc=all_lc,
+                                                                                                          status_change=status_change,
+                                                                                                          dynamic_qmatrix=dynamic_qmatrix,
+                                                                                                          n_extinct_taxa=n_extinct_taxa,
+                                                                                                          save_future_status_array=self._save_future_status_array,
+                                                                                                          save_status_through_time=self._save_status_through_time)
         # summarize simulation results
         sim_species_list = te_array[:,0].copy()
         ext_date_data = te_array[:,1:].copy()
@@ -1367,7 +1382,20 @@ def get_dtt_array_from_extinction_per_year_dict(extinction_dict_sim_out,current_
     return diversity_through_time
 
 
-def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_dict,rate_index_list,outdir,all_lc=False,status_change=True,dynamic_qmatrix=True,n_extinct_taxa=0,save_future_status_array=False):
+def run_multi_sim(n_rep,
+                  delta_t,
+                  species_list,
+                  input_status_list,
+                  dd_probs,
+                  qmatrix_dict,
+                  rate_index_list,
+                  outdir,
+                  all_lc=False,
+                  status_change=True,
+                  dynamic_qmatrix=True,
+                  n_extinct_taxa=0,
+                  save_future_status_array=False,
+                  save_status_through_time=False):
     iucn_code = {'LC':0, 'NT':1, 'VU':2, 'EN':3, 'CR':4}
     extinct_per_year_array = np.zeros([n_rep,delta_t+1])
     te_array = np.zeros((len(species_list),n_rep+1)).astype(object)
@@ -1455,8 +1483,9 @@ def run_multi_sim(n_rep,delta_t,species_list,input_status_list,dd_probs,qmatrix_
     #    pickle.dump(diversity_through_time, f, pickle.HIGHEST_PROTOCOL)
     #with open(os.path.join(outdir,'te_array.pkl'), 'wb') as f:
     #    pickle.dump(te_array, f, pickle.HIGHEST_PROTOCOL)
-    #with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
-    #    pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
+    if save_status_through_time:
+        with open(os.path.join(outdir,'status_through_time.pkl'), 'wb') as f:
+            pickle.dump(status_through_time, f, pickle.HIGHEST_PROTOCOL)
     if save_future_status_array:
         with open(os.path.join(outdir,'future_status_array_list.pkl'), 'wb') as f:
             pickle.dump(all_future_status_arrays, f, pickle.HIGHEST_PROTOCOL)
