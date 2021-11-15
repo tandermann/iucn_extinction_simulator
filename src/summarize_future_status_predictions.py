@@ -1,5 +1,6 @@
 import pickle as pkl
 import numpy as np
+from iucn_sim import iucn_sim
 
 def load_obj(file_name):
     with open(file_name, 'rb') as f:
@@ -24,3 +25,18 @@ import matplotlib.pyplot as plt
 plt.plot(status_probs[0, :, :].T)
 
 plt.plot(most_probable_status_per_year.T)
+
+
+pkl_file = '/Users/tobiasandermann/GitHub/iucnsim/data/iucn_sim/future_simulations_future_status/status_through_time.pkl'
+stt_array = iucn_sim.load_obj(pkl_file)
+np.mean(stt_array[0,:,:],axis=1)
+
+stt_array[0,:,:].shape
+
+stt_array[0,:,:]
+stt_array[-1,:,:]
+
+future_status_file = '/Users/tobiasandermann/GitHub/iucnsim/data/iucn_sim/future_simulations_future_status/future_status_array_list.pkl'
+a,b = summarize_future_status_array(future_status_file)
+a.shape
+sum(a[0,:,-1])
