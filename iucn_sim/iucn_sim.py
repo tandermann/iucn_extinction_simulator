@@ -186,7 +186,7 @@ class transition_rates():
             print('Running MCMC with user-set starting seed %i ...'%seed)
         else:
             print('Running MCMC with randomely generated starting seed %i ...'%seed)    
-        sampled_rates_df = pd.DataFrame(columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)])
+        sampled_rates_list = [pd.DataFrame(columns = ['status_change'] + ['rate_%i' % i for i in np.arange(0,n_rep)])]
         for status_a in status_change_coutn_df.columns:
             row = status_change_coutn_df.loc[status_a]
             for status_b in row.index.values:
@@ -194,8 +194,10 @@ class transition_rates():
                     count = row[status_b]
                     total_time = years_in_each_category[status_a]
                     rates = sample_rate_mcmc(count, total_time, n_samples = n_rep, n_gen = n_gen, burnin = burnin)
-                    sampled_rates_df = sampled_rates_df.append(pd.DataFrame(data=np.matrix(['%s->%s'%(status_a,status_b)]+list(rates)),columns = ['status_change']+ ['rate_%i'%i for i in np.arange(0,n_rep)]),ignore_index=True)
-        sampled_rates_df[['rate_%i'%i for i in np.arange(0,n_rep)]] = sampled_rates_df[['rate_%i'%i for i in np.arange(0,n_rep)]].apply(pd.to_numeric)
+                    sampled_rates_list.append(pd.DataFrame(data=np.matrix(['%s->%s' % (status_a,status_b)] + list(rates)),
+                                                           columns = ['status_change']+ ['rate_%i' % i for i in np.arange(0, n_rep)]))
+        sampled_rates_df = pd.concat(sampled_rates_list)                                   
+        sampled_rates_df[['rate_%i' % i for i in np.arange(0, n_rep)]] = sampled_rates_df[['rate_%i' % i for i in np.arange(0, n_rep)]].apply(pd.to_numeric)
         sampled_rates_df.to_csv(os.path.join(outdir,'sampled_status_change_rates.txt'),sep='\t',index=False,float_format='%.8f')
         print('Sampled %i rates from MCMC posterior for each transition type.'%n_rep)
         #__________________________________________________________________________
